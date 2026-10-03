@@ -1,0 +1,88 @@
+name: CHOPLIFE-GHCR
+
+# Choplife fork: build Chatwoot and push to ghcr.io/choplife-group/chatwoot for the Hetzner clusters.
+#
+#   push to develop        → :dev + :sha-<sha>   (Keel auto-rolls cs.chopwin.dev)
+#   push tag v*            → :<tag>              (pin in prod: cs.chopwin.com)
+#   workflow_dispatch ref  → :<ref>              (e.g. ref=v4.18.0 builds an upstream release tag
+#                                                 that doesn't contain this workflow file)
+#
+# Builds the EE edition, same as the upstream chatwoot/chatwoot Docker Hub image
+# (features stay license-gated). amd64 only — the Hetzner nodes are x86.
+# Upstream's own workflows are disabled in this fork (Actions → disabled), not deleted,
+# so upstream merges stay conflict-free.
+#
+# Auth: the built-in GITHUB_TOKEN can push to this org's GHCR — no extra secrets.
+
+on:
+  push:
+    branches: [develop]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to build (branch/tag/sha). Image tag = ref with / → -'
+        required: true
+        default: develop
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ghcr-${{ github.event.inputs.ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/choplife-group/chatwoot
+
+jobs:
+  build-and-push:
+    name: Build & push to GHCR
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Image tags
+        id: tags
+        run: |
+          REF="${{ github.event.inputs.ref || github.ref_name }}"
+          SHA=$(git rev-parse HEAD)
+          if [ "$REF" = "develop" ]; then
+            TAGS="${IMAGE}:dev,${IMAGE}:sha-${SHA}"
+          else
+            TAGS="${IMAGE}:$(echo "$REF" | sed 's/\//-/g'),${IMAGE}:sha-${SHA}"
+          fi
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "$TAGS"
+
+      - name: Set Chatwoot edition
+        run: echo -en '\nENV CW_EDITION="ee"' >> docker/Dockerfile
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ steps.tags.outputs.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
