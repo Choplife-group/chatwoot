@@ -7,8 +7,10 @@ name: CHOPLIFE-GHCR
 #   workflow_dispatch ref  → :<ref>              (e.g. ref=v4.18.0 builds an upstream release tag
 #                                                 that doesn't contain this workflow file)
 #
-# Builds the EE edition, same as the upstream chatwoot/chatwoot Docker Hub image
-# (features stay license-gated). amd64 only — the Hetzner nodes are x86.
+# Builds the COMMUNITY EDITION: enterprise/ is stripped before the build (same as upstream's
+# publish_foss_docker.yml). enterprise/ is under Chatwoot's commercial licence — never ship it.
+# Our own customisations (branding, HIDE_POWERED_BY, …) live in the MIT-licensed code.
+# amd64 only — the Hetzner nodes are x86.
 # Upstream's own workflows are disabled in this fork (Actions → disabled), not deleted,
 # so upstream merges stay conflict-free.
 #
@@ -60,8 +62,10 @@ jobs:
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
           echo "$TAGS"
 
-      - name: Set Chatwoot edition
-        run: echo -en '\nENV CW_EDITION="ee"' >> docker/Dockerfile
+      - name: Strip enterprise code (CE build)
+        run: |
+          rm -rf enterprise spec/enterprise
+          echo -en '\nENV CW_EDITION="ce"' >> docker/Dockerfile
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
