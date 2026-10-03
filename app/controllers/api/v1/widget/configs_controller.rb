@@ -14,7 +14,8 @@ class Api::V1::Widget::ConfigsController < Api::V1::Widget::BaseController
       'BRAND_NAME',
       'WIDGET_BRAND_URL',
       'MAXIMUM_FILE_UPLOAD_SIZE',
-      'INSTALLATION_NAME'
+      'INSTALLATION_NAME',
+      'HIDE_POWERED_BY'
     )
   end
 

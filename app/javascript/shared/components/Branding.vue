@@ -5,6 +5,7 @@ const {
   LOGO_THUMBNAIL: logoThumbnail,
   BRAND_NAME: brandName,
   WIDGET_BRAND_URL: widgetBrandURL,
+  HIDE_POWERED_BY: hidePoweredBy,
 } = window.globalConfig || {};
 
 export default {
@@ -26,6 +27,7 @@ export default {
         brandName,
         logoThumbnail,
         widgetBrandURL,
+        hidePoweredBy,
       },
     };
   },
@@ -53,7 +55,7 @@ export default {
 
 <template>
   <div
-    v-if="globalConfig.brandName && !disableBranding"
+    v-if="globalConfig.brandName && !disableBranding && !globalConfig.hidePoweredBy"
     class="px-0 py-3 flex justify-center"
   >
     <a
