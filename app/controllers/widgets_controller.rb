@@ -21,7 +21,8 @@ class WidgetsController < ActionController::Base
       'WIDGET_BRAND_URL',
       'DIRECT_UPLOADS_ENABLED',
       'MAXIMUM_FILE_UPLOAD_SIZE',
-      'INSTALLATION_NAME'
+      'INSTALLATION_NAME',
+      'HIDE_POWERED_BY'
     )
   end
 
