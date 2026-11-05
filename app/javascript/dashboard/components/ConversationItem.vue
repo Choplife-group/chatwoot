@@ -1,12 +1,15 @@
 <script setup>
 import { computed, ref, watch, inject } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { useAlert } from 'dashboard/composables';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
 import { frontendURL, conversationUrl } from 'dashboard/helper/URLHelper';
 import ConversationCard from './widgets/conversation/ConversationCard.vue';
 import ConversationCardExpanded from 'dashboard/components-next/Conversation/ConversationCard/ConversationCardExpanded.vue';
 import ContextMenu from 'dashboard/components/ui/ContextMenu.vue';
 import ConversationContextMenu from './widgets/conversation/contextMenu/Index.vue';
+import { useConversationAccess } from 'dashboard/composables/useConversationAccess';
 
 const props = defineProps({
   source: { type: Object, required: true },
@@ -21,6 +24,7 @@ const props = defineProps({
 
 const router = useRouter();
 const store = useStore();
+const { t } = useI18n();
 
 const selectConversation = inject('selectConversation');
 const deSelectConversation = inject('deSelectConversation');
@@ -51,6 +55,8 @@ watch(
     contextMenu.value = { x: null, y: null };
   }
 );
+
+const { canAssign, canChangeVip } = useConversationAccess();
 
 const currentChat = useMapGetter('getSelectedChat');
 const inboxesList = useMapGetter('inboxes/getInboxes');
@@ -174,6 +180,18 @@ const onAssignPriority = priority => {
   closeContextMenu();
 };
 
+const onToggleVip = async () => {
+  closeContextMenu();
+  try {
+    await store.dispatch('setVip', {
+      conversationId: props.source.id,
+      vip: !props.source.vip,
+    });
+  } catch {
+    useAlert(t('CONVERSATION_SIDEBAR.VIP.UPDATE_ERROR'));
+  }
+};
+
 const onDeleteConversation = () => {
   deleteConversation(props.source.id);
   closeContextMenu();
@@ -231,6 +249,9 @@ const onDeleteConversation = () => {
       :has-unread-messages="source.unread_count > 0"
       :conversation-labels="source.labels"
       :conversation-url="conversationPath"
+      :can-assign="canAssign(source)"
+      :can-change-vip="canChangeVip(source)"
+      :is-vip="!!source.vip"
       @update-conversation="onUpdateConversation"
       @assign-agent="onAssignAgent"
       @assign-label="onAssignLabel"
@@ -239,6 +260,7 @@ const onDeleteConversation = () => {
       @mark-as-unread="onMarkAsUnread"
       @mark-as-read="onMarkAsRead"
       @assign-priority="onAssignPriority"
+      @toggle-vip="onToggleVip"
       @delete-conversation="onDeleteConversation"
       @close="closeContextMenu"
     />

@@ -140,6 +140,13 @@ const copyConversationId = async () => {
           >
             {{ currentContact.name }}
           </span>
+          <span
+            v-if="chat.vip"
+            v-tooltip="$t('CONVERSATION_SIDEBAR.VIP.TOOLTIP')"
+            class="text-n-amber-11 text-xs font-semibold leading-3 py-0.5 px-1 rounded bg-n-amber-3 flex-shrink-0"
+          >
+            {{ $t('CONVERSATION_SIDEBAR.VIP.LABEL') }}
+          </span>
           <fluent-icon
             v-if="!isHMACVerified"
             v-tooltip="$t('CONVERSATION.UNVERIFIED_SESSION')"

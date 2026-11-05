@@ -181,4 +181,71 @@ RSpec.describe 'Conversation Assignment API', type: :request do
       end
     end
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:account) { create(:account) }
+    let(:inbox) { create(:inbox, account: account) }
+    let(:team) { create(:team, account: account, allow_auto_assign: false) }
+    let(:agent) { create(:user, account: account, role: :agent) }
+    let(:lead) { create(:user, account: account, role: :agent) }
+    let(:member) { create(:user, account: account, role: :agent) }
+    let(:outsider) { create(:user, account: account, role: :agent) }
+    let(:admin) { create(:user, account: account, role: :administrator) }
+    let(:other_team) { create(:team, account: account, allow_auto_assign: false) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox, team: team, assignee: agent) }
+    let(:url) { "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/assignments" }
+
+    before do
+      account.enable_features!('restricted_inbox_access')
+      create(:team_member, team: team, user: agent)
+      create(:team_member, team: team, user: lead, lead: true)
+      create(:team_member, team: team, user: member)
+      conversation
+    end
+
+    it 'does not let the assigned agent reassign or change team' do
+      post url, params: { assignee_id: member.id }, headers: agent.create_new_auth_token, as: :json
+      expect(response).to have_http_status(:unauthorized)
+
+      post url, params: { team_id: other_team.id }, headers: agent.create_new_auth_token, as: :json
+      expect(response).to have_http_status(:unauthorized)
+
+      expect(conversation.reload).to have_attributes(assignee_id: agent.id, team_id: team.id)
+    end
+
+    it 'lets a lead reassign within the team' do
+      post url, params: { assignee_id: member.id }, headers: lead.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(conversation.reload.assignee).to eq(member)
+    end
+
+    it 'lets a lead unassign' do
+      post url, params: { assignee_id: nil }, headers: lead.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(conversation.reload.assignee).to be_nil
+    end
+
+    it 'does not let a lead assign someone outside the team' do
+      post url, params: { assignee_id: outsider.id }, headers: lead.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(conversation.reload.assignee).to eq(agent)
+    end
+
+    it 'lets a lead move the conversation to another team' do
+      post url, params: { team_id: other_team.id }, headers: lead.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(conversation.reload.team).to eq(other_team)
+    end
+
+    it 'lets an administrator assign anyone' do
+      post url, params: { assignee_id: outsider.id }, headers: admin.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(conversation.reload.assignee).to eq(outsider)
+    end
+  end
 end

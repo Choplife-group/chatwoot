@@ -1,7 +1,12 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStoreGetters, useMapGetter } from 'dashboard/composables/store';
+import {
+  useStore,
+  useStoreGetters,
+  useMapGetter,
+} from 'dashboard/composables/store';
+import { useConversationAccess } from 'dashboard/composables/useConversationAccess';
 import { useKeyboardEvents } from 'dashboard/composables/useKeyboardEvents';
 import Avatar from 'next/avatar/Avatar.vue';
 import EmojiIcon from 'dashboard/components-next/emoji-icon-picker/EmojiIcon.vue';
@@ -23,9 +28,36 @@ const emit = defineEmits(['selectAgent', 'close', 'removeTrigger']);
 const { t } = useI18n();
 const getters = useStoreGetters();
 
-const agents = computed(() => getters['agents/getVerifiedAgents'].value);
-const teams = useMapGetter('teams/getTeams');
+const store = useStore();
+const { isAccountRestricted } = useConversationAccess();
+const currentChat = useMapGetter('getSelectedChat');
+const getTeamMembers = useMapGetter('teamMembers/getTeamMembers');
+const currentTeamId = computed(() => currentChat.value?.meta?.team?.id);
+
+// With restricted access, only people who can see the conversation can be mentioned
+const canSeeConversation = agent =>
+  agent.role === 'administrator' ||
+  agent.id === currentChat.value?.meta?.assignee?.id ||
+  getTeamMembers
+    .value(currentTeamId.value)
+    .some(member => member.id === agent.id && member.lead);
+
+const agents = computed(() => {
+  const verifiedAgents = getters['agents/getVerifiedAgents'].value;
+  return isAccountRestricted.value
+    ? verifiedAgents.filter(canSeeConversation)
+    : verifiedAgents;
+});
+const allTeams = useMapGetter('teams/getTeams');
+// A team mention reaches all its members, most of whom can't see the conversation
+const teams = computed(() => (isAccountRestricted.value ? [] : allTeams.value));
 const isRTL = useMapGetter('accounts/isRTL');
+
+onMounted(() => {
+  if (isAccountRestricted.value && currentTeamId.value) {
+    store.dispatch('teamMembers/get', { teamId: currentTeamId.value });
+  }
+});
 
 const searchQuery = ref(props.searchKey);
 

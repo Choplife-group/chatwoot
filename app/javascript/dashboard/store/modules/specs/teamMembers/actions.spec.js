@@ -60,11 +60,18 @@ describe('#actions', () => {
   describe('#update', () => {
     it('sends correct actions if API is success', async () => {
       axios.patch.mockResolvedValue({ data: teamMembers });
-      await actions.update({ commit }, { agentsList: teamMembers, teamId: 1 });
+      await actions.update(
+        { commit },
+        { agentsList: teamMembers, leadIds: [1], teamId: 1 }
+      );
 
+      expect(axios.patch.mock.calls.at(-1)[1]).toEqual({
+        user_ids: teamMembers,
+        lead_ids: [1],
+      });
       expect(commit.mock.calls).toEqual([
         [SET_TEAM_MEMBERS_UI_FLAG, { isUpdating: true }],
-        [ADD_AGENTS_TO_TEAM, { data: teamMembers }],
+        [ADD_AGENTS_TO_TEAM, { data: teamMembers, teamId: 1 }],
         [SET_TEAM_MEMBERS_UI_FLAG, { isUpdating: false }],
       ]);
     });

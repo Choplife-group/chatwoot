@@ -554,4 +554,21 @@ describe Messages::MentionService do
       expect(Conversations::UserMentionJob).not_to have_received(:perform_later)
     end
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:message) do
+      build(:message, conversation: conversation, account: account, inbox: inbox, private: true,
+                      content: "hi [#{first_agent.name}](mention://user/#{first_agent.id}/#{first_agent.name})")
+    end
+
+    before { account.enable_features!('restricted_inbox_access') }
+
+    it 'ignores a mention of an agent who can\'t see the conversation' do
+      expect(Conversations::UserMentionJob).not_to receive(:perform_later)
+
+      described_class.new(message: message).perform
+
+      expect(conversation.conversation_participants.where(user: first_agent)).not_to exist
+    end
+  end
 end

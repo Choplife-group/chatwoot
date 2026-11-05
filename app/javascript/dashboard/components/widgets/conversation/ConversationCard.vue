@@ -57,6 +57,7 @@ const getCategoryPath = useMapGetter('conversationCategories/getPath');
 
 const showMetaSection = computed(() => {
   return (
+    props.chat.vip ||
     market.value ||
     category.value ||
     props.showInboxName ||
@@ -121,6 +122,7 @@ watch(
       'active animate-card-select bg-n-background !border-n-surface-1':
         isActiveChat,
       'selected bg-n-slate-2 !border-n-surface-1': selected,
+      'bg-n-amber-2': chat.vip && !isActiveChat && !selected,
       'px-0': compact,
       'px-3': !compact,
     }"
@@ -185,6 +187,14 @@ watch(
             class="text-n-slate-11 text-xs leading-3 py-0.5 truncate min-w-0 max-w-32"
           >
             {{ category.name }}
+          </span>
+          <span
+            v-if="chat.vip"
+            v-tooltip.top="$t('CONVERSATION_SIDEBAR.VIP.TOOLTIP')"
+            class="inline-flex items-center gap-0.5 text-n-amber-11 text-xs font-semibold leading-3 py-0.5 px-1 rounded bg-n-amber-3 flex-shrink-0"
+          >
+            <Icon icon="i-lucide-star" class="size-3" />
+            {{ $t('CONVERSATION_SIDEBAR.VIP.LABEL') }}
           </span>
           <span
             v-if="market"

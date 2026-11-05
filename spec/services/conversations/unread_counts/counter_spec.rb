@@ -113,4 +113,37 @@ RSpec.describe Conversations::UnreadCounts::Counter do
       folders: { '4' => 5 }
     )
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:led_team) { create(:team, account: account, allow_auto_assign: false) }
+    let!(:mine) { create_unread_conversation(account: account, inbox: visible_inbox, labels: [label.title], assignee: agent, team: visible_team) }
+
+    before do
+      account.enable_features!('restricted_inbox_access')
+      create_unread_conversation(account: account, inbox: visible_inbox, labels: [label.title], team: led_team)
+    end
+
+    it 'counts only the agent\'s own conversations' do
+      expect(described_class.new(account: account, user: agent).perform).to eq(
+        all_count: 1,
+        inboxes: { visible_inbox.id.to_s => 1 },
+        labels: { label.id.to_s => 1 },
+        teams: { visible_team.id.to_s => 1 }
+      )
+    end
+
+    it 'adds the conversations of teams the user leads, without counting any twice' do
+      create(:team_member, user: agent, team: led_team, lead: true)
+      mine.update!(team: led_team)
+
+      counts = described_class.new(account: account, user: agent).perform
+
+      expect(counts[:all_count]).to eq(2)
+      expect(counts[:teams]).to eq(led_team.id.to_s => 2)
+    end
+
+    it 'keeps the full counts for an administrator' do
+      expect(described_class.new(account: account, user: admin).perform[:all_count]).to eq(2)
+    end
+  end
 end

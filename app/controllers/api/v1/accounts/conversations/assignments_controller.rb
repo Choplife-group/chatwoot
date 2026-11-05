@@ -1,4 +1,6 @@
 class Api::V1::Accounts::Conversations::AssignmentsController < Api::V1::Accounts::Conversations::BaseController
+  before_action :authorize_assignment
+
   # assigns agent/team to a conversation
   def create
     if params.key?(:assignee_id) || agent_bot_assignment?
@@ -11,6 +13,13 @@ class Api::V1::Accounts::Conversations::AssignmentsController < Api::V1::Account
   end
 
   private
+
+  def authorize_assignment
+    authorize @conversation, :assign?
+    return if !params.key?(:assignee_id) || Conversations::AssignmentGuard.assignee_allowed?(@conversation, Current.user, params[:assignee_id])
+
+    render_could_not_create_error(I18n.t('errors.conversations.assignee_not_in_team'))
+  end
 
   def set_agent
     resource = Conversations::AssignmentService.new(

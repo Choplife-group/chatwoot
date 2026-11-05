@@ -156,6 +156,12 @@ const selectedModel = computed({
         class="text-heading-3 my-0 capitalize truncate text-n-slate-12 font-medium w-32 flex-shrink-0"
       >
         {{ currentContact.name }}
+        <span
+          v-if="chat.vip"
+          class="text-n-amber-11 text-xs font-semibold px-1 rounded bg-n-amber-3"
+        >
+          {{ $t('CONVERSATION_SIDEBAR.VIP.LABEL') }}
+        </span>
       </h4>
 
       <CardContent

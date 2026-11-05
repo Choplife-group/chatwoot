@@ -374,6 +374,11 @@ const actions = {
     });
   },
 
+  setVip: async ({ commit }, { conversationId, vip }) => {
+    await ConversationApi.updateVip({ conversationId, vip });
+    commit(types.ASSIGN_VIP, { conversationId, vip });
+  },
+
   toggleStatus: async (
     { commit },
     { conversationId, status, snoozedUntil = null, customAttributes = null }
@@ -532,6 +537,13 @@ const actions = {
     } catch (error) {
       throw new Error(error);
     }
+  },
+
+  removeConversationAccess({ commit, state }, conversationId) {
+    if (state.selectedChatId === conversationId) {
+      commit(types.CLEAR_CURRENT_CHAT_WINDOW);
+    }
+    commit(types.DELETE_CONVERSATION, conversationId);
   },
 
   addConversation({ commit, state, dispatch, rootState }, conversation) {

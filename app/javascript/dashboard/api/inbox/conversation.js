@@ -94,6 +94,10 @@ class ConversationApi extends ApiClient {
     });
   }
 
+  updateVip({ conversationId, vip }) {
+    return axios.post(`${this.url}/${conversationId}/vip`, { vip });
+  }
+
   updateMarket({ conversationId, marketId }) {
     return axios.patch(`${this.url}/${conversationId}`, {
       market_id: marketId,

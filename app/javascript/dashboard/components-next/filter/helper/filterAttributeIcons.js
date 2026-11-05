@@ -22,6 +22,7 @@ const ATTRIBUTE_ICONS = {
   inbox_id: 'i-lucide-inbox',
   team_id: 'i-lucide-users-round',
   market_id: 'i-lucide-globe-2',
+  vip: 'i-lucide-star',
   category_id: 'i-lucide-list-tree',
   contact_id: 'i-lucide-contact',
   display_id: 'i-lucide-hash',

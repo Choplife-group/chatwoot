@@ -21,6 +21,12 @@ requestBody:
               type: integer
             description: IDs of users to be added to the team
             example: [1]
+          lead_ids:
+            type: array
+            items:
+              type: integer
+            description: IDs of the team leads. Must be a subset of user_ids. Leave it out to keep the current leads
+            example: [1]
 responses:
   '200':
     description: Success

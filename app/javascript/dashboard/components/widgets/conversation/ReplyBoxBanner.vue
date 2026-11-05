@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 import { useMapGetter } from 'dashboard/composables/store';
 import { useAlert } from 'dashboard/composables';
+import { useConversationAccess } from 'dashboard/composables/useConversationAccess';
 import { useI18n } from 'vue-i18n';
 import { isAIAssigneeType } from 'dashboard/helper/agentHelper';
 import ConversationApi from 'dashboard/api/inbox/conversation';
@@ -27,12 +28,15 @@ const { t } = useI18n();
 const currentChat = useMapGetter('getSelectedChat');
 const currentUser = useMapGetter('getCurrentUser');
 
+const { canAssign } = useConversationAccess();
+
 const assignedAgent = computed(() => currentChat.value?.meta?.assignee);
 
 const showSelfAssignBanner = computed(
   () =>
     props.message !== '' &&
     !props.isOnPrivateNote &&
+    canAssign(currentChat.value) &&
     (!assignedAgent.value || assignedAgent.value.id !== currentUser.value?.id)
 );
 

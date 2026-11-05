@@ -89,6 +89,8 @@ const getValueFromConversation = (conversation, attributeKey) => {
       return conversation.meta?.team?.id;
     case 'market_id':
       return conversation.meta?.market?.id;
+    case 'vip':
+      return String(Boolean(conversation.vip));
     case 'category_id': {
       // A filter on a category also matches the categories below it
       const category = conversation.meta?.category;

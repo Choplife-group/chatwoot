@@ -14,6 +14,7 @@ export const CONVERSATION_ATTRIBUTES = {
   INBOX_ID: 'inbox_id',
   TEAM_ID: 'team_id',
   MARKET_ID: 'market_id',
+  VIP: 'vip',
   CATEGORY_ID: 'category_id',
   CONTACT_ID: 'contact_id',
   DISPLAY_ID: 'display_id',

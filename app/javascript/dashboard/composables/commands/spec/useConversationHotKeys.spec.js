@@ -20,6 +20,9 @@ vi.mock('vue-router');
 vi.mock('dashboard/composables/useConversationLabels');
 vi.mock('dashboard/composables/useCaptain');
 vi.mock('dashboard/composables/useAgentsList');
+vi.mock('dashboard/composables/useConversationAccess', () => ({
+  useConversationAccess: () => ({ canAssign: () => true }),
+}));
 
 describe('useConversationHotKeys', () => {
   let store;

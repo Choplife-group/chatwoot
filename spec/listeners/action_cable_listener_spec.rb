@@ -344,4 +344,70 @@ describe ActionCableListener do
       listener.conversation_unread_count_changed(event)
     end
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:team) { create(:team, account: account) }
+    let!(:lead) { create(:user, account: account, role: :agent) }
+    let!(:bystander) { create(:user, account: account, role: :agent) }
+    let(:message) { create(:message, account: account, inbox: inbox, conversation: conversation) }
+    let(:tokens) { [] }
+
+    before do
+      account.enable_features!('restricted_inbox_access')
+      create(:inbox_member, inbox: inbox, user: bystander)
+      create(:team_member, team: team, user: lead, lead: true)
+      create(:team_member, team: team, user: agent)
+      conversation.update!(team: team)
+      allow(ActionCableBroadcastJob).to receive(:perform_later) { |broadcast_tokens, event_name, _data| tokens << [event_name, broadcast_tokens] }
+    end
+
+    it 'sends messages to the assignee, the team lead and administrators, not other inbox members' do
+      listener.message_created(Events::Base.new(:'message.created', Time.zone.now, message: message))
+
+      expect(tokens.to_h['message.created']).to contain_exactly(agent.pubsub_token, lead.pubsub_token, admin.pubsub_token,
+                                                                conversation.contact_inbox.pubsub_token)
+    end
+
+    it 'sends typing events to the same audience' do
+      listener.conversation_typing_on(Events::Base.new(:'conversation.typing_on', Time.zone.now, conversation: conversation, user: admin))
+
+      expect(tokens.to_h['conversation.typing_on']).not_to include(bystander.pubsub_token)
+    end
+
+    it 'tells the previous assignee they lost the conversation, with only its id' do
+      conversation.update!(assignee: bystander)
+      changes = { 'assignee_id' => [agent.id, bystander.id] }
+
+      expect(ActionCableBroadcastJob).to receive(:perform_later)
+        .with([agent.pubsub_token], 'conversation.access_removed', hash_including(id: conversation.display_id, account_id: account.id))
+      expect(ActionCableBroadcastJob).to receive(:perform_later).with(anything, 'assignee.changed', anything)
+
+      listener.assignee_changed(Events::Base.new(:'assignee.changed', Time.zone.now, conversation: conversation, changed_attributes: changes))
+    end
+
+    it 'tells the previous team lead when the conversation moves to another team' do
+      other_team = create(:team, account: account)
+      conversation.update!(team: other_team)
+      tokens.clear
+
+      listener.team_changed(Events::Base.new(:'team.changed', Time.zone.now, conversation: conversation,
+                                                                             changed_attributes: { 'team_id' => [team.id, other_team.id] }))
+
+      expect(tokens.to_h['conversation.access_removed']).to eq([lead.pubsub_token])
+    end
+
+    it 'does not tell someone who can still see it' do
+      changes = { 'assignee_id' => [lead.id, agent.id] }
+
+      listener.assignee_changed(Events::Base.new(:'assignee.changed', Time.zone.now, conversation: conversation, changed_attributes: changes))
+
+      expect(tokens.to_h).not_to have_key('conversation.access_removed')
+    end
+
+    it 'copes with an assignee event that has no changed attributes' do
+      expect do
+        listener.assignee_changed(Events::Base.new(:'assignee.changed', Time.zone.now, conversation: conversation))
+      end.not_to raise_error
+    end
+  end
 end

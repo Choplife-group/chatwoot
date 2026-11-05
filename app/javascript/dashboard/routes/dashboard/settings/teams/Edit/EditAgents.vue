@@ -27,6 +27,7 @@ export default {
   data() {
     return {
       selectedAgents: [],
+      selectedLeads: [],
       isCreating: false,
     };
   },
@@ -66,6 +67,9 @@ export default {
       });
       const members = this.teamMembers.map(item => item.id);
       this.updateSelectedAgents(members);
+      this.selectedLeads = this.teamMembers
+        .filter(item => item.lead)
+        .map(item => item.id);
     } catch {
       this.updateSelectedAgents([]);
     }
@@ -75,15 +79,22 @@ export default {
     updateSelectedAgents(newAgentList) {
       this.v$.selectedAgents.$touch();
       this.selectedAgents = [...newAgentList];
+      this.selectedLeads = this.selectedLeads.filter(id =>
+        newAgentList.includes(id)
+      );
+    },
+    updateSelectedLeads(newLeadList) {
+      this.selectedLeads = newLeadList;
     },
     async addAgents() {
       this.isCreating = true;
-      const { teamId, selectedAgents } = this;
+      const { teamId, selectedAgents, selectedLeads } = this;
 
       try {
         await this.$store.dispatch('teamMembers/update', {
           teamId,
           agentsList: selectedAgents,
+          leadIds: selectedLeads,
         });
         router.replace({
           name: 'settings_teams_edit_finish',
@@ -121,6 +132,9 @@ export default {
           :agent-list="agentList"
           :selected-agents="selectedAgents"
           :update-selected-agents="updateSelectedAgents"
+          :selected-leads="selectedLeads"
+          :update-selected-leads="updateSelectedLeads"
+          show-lead-column
           :is-working="isCreating"
           :submit-button-text="
             $t('TEAMS_SETTINGS.EDIT_FLOW.AGENTS.BUTTON_TEXT')

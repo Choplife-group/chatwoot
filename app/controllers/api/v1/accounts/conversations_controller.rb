@@ -8,7 +8,7 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
   include ConversationResolveGuardConcern
 
   before_action :conversation, except: [:index, :meta, :search, :create, :filter]
-  before_action :validate_assignment_targets, :inbox, :contact, :contact_inbox, only: [:create]
+  before_action :validate_assignment_targets, :assign_new_conversation_to_restricted_user, :inbox, :contact, :contact_inbox, only: [:create]
 
   ATTACHMENT_RESULTS_PER_PAGE = 100
 
@@ -43,6 +43,8 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
   def create
     ActiveRecord::Base.transaction do
       @conversation = ConversationBuilder.new(params: params, contact_inbox: @contact_inbox).perform
+      # An inbox locked to a single conversation returns the existing one, which may be someone else's
+      authorize @conversation, :show?
       Messages::MessageBuilder.new(Current.user, @conversation, params[:message]).perform if params[:message].present?
     end
   end
@@ -103,6 +105,14 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
 
   def toggle_priority
     @conversation.toggle_priority(permitted_update_params[:priority])
+    head :ok
+  end
+
+  def vip
+    authorize @conversation, :update_vip?
+    return render_could_not_create_error('vip must be true or false') unless [true, false].include?(params[:vip])
+
+    @conversation.update!(vip: params[:vip])
     head :ok
   end
 

@@ -10,11 +10,19 @@ class Conversations::PermissionFilterService
 
   def perform
     return conversations if user_role == 'administrator'
+    return restricted_conversations if account.feature_enabled?('restricted_inbox_access')
 
     accessible_conversations
   end
 
   private
+
+  # Agents see what's assigned to them. Team leads also see everything in the teams they lead.
+  def restricted_conversations
+    led_team_ids = user.team_members.leads.joins(:team).where(teams: { account_id: account.id }).select(:team_id)
+
+    conversations.where(assignee_id: user.id).or(conversations.where(team_id: led_team_ids))
+  end
 
   def accessible_conversations
     return hinted_accessible_conversations if @plan_hint_selective_filter

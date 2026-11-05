@@ -14,6 +14,9 @@ class Conversations::UnreadCounts::Counter
   end
 
   def perform
+    restricted_counter = ::Conversations::UnreadCounts::RestrictedCounter.new(account: account, user: user)
+    return with_filtered_counts(restricted_counter.perform) if restricted_counter.applies?
+
     return with_filtered_counts(empty_counts, build: false) if permission_mode == :none
 
     ensure_base_cache!

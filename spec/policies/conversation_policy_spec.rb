@@ -70,4 +70,39 @@ RSpec.describe ConversationPolicy, type: :policy do
       end
     end
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:inbox) { create(:inbox, account: account) }
+    let(:team) { create(:team, account: account) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox, team: team) }
+
+    before do
+      account.enable_features!('restricted_inbox_access')
+      create(:inbox_member, user: agent, inbox: inbox)
+    end
+
+    permissions :show? do
+      it 'denies an inbox and team member who is not assigned' do
+        create(:team_member, team: team, user: agent)
+
+        expect(subject).not_to permit(agent_context, conversation)
+      end
+
+      it 'permits the assignee' do
+        conversation.update!(assignee: agent)
+
+        expect(subject).to permit(agent_context, conversation)
+      end
+
+      it 'permits a lead of the team' do
+        create(:team_member, team: team, user: agent, lead: true)
+
+        expect(subject).to permit(agent_context, conversation)
+      end
+
+      it 'permits an administrator' do
+        expect(subject).to permit(administrator_context, conversation)
+      end
+    end
+  end
 end

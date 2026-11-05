@@ -1,5 +1,5 @@
 class Conversations::EventDataPresenter < SimpleDelegator
-  def push_data
+  def push_data # rubocop:disable Metrics/MethodLength
     {
       additional_attributes: additional_attributes,
       can_reply: can_reply?,
@@ -16,6 +16,7 @@ class Conversations::EventDataPresenter < SimpleDelegator
       unread_count: unread_incoming_messages.count,
       first_reply_created_at: first_reply_created_at,
       priority: priority,
+      vip: vip,
       waiting_since: waiting_since.to_i,
       **push_timestamps
     }

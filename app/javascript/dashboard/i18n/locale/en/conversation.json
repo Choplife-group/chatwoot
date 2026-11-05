@@ -254,6 +254,8 @@
       "RESOLVED": "Mark as resolved",
       "MARK_AS_UNREAD": "Mark as unread",
       "MARK_AS_READ": "Mark as read",
+      "MARK_AS_VIP": "Mark as VIP",
+      "REMOVE_VIP": "Remove VIP",
       "REOPEN": "Reopen conversation",
       "SNOOZE": {
         "TITLE": "Snooze",
@@ -479,6 +481,12 @@
   },
   "CONVERSATION_SIDEBAR": {
     "ASSIGNEE_LABEL": "Assigned Agent",
+    "NONE": "None",
+    "VIP": {
+      "LABEL": "VIP",
+      "TOOLTIP": "VIP conversation: pick this up first",
+      "UPDATE_ERROR": "Could not update the VIP mark"
+    },
     "SELF_ASSIGN": "Assign to me",
     "TEAM_LABEL": "Assigned Team",
     "MARKET_LABEL": "Market",

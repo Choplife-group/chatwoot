@@ -795,5 +795,33 @@ describe SearchService do
         expect(results.first.sender_id).to eq(test_contact.id)
       end
     end
+
+    context 'when restricted_inbox_access is enabled' do
+      let(:params) { { q: 'wizard' } }
+      let!(:mine) { create(:conversation, contact: harry, inbox: inbox, account: account, assignee: user) }
+      let!(:my_message) { create(:message, account: account, inbox: inbox, conversation: mine, content: 'A wizard wrote in') }
+      let!(:other_message) { create(:message, account: account, inbox: inbox, conversation: conversation, content: 'Another wizard') }
+
+      before { account.enable_features!('restricted_inbox_access') }
+
+      it 'returns only the agent\'s own conversations' do
+        result = described_class.new(current_user: user, current_account: account, params: { q: 'Potter' }, search_type: 'Conversation').perform
+
+        expect(result[:conversations]).to contain_exactly(mine)
+      end
+
+      it 'returns only messages from the agent\'s own conversations, even with access to every inbox' do
+        result = described_class.new(current_user: user, current_account: account, params: params, search_type: 'Message').perform
+
+        expect(result[:messages]).to contain_exactly(my_message)
+      end
+
+      it 'returns everything for an administrator' do
+        admin = create(:user, account: account, role: :administrator)
+        result = described_class.new(current_user: admin, current_account: account, params: params, search_type: 'Message').perform
+
+        expect(result[:messages]).to include(my_message, other_message)
+      end
+    end
   end
 end

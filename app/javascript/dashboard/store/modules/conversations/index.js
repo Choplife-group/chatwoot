@@ -167,6 +167,11 @@ export const mutations = {
     chat.meta.market = market;
   },
 
+  [types.ASSIGN_VIP](_state, { vip, conversationId }) {
+    const [chat] = _state.allConversations.filter(c => c.id === conversationId);
+    chat.vip = vip;
+  },
+
   [types.UPDATE_CONVERSATION_LAST_ACTIVITY](
     _state,
     { lastActivityAt, conversationId }

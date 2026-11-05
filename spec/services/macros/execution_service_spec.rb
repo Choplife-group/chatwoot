@@ -175,4 +175,31 @@ RSpec.describe Macros::ExecutionService, type: :service do
       service.send(:send_webhook_event, ['https://example.com/webhook'])
     end
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:team) { create(:team, account: account, allow_auto_assign: false) }
+    let(:other_agent) { create(:user, account: account, role: :agent) }
+
+    before do
+      account.enable_features!('restricted_inbox_access')
+      create(:inbox_member, user: other_agent, inbox: conversation.inbox)
+      conversation.update!(assignee: user)
+    end
+
+    it 'leaves a note instead of reassigning' do
+      expect(Conversations::ActivityMessageJob).to receive(:perform_later)
+
+      service.send(:assign_agent, [other_agent.id])
+
+      expect(conversation.reload.assignee).to eq(user)
+    end
+
+    it 'leaves a note instead of changing the team' do
+      expect(Conversations::ActivityMessageJob).to receive(:perform_later)
+
+      service.send(:assign_team, [team.id])
+
+      expect(conversation.reload.team).to be_nil
+    end
+  end
 end

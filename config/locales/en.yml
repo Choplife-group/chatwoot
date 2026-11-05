@@ -116,6 +116,7 @@ en:
     conversations:
       resolved: Conversation is resolved and does not accept new messages
       category_required: Choose a category and subcategory before resolving this conversation
+      assignee_not_in_team: Assign this conversation to a member of its team
       invalid_category: Choose a category from the last level of the list
       unread_counts:
         feature_not_enabled: Conversation unread counts feature not enabled for this account
@@ -373,6 +374,10 @@ en:
         assigned: 'Assigned to %{team_name} by %{user_name}'
         assigned_with_assignee: 'Assigned to %{assignee_name} via %{team_name} by %{user_name}'
         removed: 'Unassigned from %{team_name} by %{user_name}'
+      vip:
+        added: '%{user_name} marked this conversation as VIP'
+        removed: '%{user_name} removed the VIP mark'
+      assignment_skipped: 'Not assigned by %{user_name}: only team leads and administrators can change the assignee or team'
       category:
         set: '%{user_name} set the category to %{category_path}'
         removed: '%{user_name} removed the category'

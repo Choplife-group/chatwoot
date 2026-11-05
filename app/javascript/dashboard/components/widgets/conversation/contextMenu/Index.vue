@@ -70,6 +70,18 @@ export default {
       type: Array,
       default: () => [],
     },
+    canAssign: {
+      type: Boolean,
+      default: true,
+    },
+    canChangeVip: {
+      type: Boolean,
+      default: false,
+    },
+    isVip: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     'updateConversation',
@@ -81,6 +93,7 @@ export default {
     'assignLabel',
     'removeLabel',
     'deleteConversation',
+    'toggleVip',
     'close',
   ],
   setup() {
@@ -204,6 +217,16 @@ export default {
         agentsByUpdatedPresence
       );
       return filteredAgents;
+    },
+    vipOption() {
+      return {
+        label: this.$t(
+          this.isVip
+            ? 'CONVERSATION.CARD_CONTEXT_MENU.REMOVE_VIP'
+            : 'CONVERSATION.CARD_CONTEXT_MENU.MARK_AS_VIP'
+        ),
+        icon: 'star-emphasis',
+      };
     },
     assignableAgents() {
       return [
@@ -333,6 +356,12 @@ export default {
     <template
       v-if="isAllowed([MENU.PRIORITY, MENU.LABEL, MENU.AGENT, MENU.TEAM])"
     >
+      <MenuItem
+        v-if="canChangeVip"
+        :option="vipOption"
+        variant="icon"
+        @click.stop="$emit('toggleVip')"
+      />
       <MenuItemWithSubmenu
         v-if="isAllowed([MENU.PRIORITY])"
         :option="priorityConfig"
@@ -394,7 +423,7 @@ export default {
         </div>
       </MenuItemWithSubmenu>
       <MenuItemWithSubmenu
-        v-if="isAllowed([MENU.AGENT])"
+        v-if="canAssign && isAllowed([MENU.AGENT])"
         :option="agentMenuConfig"
         :sub-menu-available="!!assignableAgents.length"
       >
@@ -410,7 +439,7 @@ export default {
         </template>
       </MenuItemWithSubmenu>
       <MenuItemWithSubmenu
-        v-if="isAllowed([MENU.TEAM])"
+        v-if="canAssign && isAllowed([MENU.TEAM])"
         :option="teamMenuConfig"
         :sub-menu-available="!!teams.length"
       >

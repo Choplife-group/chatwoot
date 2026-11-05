@@ -38,10 +38,8 @@ class Messages::MentionService
   end
 
   def valid_mentionable_user_ids
-    @valid_mentionable_user_ids ||= begin
-      inbox = message.inbox
-      inbox.account.administrators.pluck(:id) + inbox.members.pluck(:id)
-    end
+    @valid_mentionable_user_ids ||= message.account.administrators.pluck(:id) +
+                                    Conversations::AudienceService.new(conversation: message.conversation).users.pluck(:id)
   end
 
   def filter_mentioned_ids_by_inbox

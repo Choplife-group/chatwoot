@@ -1628,6 +1628,10 @@
             "type": "number",
             "description": "The last activity at of the conversation"
           },
+          "vip": {
+            "type": "boolean",
+            "description": "Whether the conversation is marked as VIP"
+          },
           "priority": {
             "type": [
               "string",

@@ -33,9 +33,17 @@ class BulkActionsJob < ApplicationJob
 
   # Uncategorised conversations keep their status when a person bulk-resolves (Conversations::ResolveGuard)
   def params_for(conversation, params)
+    params = params.except(:assignee_id, :team_id) unless assignment_allowed?(conversation, params)
     return params unless params[:status] == 'resolved' && Conversations::ResolveGuard.blocked?(conversation, @user)
 
     params.except(:status)
+  end
+
+  def assignment_allowed?(conversation, params)
+    return true unless params.key?(:assignee_id) || params.key?(:team_id)
+
+    Conversations::AssignmentGuard.allowed?(conversation, @user) &&
+      Conversations::AssignmentGuard.assignee_allowed?(conversation, @user, params[:assignee_id])
   end
 
   def bulk_remove_labels

@@ -4006,6 +4006,84 @@
         }
       }
     },
+    "/api/v1/accounts/{account_id}/conversations/{conversation_id}/vip": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        },
+        {
+          "$ref": "#/components/parameters/conversation_id"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Conversations"
+        ],
+        "operationId": "update-conversation-vip",
+        "summary": "Update the VIP flag",
+        "description": "Marks a conversation as VIP or removes the mark. Only team leads of the conversation's team and administrators can do this.",
+        "security": [
+          {
+            "userApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vip"
+                ],
+                "properties": {
+                  "vip": {
+                    "type": "boolean",
+                    "description": "Whether the conversation is VIP",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Conversation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "vip is not true or false",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/accounts/{account_id}/conversations/{conversation_id}/toggle_typing_status": {
       "parameters": [
         {
@@ -7369,6 +7447,16 @@
                     "example": [
                       1
                     ]
+                  },
+                  "lead_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "IDs of the team leads. Must be a subset of user_ids. Leave it out to keep the current leads",
+                    "example": [
+                      1
+                    ]
                   }
                 }
               }
@@ -9863,6 +9951,10 @@
           "last_activity_at": {
             "type": "number",
             "description": "The last activity at of the conversation"
+          },
+          "vip": {
+            "type": "boolean",
+            "description": "Whether the conversation is marked as VIP"
           },
           "priority": {
             "type": [

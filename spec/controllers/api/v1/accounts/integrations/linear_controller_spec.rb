@@ -5,11 +5,23 @@ RSpec.describe 'Linear Integration API', type: :request do
   let(:user) { create(:user) }
   let(:api_key) { 'valid_api_key' }
   let(:agent) { create(:user, account: account, role: :agent) }
+  let(:inbox) { create(:inbox, account: account) }
   let(:processor_service) { instance_double(Integrations::Linear::ProcessorService) }
 
   before do
+    create(:inbox_member, user: agent, inbox: inbox)
     create(:integrations_hook, :linear, account: account)
     allow(Integrations::Linear::ProcessorService).to receive(:new).with(account: account).and_return(processor_service)
+  end
+
+  it 'does not let an agent without access to the conversation see its linked issues' do
+    conversation = create(:conversation, account: account)
+
+    get "/api/v1/accounts/#{account.id}/integrations/linear/linked_issues",
+        params: { conversation_id: conversation.display_id },
+        headers: agent.create_new_auth_token
+
+    expect(response).to have_http_status(:unauthorized)
   end
 
   describe 'DELETE /api/v1/accounts/:account_id/integrations/linear' do
@@ -178,7 +190,7 @@ RSpec.describe 'Linear Integration API', type: :request do
 
   describe 'POST /api/v1/accounts/:account_id/integrations/linear/link_issue' do
     let(:issue_id) { 'ENG-456' }
-    let(:conversation) { create(:conversation, account: account) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox) }
     let(:link) { "#{ENV.fetch('FRONTEND_URL', nil)}/app/accounts/#{account.id}/conversations/#{conversation.display_id}" }
     let(:title) { 'Sample Issue' }
 
@@ -228,7 +240,7 @@ RSpec.describe 'Linear Integration API', type: :request do
   describe 'POST /api/v1/accounts/:account_id/integrations/linear/unlink_issue' do
     let(:link_id) { 'attachment1' }
     let(:issue_id) { 'ENG-789' }
-    let(:conversation) { create(:conversation, account: account) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox) }
 
     context 'when it is an authenticated user' do
       context 'when the issue is unlinked successfully' do
@@ -306,7 +318,7 @@ RSpec.describe 'Linear Integration API', type: :request do
   end
 
   describe 'GET /api/v1/accounts/:account_id/integrations/linear/linked_issues' do
-    let(:conversation) { create(:conversation, account: account) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox) }
     let(:link) { "#{ENV.fetch('FRONTEND_URL', nil)}/app/accounts/#{account.id}/conversations/#{conversation.display_id}" }
 
     context 'when it is an authenticated user' do

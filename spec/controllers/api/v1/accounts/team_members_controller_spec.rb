@@ -160,6 +160,59 @@ RSpec.describe 'Team Members API', type: :request do
         json_response = response.parsed_body
         expect(json_response['error']).to eq('Invalid User IDs')
       end
+
+      it 'sets the team leads when lead_ids is passed' do
+        member = create(:user, account: account, role: :agent)
+        lead = create(:user, account: account, role: :agent)
+        create(:team_member, team: team, user: member, lead: true)
+
+        patch "/api/v1/accounts/#{account.id}/teams/#{team.id}/team_members",
+              params: { user_ids: [member.id, lead.id], lead_ids: [lead.id] },
+              headers: administrator.create_new_auth_token,
+              as: :json
+
+        expect(response).to have_http_status(:success)
+        expect(team.team_members.leads.pluck(:user_id)).to eq([lead.id])
+        expect(response.parsed_body.to_h { |agent| [agent['id'], agent['lead']] }).to eq(member.id => false, lead.id => true)
+      end
+
+      it 'keeps the current leads when lead_ids is not passed' do
+        lead = create(:user, account: account, role: :agent)
+        create(:team_member, team: team, user: lead, lead: true)
+
+        patch "/api/v1/accounts/#{account.id}/teams/#{team.id}/team_members",
+              params: { user_ids: [lead.id] },
+              headers: administrator.create_new_auth_token,
+              as: :json
+
+        expect(team.team_members.leads.pluck(:user_id)).to eq([lead.id])
+      end
+
+      it 'rejects a lead who is not a team member' do
+        member = create(:user, account: account, role: :agent)
+        outsider = create(:user, account: account, role: :agent)
+
+        patch "/api/v1/accounts/#{account.id}/teams/#{team.id}/team_members",
+              params: { user_ids: [member.id], lead_ids: [outsider.id] },
+              headers: administrator.create_new_auth_token,
+              as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(team.team_members.count).to eq(0)
+      end
+
+      it 'does not let an agent set team leads' do
+        agent = create(:user, account: account, role: :agent)
+        create(:team_member, team: team, user: agent)
+
+        patch "/api/v1/accounts/#{account.id}/teams/#{team.id}/team_members",
+              params: { user_ids: [agent.id], lead_ids: [agent.id] },
+              headers: agent.create_new_auth_token,
+              as: :json
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(team.team_members.leads).to be_empty
+      end
     end
   end
 end

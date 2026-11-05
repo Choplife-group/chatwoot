@@ -11,10 +11,24 @@ class ConversationPolicy < ApplicationPolicy
     administrator? || agent_bot? || agent_can_view_conversation?
   end
 
+  def assign?
+    Conversations::AssignmentGuard.allowed?(record, user)
+  end
+
+  def update_vip?
+    administrator? || user.team_members.leads.exists?(team_id: record.team_id)
+  end
+
   private
 
   def agent_can_view_conversation?
+    return restricted_access? if account.feature_enabled?('restricted_inbox_access')
+
     inbox_access? || team_access?
+  end
+
+  def restricted_access?
+    Conversations::PermissionFilterService.new(Conversation.where(id: record.id), user, account).perform.exists?
   end
 
   def administrator?

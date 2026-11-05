@@ -32,6 +32,7 @@ module Events::Types
   CONVERSATION_UNREAD_COUNT_CHANGED = 'conversation.unread_count_changed'
   ASSIGNEE_CHANGED = 'assignee.changed'
   TEAM_CHANGED = 'team.changed'
+  CONVERSATION_ACCESS_REMOVED = 'conversation.access_removed'
   CONVERSATION_TYPING_ON = 'conversation.typing_on'
   CONVERSATION_TYPING_OFF = 'conversation.typing_off'
   CONVERSATION_MENTIONED = 'conversation.mentioned'

@@ -1,6 +1,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
+import { useConversationAccess } from 'dashboard/composables/useConversationAccess';
 import { useRoute } from 'vue-router';
 import { emitter } from 'shared/helpers/mitt';
 import { useConversationLabels } from 'dashboard/composables/useConversationLabels';
@@ -148,6 +149,7 @@ export function useConversationHotKeys() {
 
   const { captainTasksEnabled } = useCaptain();
   const { agentsList } = useAgentsList();
+  const { canAssign } = useConversationAccess();
 
   const currentChat = useMapGetter('getSelectedChat');
   const replyMode = useMapGetter('draftMessages/getReplyEditorMode');
@@ -376,8 +378,9 @@ export function useConversationHotKeys() {
     const defaultConversationHotKeys = [
       ...statusActions.value,
       ...conversationAdditionalActions.value,
-      ...assignAgentActions.value,
-      ...assignTeamActions.value,
+      ...(canAssign(currentChat.value)
+        ? [...assignAgentActions.value, ...assignTeamActions.value]
+        : []),
       ...labelActions.value,
       ...assignPriorityActions.value,
     ];

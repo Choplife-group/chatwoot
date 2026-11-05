@@ -212,6 +212,20 @@ export function useConversationFilterContext() {
       attributeModel: 'standard',
     },
     {
+      attributeKey: CONVERSATION_ATTRIBUTES.VIP,
+      value: CONVERSATION_ATTRIBUTES.VIP,
+      attributeName: t('FILTER.ATTRIBUTES.VIP'),
+      label: t('FILTER.ATTRIBUTES.VIP'),
+      inputType: 'searchSelect',
+      options: [
+        { id: 'true', name: t('FILTER.ATTRIBUTES.VIP_YES') },
+        { id: 'false', name: t('FILTER.ATTRIBUTES.VIP_NO') },
+      ],
+      dataType: 'text',
+      filterOperators: equalityOperators.value,
+      attributeModel: 'standard',
+    },
+    {
       attributeKey: CONVERSATION_ATTRIBUTES.CATEGORY_ID,
       value: CONVERSATION_ATTRIBUTES.CATEGORY_ID,
       attributeName: t('FILTER.ATTRIBUTES.CATEGORY'),

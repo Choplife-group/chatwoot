@@ -188,5 +188,7 @@ const sortConfig = {
 export const sortComparator = (a, b, sortKey) => {
   const [sortMethod, sortDirection] =
     SORT_OPTIONS[sortKey] || SORT_OPTIONS.last_activity_at_desc;
+  // VIP conversations come first, whatever the chosen sort
+  if (Boolean(a.vip) !== Boolean(b.vip)) return a.vip ? -1 : 1;
   return sortConfig[sortMethod](a, b, sortDirection);
 };

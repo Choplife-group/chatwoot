@@ -94,4 +94,21 @@ RSpec.describe BulkActionsJob do
       expect(forbidden_conversation.reload.status).to eq('open')
     end
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:team) { create(:team, account: account, allow_auto_assign: false) }
+    let(:other_agent) { create(:user, account: account, role: :agent) }
+    let!(:conversation) { create(:conversation, account_id: account.id, assignee: agent, status: :open) }
+    let(:assign_params) do
+      { type: 'Conversation', ids: [conversation.display_id], fields: { assignee_id: other_agent.id, status: 'snoozed' } }.with_indifferent_access
+    end
+
+    before { account.enable_features!('restricted_inbox_access') }
+
+    it 'keeps the assignee but applies the other changes for an agent' do
+      described_class.perform_now(account: account, params: assign_params, user: agent)
+
+      expect(conversation.reload).to have_attributes(assignee_id: agent.id, status: 'snoozed')
+    end
+  end
 end

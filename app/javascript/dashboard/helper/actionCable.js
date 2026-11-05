@@ -48,6 +48,7 @@ class ActionCableConnector extends BaseActionCableConnector {
       'user:logout': this.onLogout,
       'page:reload': this.onReload,
       'assignee.changed': this.onAssigneeChanged,
+      'conversation.access_removed': this.onConversationAccessRemoved,
       'conversation.typing_on': this.onTypingOn,
       'conversation.typing_off': this.onTypingOff,
       'conversation.contact_changed': this.onConversationContactChange,
@@ -121,6 +122,11 @@ class ActionCableConnector extends BaseActionCableConnector {
     if (id) {
       this.app.$store.dispatch('updateConversation', payload);
     }
+    this.fetchConversationStats();
+  };
+
+  onConversationAccessRemoved = ({ id }) => {
+    this.app.$store.dispatch('removeConversationAccess', id);
     this.fetchConversationStats();
   };
 

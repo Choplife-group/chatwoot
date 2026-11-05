@@ -18,6 +18,7 @@
 #  status                 :integer          default("open"), not null
 #  status_changed_at      :datetime
 #  uuid                   :uuid             not null
+#  vip                    :boolean          default(FALSE), not null
 #  waiting_since          :datetime
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
@@ -41,6 +42,7 @@
 #  index_conversations_on_account_id_and_category_id  (account_id,category_id)
 #  index_conversations_on_account_id_and_display_id   (account_id,display_id) UNIQUE
 #  index_conversations_on_account_id_and_market_id    (account_id,market_id)
+#  index_conversations_on_account_id_and_vip          (account_id,vip) WHERE vip
 #  index_conversations_on_assignee_id_and_account_id  (assignee_id,account_id)
 #  index_conversations_on_campaign_id                 (campaign_id)
 #  index_conversations_on_contact_id                  (contact_id)
@@ -66,6 +68,7 @@ class Conversation < ApplicationRecord
   include ActivityMessageHandler
   include MarketHandler
   include CategoryHandler
+  include VipHandler
   include UrlHelper
   include SortHandler
   include PushDataHelper
@@ -357,7 +360,7 @@ class Conversation < ApplicationRecord
 
   def list_of_keys
     %w[team_id assignee_id assignee_agent_bot_id ai_assignee_type status snoozed_until custom_attributes label_list waiting_since
-       first_reply_created_at priority]
+       first_reply_created_at priority vip]
   end
 
   def allowed_keys?

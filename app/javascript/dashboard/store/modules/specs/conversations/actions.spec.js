@@ -212,6 +212,29 @@ describe('#actions', () => {
     });
   });
 
+  describe('#removeConversationAccess', () => {
+    it('removes the conversation from the list', () => {
+      const mockCommit = vi.fn();
+      actions.removeConversationAccess(
+        { commit: mockCommit, state: { selectedChatId: 2 } },
+        1
+      );
+      expect(mockCommit.mock.calls).toEqual([[types.DELETE_CONVERSATION, 1]]);
+    });
+
+    it('closes the conversation when it is open', () => {
+      const mockCommit = vi.fn();
+      actions.removeConversationAccess(
+        { commit: mockCommit, state: { selectedChatId: 1 } },
+        1
+      );
+      expect(mockCommit.mock.calls).toEqual([
+        [types.CLEAR_CURRENT_CHAT_WINDOW],
+        [types.DELETE_CONVERSATION, 1],
+      ]);
+    });
+  });
+
   describe('#updateConversation', () => {
     it('sends setContact action and update_conversation mutation', () => {
       const conversation = {

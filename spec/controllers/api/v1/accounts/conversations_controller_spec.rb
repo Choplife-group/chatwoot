@@ -1503,4 +1503,146 @@ RSpec.describe 'Conversations API', type: :request do
       end
     end
   end
+
+  context 'when restricted_inbox_access is enabled' do
+    let(:account) { create(:account) }
+    let(:agent) { create(:user, account: account, role: :agent) }
+    let(:inbox) { create(:inbox, account: account) }
+    let!(:mine) { create(:conversation, account: account, inbox: inbox, assignee: agent) }
+    let!(:not_mine) { create(:conversation, account: account, inbox: inbox) }
+
+    before do
+      account.enable_features!('restricted_inbox_access')
+      create(:inbox_member, user: agent, inbox: inbox)
+    end
+
+    it 'lists only the agent\'s conversations, with matching counts' do
+      get "/api/v1/accounts/#{account.id}/conversations",
+          params: { assignee_type: 'all' },
+          headers: agent.create_new_auth_token
+
+      expect(response.parsed_body['data']['payload'].pluck('id')).to eq([mine.display_id])
+      expect(response.parsed_body['data']['meta']).to include('all_count' => 1, 'mine_count' => 1, 'unassigned_count' => 0)
+    end
+
+    it 'does not open someone else\'s conversation or its messages' do
+      headers = agent.create_new_auth_token
+
+      get "/api/v1/accounts/#{account.id}/conversations/#{not_mine.display_id}", headers: headers
+      expect(response).to have_http_status(:unauthorized)
+
+      get "/api/v1/accounts/#{account.id}/conversations/#{not_mine.display_id}/messages", headers: headers
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
+  context 'when an agent with restricted access starts a conversation' do
+    let(:account) { create(:account) }
+    let(:agent) { create(:user, account: account, role: :agent) }
+    let(:other_agent) { create(:user, account: account, role: :agent) }
+    let(:team) { create(:team, account: account, allow_auto_assign: false) }
+    let(:inbox) { create(:inbox, account: account) }
+    let(:contact) { create(:contact, account: account) }
+    let!(:contact_inbox) { create(:contact_inbox, contact: contact, inbox: inbox) }
+    let(:url) { "/api/v1/accounts/#{account.id}/conversations" }
+
+    before do
+      account.enable_features!('restricted_inbox_access')
+      create(:inbox_member, user: agent, inbox: inbox)
+    end
+
+    it 'assigns it to them, whatever was asked for' do
+      post url, params: { source_id: contact_inbox.source_id, assignee_id: other_agent.id, team_id: team.id },
+                headers: agent.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(Conversation.last).to have_attributes(assignee_id: agent.id, team_id: nil)
+    end
+
+    it 'does not return or write to someone else\'s conversation in a locked inbox' do
+      inbox.update!(lock_to_single_conversation: true)
+      existing = create(:conversation, account: account, inbox: inbox, contact: contact, contact_inbox: contact_inbox, assignee: other_agent)
+
+      post url, params: { source_id: contact_inbox.source_id, message: { content: 'hello' } },
+                headers: agent.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(existing.messages.where(content: 'hello')).not_to exist
+    end
+  end
+
+  describe 'POST /api/v1/accounts/{account.id}/conversations/:id/vip' do
+    let(:account) { create(:account) }
+    let(:inbox) { create(:inbox, account: account) }
+    let(:team) { create(:team, account: account, allow_auto_assign: false) }
+    let(:agent) { create(:user, account: account, role: :agent) }
+    let(:lead) { create(:user, account: account, role: :agent) }
+    let(:other_lead) { create(:user, account: account, role: :agent) }
+    let(:admin) { create(:user, account: account, role: :administrator) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox, team: team, assignee: agent) }
+    let(:url) { "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/vip" }
+
+    before do
+      create(:inbox_member, user: agent, inbox: inbox)
+      create(:inbox_member, user: other_lead, inbox: inbox)
+      create(:team_member, team: team, user: agent)
+      create(:team_member, team: team, user: lead, lead: true)
+      create(:team_member, team: create(:team, account: account), user: other_lead, lead: true)
+    end
+
+    it 'rejects an agent adding or removing the mark, even on their own conversation' do
+      post url, params: { vip: true }, headers: agent.create_new_auth_token, as: :json
+      expect(response).to have_http_status(:unauthorized)
+      expect(conversation.reload.vip).to be(false)
+
+      conversation.update!(vip: true)
+      post url, params: { vip: false }, headers: agent.create_new_auth_token, as: :json
+      expect(response).to have_http_status(:unauthorized)
+      expect(conversation.reload.vip).to be(true)
+    end
+
+    it 'rejects a lead of another team' do
+      post url, params: { vip: true }, headers: other_lead.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'lets a lead of the team and an administrator change it' do
+      post url, params: { vip: true }, headers: lead.create_new_auth_token, as: :json
+      expect(response).to have_http_status(:success)
+      expect(conversation.reload.vip).to be(true)
+
+      post url, params: { vip: false }, headers: admin.create_new_auth_token, as: :json
+      expect(conversation.reload.vip).to be(false)
+    end
+
+    it 'rejects anything but true or false' do
+      post url, params: { vip: 'yes' }, headers: admin.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'ignores vip on the conversation update endpoint' do
+      patch "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}",
+            params: { vip: true, priority: 'high' }, headers: agent.create_new_auth_token, as: :json
+
+      expect(conversation.reload).to have_attributes(vip: false, priority: 'high')
+    end
+
+    it 'lists VIP conversations first and filters by them' do
+      vip_conversation = create(:conversation, account: account, inbox: inbox, last_activity_at: 1.week.ago, vip: true)
+      conversation.update!(last_activity_at: Time.current)
+
+      get "/api/v1/accounts/#{account.id}/conversations", params: { assignee_type: 'all' }, headers: admin.create_new_auth_token
+
+      first_result = response.parsed_body['data']['payload'].first
+      expect(first_result).to include('id' => vip_conversation.display_id, 'vip' => true)
+
+      post "/api/v1/accounts/#{account.id}/conversations/filter",
+           params: { payload: [{ attribute_key: 'vip', filter_operator: 'equal_to', values: ['true'], query_operator: nil }] },
+           headers: admin.create_new_auth_token, as: :json
+
+      expect(response.parsed_body['payload'].pluck('id')).to eq([vip_conversation.display_id])
+    end
+  end
 end

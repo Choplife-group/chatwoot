@@ -24,6 +24,14 @@ RSpec.describe TeamMember do
       end.to change { store.built_in_filter_version(account_id: account.id, user_id: user.id) }.by(1)
     end
 
+    it 'invalidates the user built-in filter version when the lead flag changes' do
+      team_member = create(:team_member, team: team, user: user)
+
+      expect do
+        team_member.update!(lead: true)
+      end.to change { store.built_in_filter_version(account_id: account.id, user_id: user.id) }.by(1)
+    end
+
     it 'invalidates the user built-in filter version when team access is removed' do
       team_member = create(:team_member, team: team, user: user)
 

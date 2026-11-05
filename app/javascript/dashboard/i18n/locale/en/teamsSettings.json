@@ -69,6 +69,7 @@
     "AGENTS": {
       "AGENT": "Agent",
       "EMAIL": "Email",
+      "TEAM_LEAD": "Team lead",
       "BUTTON_TEXT": "Add agents",
       "ADD_AGENTS": "Adding Agents to your Team...",
       "SELECT": "select",

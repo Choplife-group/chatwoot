@@ -5,6 +5,7 @@ import { useTimeoutFn } from '@vueuse/core';
 import { useAlert, useTrack } from 'dashboard/composables';
 import { useMapGetter, useStore } from 'dashboard/composables/store';
 import { useAgentsList } from 'dashboard/composables/useAgentsList';
+import { useConversationAccess } from 'dashboard/composables/useConversationAccess';
 import { useConversationLabels } from 'dashboard/composables/useConversationLabels';
 import { useConversationSuggestions } from 'dashboard/composables/useConversationSuggestions';
 import { CONVERSATION_PRIORITY } from 'shared/constants/messages';
@@ -17,6 +18,7 @@ import CategoryPicker from './CategoryPicker.vue';
 import MultiselectDropdown from 'shared/components/ui/MultiselectDropdown.vue';
 import ConversationLabels from './labels/LabelBox.vue';
 import NextButton from 'dashboard/components-next/button/Button.vue';
+import Switch from 'dashboard/components-next/switch/Switch.vue';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
 import SuggestButton from 'dashboard/components-next/captain/classifier/SuggestButton.vue';
 import SuggestionSkeleton from 'dashboard/components-next/captain/classifier/SuggestionSkeleton.vue';
@@ -39,6 +41,44 @@ const teams = useMapGetter('teams/getTeams');
 const markets = useMapGetter('markets/getActiveMarkets');
 
 const { agentsList } = useAgentsList(true, { includeAIAssignees: true });
+const { isRestricted, canAssign, canChangeVip } = useConversationAccess();
+const getTeamMembers = useMapGetter('teamMembers/getTeamMembers');
+
+const canAssignChat = computed(() => canAssign(currentChat.value));
+const canChangeChatVip = computed(() => canChangeVip(currentChat.value));
+
+const isVip = computed({
+  get() {
+    return !!currentChat.value?.vip;
+  },
+  async set(vip) {
+    try {
+      await store.dispatch('setVip', {
+        conversationId: currentChat.value.id,
+        vip,
+      });
+    } catch {
+      useAlert(t('CONVERSATION_SIDEBAR.VIP.UPDATE_ERROR'));
+    }
+  },
+});
+const currentTeamId = computed(() => currentChat.value?.meta?.team?.id);
+
+// A team lead assigns within the team and may not be in the inbox, so the list comes from the team
+const assignableAgents = computed(() => {
+  if (!isRestricted.value) return agentsList.value;
+
+  const noneOption = agentsList.value.filter(agent => !agent.id);
+  return [...noneOption, ...getTeamMembers.value(currentTeamId.value)];
+});
+
+watch(
+  [isRestricted, currentTeamId],
+  ([restricted, teamId]) => {
+    if (restricted && teamId) store.dispatch('teamMembers/get', { teamId });
+  },
+  { immediate: true }
+);
 const { accountLabels, savedLabels, onUpdateLabels } = useConversationLabels();
 
 const {
@@ -196,6 +236,7 @@ const assignedPriority = computed({
 });
 
 const showSelfAssign = computed(() => {
+  if (!canAssignChat.value) return false;
   if (!assignedAgent.value) return true;
   return (
     assignedAgent.value.id !== currentUser.value.id ||
@@ -348,8 +389,12 @@ const rejectSuggestedLabel = ({ title }) => {
           />
         </template>
       </ContactDetailsItem>
+      <p v-if="!canAssignChat" class="px-2 mb-0 text-sm text-n-slate-12">
+        {{ assignedAgent?.name || $t('CONVERSATION_SIDEBAR.NONE') }}
+      </p>
       <MultiselectDropdown
-        :options="agentsList"
+        v-else
+        :options="assignableAgents"
         :selected-item="assignedAgent"
         :multiselector-title="$t('AGENT_MGMT.MULTI_SELECTOR.TITLE.AGENT')"
         :multiselector-placeholder="$t('AGENT_MGMT.MULTI_SELECTOR.PLACEHOLDER')"
@@ -367,7 +412,11 @@ const rejectSuggestedLabel = ({ title }) => {
         compact
         :title="$t('CONVERSATION_SIDEBAR.TEAM_LABEL')"
       />
+      <p v-if="!canAssignChat" class="px-2 mb-0 text-sm text-n-slate-12">
+        {{ assignedTeam?.name || $t('CONVERSATION_SIDEBAR.NONE') }}
+      </p>
       <MultiselectDropdown
+        v-else
         :options="teamsList"
         :selected-item="assignedTeam"
         show-emoji-icon
@@ -381,6 +430,13 @@ const rejectSuggestedLabel = ({ title }) => {
         "
         @select="onClickAssignTeam"
       />
+    </div>
+    <div v-if="canChangeChatVip">
+      <ContactDetailsItem compact :title="$t('CONVERSATION_SIDEBAR.VIP.LABEL')">
+        <template #button>
+          <Switch v-model="isVip" />
+        </template>
+      </ContactDetailsItem>
     </div>
     <div>
       <ContactDetailsItem

@@ -24,6 +24,16 @@ class Conversations::UnreadCounts::Builder
     build_assignment!
   end
 
+  def unread_conversations
+    account.conversations
+           .open
+           .joins(:messages)
+           .merge(Message.incoming.reorder(nil))
+           .where(messages: { account_id: account.id })
+           .where(unread_since_last_seen_condition)
+           .distinct
+  end
+
   private
 
   def write_memberships(assignment:)
@@ -42,16 +52,6 @@ class Conversations::UnreadCounts::Builder
 
       store.add_memberships(account_id: account.id, memberships: memberships, assignment: assignment)
     end
-  end
-
-  def unread_conversations
-    account.conversations
-           .open
-           .joins(:messages)
-           .merge(Message.incoming.reorder(nil))
-           .where(messages: { account_id: account.id })
-           .where(unread_since_last_seen_condition)
-           .distinct
   end
 
   def unread_since_last_seen_condition

@@ -1,0 +1,19 @@
+# With restricted_inbox_access on, only team leads and administrators can change a conversation's assignee or team.
+# Leads assign within their team. Auto-assignment, automations and bots aren't people, so they are not checked.
+class Conversations::AssignmentGuard
+  def self.restricted?(account, user)
+    user.is_a?(User) && account.feature_enabled?('restricted_inbox_access') && !account.administrators.exists?(id: user.id)
+  end
+
+  def self.allowed?(conversation, user)
+    return true unless restricted?(conversation.account, user)
+
+    conversation.team_id.present? && user.team_members.leads.exists?(team_id: conversation.team_id)
+  end
+
+  def self.assignee_allowed?(conversation, user, assignee_id)
+    return true unless restricted?(conversation.account, user)
+
+    assignee_id.blank? || conversation.team.members.exists?(id: assignee_id)
+  end
+end

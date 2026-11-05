@@ -21,6 +21,6 @@ class Conversations::SortService
 
   def self.apply(scope, sort_by)
     sort_method, sort_order = SORT_OPTIONS[sort_by] || SORT_OPTIONS[DEFAULT_SORT]
-    scope.public_send(sort_method, sort_order)
+    scope.order(vip: :desc).public_send(sort_method, sort_order)
   end
 end

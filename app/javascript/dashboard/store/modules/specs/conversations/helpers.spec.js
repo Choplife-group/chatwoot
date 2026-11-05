@@ -5,6 +5,7 @@ import {
   filterByTeam,
   filterByLabel,
   filterByUnattended,
+  sortComparator,
 } from '../../conversations/helpers';
 
 const conversationList = [
@@ -170,5 +171,19 @@ describe('#filterByUnattended', () => {
   });
   it('returns true if conversation type is unattended and has first reply', () => {
     expect(filterByUnattended(true, 'mentions', 123)).toEqual(true);
+  });
+});
+
+describe('#sortComparator with VIP conversations', () => {
+  it('puts VIP conversations first, then applies the sort', () => {
+    const older = { id: 1, vip: true, last_activity_at: 10 };
+    const newer = { id: 2, vip: false, last_activity_at: 20 };
+    const newest = { id: 3, vip: false, last_activity_at: 30 };
+
+    const sorted = [newer, newest, older].sort((a, b) =>
+      sortComparator(a, b, 'last_activity_at_desc')
+    );
+
+    expect(sorted.map(item => item.id)).toEqual([1, 3, 2]);
   });
 });

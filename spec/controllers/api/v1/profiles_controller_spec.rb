@@ -30,6 +30,17 @@ RSpec.describe 'Profile API', type: :request do
         expect(json_response['message_signature']).to be_nil
       end
 
+      it 'returns the teams the user leads in each account' do
+        team = create(:team, account: account)
+        other_team = create(:team, account: account)
+        create(:team_member, team: team, user: agent, lead: true)
+        create(:team_member, team: other_team, user: agent)
+
+        get '/api/v1/profile', headers: agent.create_new_auth_token, as: :json
+
+        expect(response.parsed_body['accounts'].find { |item| item['id'] == account.id }['led_team_ids']).to eq([team.id])
+      end
+
       it 'returns an empty access token when all accounts have API and webhook access disabled' do
         account.disable_features!('api_and_webhooks')
         allow(account).to receive(:api_and_webhooks_enabled?).and_return(false)

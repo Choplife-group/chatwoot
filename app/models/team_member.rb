@@ -3,6 +3,7 @@
 # Table name: team_members
 #
 #  id         :bigint           not null, primary key
+#  lead       :boolean          default(FALSE), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  team_id    :bigint           not null
@@ -19,12 +20,19 @@ class TeamMember < ApplicationRecord
   belongs_to :team
   validates :user_id, uniqueness: { scope: :team_id }
 
+  scope :leads, -> { where(lead: true) }
+
   after_commit :invalidate_filtered_unread_count_visibility, on: [:create, :destroy]
+  after_update_commit :invalidate_filtered_unread_count_visibility_update, if: :saved_change_to_lead?
 
   private
 
   def invalidate_filtered_unread_count_visibility
     ::Conversations::UnreadCounts::FilteredCountInvalidator.new(team&.account).user_visibility_changed!(user_id: user_id)
+  end
+
+  def invalidate_filtered_unread_count_visibility_update
+    invalidate_filtered_unread_count_visibility
   end
 end
 

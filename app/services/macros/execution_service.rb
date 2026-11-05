@@ -36,15 +36,41 @@ class Macros::ExecutionService < ActionService
   end
 
   def note_resolve_skipped
-    content = I18n.t('conversations.activity.category.resolve_skipped', user_name: @user.name)
+    note_activity(I18n.t('conversations.activity.category.resolve_skipped', user_name: @user.name))
+  end
+
+  def note_assignment_skipped
+    note_activity(I18n.t('conversations.activity.assignment_skipped', user_name: @user.name))
+  end
+
+  def note_activity(content)
     ::Conversations::ActivityMessageJob.perform_later(
       @conversation, { account_id: @conversation.account_id, inbox_id: @conversation.inbox_id, message_type: :activity, content: content }
     )
   end
 
+  def assignment_allowed?(assignee_id = nil)
+    Conversations::AssignmentGuard.allowed?(@conversation, @user) &&
+      Conversations::AssignmentGuard.assignee_allowed?(@conversation, @user, assignee_id)
+  end
+
   def assign_agent(agent_ids)
     agent_ids = agent_ids.map { |id| id == 'self' ? @user.id : id }
+    return note_assignment_skipped unless assignment_allowed?(agent_ids[0] == 'nil' ? nil : agent_ids[0])
+
     super(agent_ids)
+  end
+
+  def assign_team(team_ids = [])
+    return note_assignment_skipped unless assignment_allowed?
+
+    super
+  end
+
+  def remove_assigned_team(params)
+    return note_assignment_skipped unless assignment_allowed?
+
+    super
   end
 
   def add_private_note(message)

@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import NextButton from 'dashboard/components-next/button/Button.vue';
 import Avatar from 'next/avatar/Avatar.vue';
 import Checkbox from 'dashboard/components-next/checkbox/Checkbox.vue';
+import Switch from 'dashboard/components-next/switch/Switch.vue';
 import BaseTable from 'dashboard/components-next/table/BaseTable.vue';
 import BaseTableRow from 'dashboard/components-next/table/BaseTableRow.vue';
 import BaseTableCell from 'dashboard/components-next/table/BaseTableCell.vue';
@@ -20,6 +21,18 @@ const props = defineProps({
   updateSelectedAgents: {
     type: Function,
     default: () => {},
+  },
+  selectedLeads: {
+    type: Array,
+    default: () => [],
+  },
+  updateSelectedLeads: {
+    type: Function,
+    default: () => {},
+  },
+  showLeadColumn: {
+    type: Boolean,
+    default: false,
   },
   isWorking: {
     type: Boolean,
@@ -64,6 +77,16 @@ const handleSelectAgent = agentId => {
   props.updateSelectedAgents(result);
 };
 
+const isLead = agentId => props.selectedLeads.includes(agentId);
+
+const handleToggleLead = agentId => {
+  props.updateSelectedLeads(
+    isLead(agentId)
+      ? props.selectedLeads.filter(item => item !== agentId)
+      : [...props.selectedLeads, agentId]
+  );
+};
+
 const toggleSelectAll = () => {
   if (allAgentsSelected.value) {
     props.updateSelectedAgents([]);
@@ -77,6 +100,7 @@ const headers = computed(() => [
   '',
   t('TEAMS_SETTINGS.AGENTS.AGENT'),
   t('TEAMS_SETTINGS.AGENTS.EMAIL'),
+  ...(props.showLeadColumn ? [t('TEAMS_SETTINGS.AGENTS.TEAM_LEAD')] : []),
 ]);
 </script>
 
@@ -126,6 +150,14 @@ const headers = computed(() => [
             <span class="text-body-main text-n-slate-11 truncate block">
               {{ agent.email || '---' }}
             </span>
+          </BaseTableCell>
+
+          <BaseTableCell v-if="showLeadColumn" class="w-24">
+            <Switch
+              :model-value="isLead(agent.id)"
+              :disabled="!isAgentSelected(agent.id)"
+              @update:model-value="handleToggleLead(agent.id)"
+            />
           </BaseTableCell>
         </template>
       </BaseTableRow>

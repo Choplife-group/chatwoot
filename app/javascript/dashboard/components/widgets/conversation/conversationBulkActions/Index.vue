@@ -7,6 +7,7 @@ import { findSnoozeTime } from 'dashboard/helper/snoozeHelpers';
 import { emitter } from 'shared/helpers/mitt';
 import { useBulkActions } from 'dashboard/composables/chatlist/useBulkActions.js';
 import { usePolicy } from 'dashboard/composables/usePolicy';
+import { useConversationAccess } from 'dashboard/composables/useConversationAccess';
 import { FEATURE_FLAGS } from 'dashboard/featureFlags';
 import wootConstants from 'dashboard/constants/globals';
 import {
@@ -71,6 +72,8 @@ const {
 } = useBulkActions();
 
 const { isFeatureFlagEnabled } = usePolicy();
+const { canSeeQueues } = useConversationAccess();
+
 const isMacrosEnabled = computed(() =>
   isFeatureFlagEnabled(FEATURE_FLAGS.MACROS)
 );
@@ -201,11 +204,13 @@ onUnmounted(() => {
             @update="onUpdateConversations"
           />
           <BulkAgentActions
+            v-if="canSeeQueues"
             :selected-inboxes="selectedInboxes"
             :conversation-count="conversations.length"
             @select="onAssignAgent"
           />
           <BulkTeamActions
+            v-if="canSeeQueues"
             :conversation-count="conversations.length"
             @select="onAssignTeam"
           />

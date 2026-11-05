@@ -55,6 +55,14 @@ const filterTypes = [
     attributeModel: 'standard',
   },
   {
+    attributeKey: 'vip',
+    attributeI18nKey: 'VIP',
+    inputType: 'search_select',
+    dataType: 'text',
+    filterOperators: OPERATOR_TYPES_1,
+    attributeModel: 'standard',
+  },
+  {
     attributeKey: 'category_id',
     attributeI18nKey: 'CATEGORY',
     inputType: 'search_select',
@@ -160,6 +168,10 @@ export const filterAttributeGroups = [
       {
         key: 'market_id',
         i18nKey: 'MARKET',
+      },
+      {
+        key: 'vip',
+        i18nKey: 'VIP',
       },
       {
         key: 'category_id',

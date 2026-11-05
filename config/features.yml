@@ -295,3 +295,7 @@
   enabled: false
   premium: true
   column: feature_flags_ext_1
+- name: restricted_inbox_access
+  display_name: Restricted Inbox Access
+  enabled: false
+  column: feature_flags_ext_1
