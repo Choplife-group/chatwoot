@@ -21,7 +21,8 @@ export const actions = {
   process: async function processAction({ commit }, payload) {
     commit(types.SET_BULK_ACTIONS_FLAG, { isUpdating: true });
     try {
-      await BulkActionsAPI.create(payload);
+      const response = await BulkActionsAPI.create(payload);
+      return response?.data;
     } catch (error) {
       throw new Error(error);
     } finally {

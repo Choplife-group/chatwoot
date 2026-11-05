@@ -77,6 +77,7 @@ class Account < ApplicationRecord
   has_many :contacts, dependent: :destroy_async
   has_many :companies, dependent: :destroy_async
   has_many :conversations, dependent: :destroy_async
+  has_many :conversation_categories, dependent: :destroy_async
   has_many :csat_survey_responses, dependent: :destroy_async
   has_many :custom_attribute_definitions, dependent: :destroy_async
   has_many :custom_filters, dependent: :destroy_async
@@ -92,6 +93,7 @@ class Account < ApplicationRecord
   has_many :line_channels, dependent: :destroy_async, class_name: '::Channel::Line'
   has_many :mentions, dependent: :destroy_async
   has_many :messages, dependent: :destroy_async
+  has_many :markets, dependent: :destroy_async
   has_many :notes, dependent: :destroy_async
   has_many :notification_settings, dependent: :destroy_async
   has_many :notifications, dependent: :destroy_async

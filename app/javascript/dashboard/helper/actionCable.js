@@ -201,6 +201,8 @@ class ActionCableConnector extends BaseActionCableConnector {
       lastActivityAt,
       conversationId,
     });
+    // A new message can start or stop a conversation waiting for a reply
+    emitter.emit('conversation_group_counts_changed');
   };
 
   // eslint-disable-next-line class-methods-use-this

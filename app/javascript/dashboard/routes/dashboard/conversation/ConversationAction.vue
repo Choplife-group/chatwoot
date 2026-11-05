@@ -13,6 +13,7 @@ import {
   CONVERSATION_EVENTS,
 } from 'dashboard/helper/AnalyticsHelper/events';
 import ContactDetailsItem from './ContactDetailsItem.vue';
+import CategoryPicker from './CategoryPicker.vue';
 import MultiselectDropdown from 'shared/components/ui/MultiselectDropdown.vue';
 import ConversationLabels from './labels/LabelBox.vue';
 import NextButton from 'dashboard/components-next/button/Button.vue';
@@ -35,6 +36,7 @@ const { t } = useI18n();
 const currentChat = useMapGetter('getSelectedChat');
 const currentUser = useMapGetter('getCurrentUser');
 const teams = useMapGetter('teams/getTeams');
+const markets = useMapGetter('markets/getActiveMarkets');
 
 const { agentsList } = useAgentsList(true, { includeAIAssignees: true });
 const { accountLabels, savedLabels, onUpdateLabels } = useConversationLabels();
@@ -90,6 +92,35 @@ const teamsList = computed(() => {
   }
   return teams.value;
 });
+
+const marketOption = market =>
+  market && { id: market.id, name: `${market.name} (${market.code})` };
+
+const marketsList = computed(() => {
+  const options = markets.value.map(marketOption);
+  if (currentChat.value?.meta?.market) {
+    return [{ id: 0, name: t('CONVERSATION_SIDEBAR.MARKET.NONE') }, ...options];
+  }
+  return options;
+});
+
+const assignedMarket = computed(() =>
+  marketOption(currentChat.value?.meta?.market)
+);
+
+const onClickAssignMarket = async selectedMarket => {
+  const isSameMarket = assignedMarket.value?.id === selectedMarket.id;
+  const market = isSameMarket || !selectedMarket.id ? null : selectedMarket;
+  try {
+    await store.dispatch('assignMarket', {
+      conversationId: currentChat.value.id,
+      market,
+    });
+    useAlert(t('CONVERSATION_SIDEBAR.MARKET.UPDATED'));
+  } catch (error) {
+    useAlert(t('CONVERSATION_SIDEBAR.MARKET.UPDATE_ERROR'));
+  }
+};
 
 const assignedAgent = computed({
   get() {
@@ -350,6 +381,30 @@ const rejectSuggestedLabel = ({ title }) => {
         "
         @select="onClickAssignTeam"
       />
+    </div>
+    <div>
+      <ContactDetailsItem
+        compact
+        :title="$t('CONVERSATION_SIDEBAR.MARKET_LABEL')"
+      />
+      <MultiselectDropdown
+        :options="marketsList"
+        :selected-item="assignedMarket"
+        :multiselector-title="$t('CONVERSATION_SIDEBAR.MARKET.SELECT_TITLE')"
+        :multiselector-placeholder="$t('AGENT_MGMT.MULTI_SELECTOR.PLACEHOLDER')"
+        :no-search-result="$t('CONVERSATION_SIDEBAR.MARKET.NO_RESULTS')"
+        :input-placeholder="
+          $t('CONVERSATION_SIDEBAR.MARKET.SEARCH_PLACEHOLDER')
+        "
+        @select="onClickAssignMarket"
+      />
+    </div>
+    <div>
+      <ContactDetailsItem
+        compact
+        :title="$t('CONVERSATION_SIDEBAR.CATEGORY_LABEL')"
+      />
+      <CategoryPicker />
     </div>
     <div>
       <ContactDetailsItem compact :title="$t('CONVERSATION.PRIORITY.TITLE')">

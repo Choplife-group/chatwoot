@@ -1278,6 +1278,11 @@
       "REMOVE": "Remove Help Center",
       "SUB_TEXT": "Attach a Help Center with the inbox"
     },
+    "MARKET": {
+      "LABEL": "Market",
+      "SUB_TEXT": "New conversations in this inbox get this market. Leave empty for inboxes shared by several markets, such as the support email: they use the contact’s market instead.",
+      "NONE": "No market (shared inbox)"
+    },
     "AUTO_ASSIGNMENT": {
       "MAX_ASSIGNMENT_LIMIT": "Auto assignment limit",
       "MAX_ASSIGNMENT_LIMIT_RANGE_ERROR": "Please enter a value greater than 0",

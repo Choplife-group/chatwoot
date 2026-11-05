@@ -1,0 +1,23 @@
+tags:
+  - Markets
+operationId: list-all-markets
+summary: List all markets
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: List the markets of the account (archived ones included), in display order
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/market'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

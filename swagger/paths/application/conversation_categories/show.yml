@@ -1,0 +1,27 @@
+tags:
+  - Conversation Categories
+operationId: get-details-of-a-conversation-category
+summary: Get a conversation category
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: Get the details of a category
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/conversation_category'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '404':
+    description: The category does not exist in the account
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

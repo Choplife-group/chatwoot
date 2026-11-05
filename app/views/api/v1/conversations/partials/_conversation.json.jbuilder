@@ -24,6 +24,8 @@ json.meta do
       json.partial! 'api/v1/models/team', formats: [:json], resource: conversation.team
     end
   end
+  json.market conversation.market&.push_event_data
+  json.category conversation.category&.slice(:id, :name, :ancestor_ids)
   json.hmac_verified conversation.contact_inbox&.hmac_verified
 end
 

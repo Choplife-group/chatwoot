@@ -157,6 +157,16 @@ export const mutations = {
     chat.meta.team = team;
   },
 
+  [types.ASSIGN_CATEGORY](_state, { category, conversationId }) {
+    const [chat] = _state.allConversations.filter(c => c.id === conversationId);
+    chat.meta.category = category;
+  },
+
+  [types.ASSIGN_MARKET](_state, { market, conversationId }) {
+    const [chat] = _state.allConversations.filter(c => c.id === conversationId);
+    chat.meta.market = market;
+  },
+
   [types.UPDATE_CONVERSATION_LAST_ACTIVITY](
     _state,
     { lastActivityAt, conversationId }

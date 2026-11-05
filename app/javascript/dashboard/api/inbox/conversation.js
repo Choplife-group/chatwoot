@@ -14,6 +14,7 @@ class ConversationApi extends ApiClient {
       page,
       labels,
       teamId,
+      marketId,
       conversationType,
       sortBy,
       updatedWithin,
@@ -25,6 +26,7 @@ class ConversationApi extends ApiClient {
       params: {
         inbox_id: inboxId,
         team_id: teamId,
+        market_id: marketId,
         status,
         assignee_type: assigneeType,
         page,
@@ -80,6 +82,24 @@ class ConversationApi extends ApiClient {
     return axios.post(`${this.url}/${conversationId}/assignments`, params);
   }
 
+  groupCounts(groupBy) {
+    return axios.get(`${this.url}/group_counts`, {
+      params: { group_by: groupBy },
+    });
+  }
+
+  updateCategory({ conversationId, categoryId }) {
+    return axios.patch(`${this.url}/${conversationId}`, {
+      category_id: categoryId,
+    });
+  }
+
+  updateMarket({ conversationId, marketId }) {
+    return axios.patch(`${this.url}/${conversationId}`, {
+      market_id: marketId,
+    });
+  }
+
   markMessageRead({ id }) {
     return axios.post(`${this.url}/${id}/update_last_seen`);
   }
@@ -103,7 +123,15 @@ class ConversationApi extends ApiClient {
     return axios.post(`${this.url}/${conversationId}/unmute`);
   }
 
-  meta({ inboxId, status, assigneeType, labels, teamId, conversationType }) {
+  meta({
+    inboxId,
+    status,
+    assigneeType,
+    labels,
+    teamId,
+    marketId,
+    conversationType,
+  }) {
     return axios.get(`${this.url}/meta`, {
       params: {
         inbox_id: inboxId,
@@ -111,6 +139,7 @@ class ConversationApi extends ApiClient {
         assignee_type: assigneeType,
         labels,
         team_id: teamId,
+        market_id: marketId,
         conversation_type: conversationType,
       },
     });

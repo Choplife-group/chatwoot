@@ -23,7 +23,8 @@
     },
     "RESOLVE": {
       "ALL_MISSING_ATTRIBUTES": "Cannot resolve conversations due to missing required attributes",
-      "PARTIAL_SUCCESS": "Some conversations need required attributes before resolving and were skipped"
+      "PARTIAL_SUCCESS": "Some conversations need required attributes before resolving and were skipped",
+      "CATEGORY_SKIPPED": "{n} conversation wasn't resolved: choose a category first | {n} conversations weren't resolved: choose a category first"
     },
     "LABELS": {
       "ASSIGN_LABELS": "Assign labels",

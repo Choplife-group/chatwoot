@@ -163,29 +163,47 @@ export function useBulkActions() {
 
     let conversationIds = selectedConversations.value;
     let skippedCount = 0;
+    // A person can't resolve a conversation without a category (the API skips them too)
+    let uncategorisedCount = 0;
 
     // If resolving, check for required attributes
     if (status === wootConstants.STATUS_TYPE.RESOLVED) {
-      const { validIds, skippedIds } = selectedConversations.value.reduce(
-        (acc, id) => {
-          const conversation = store.getters.getConversationById(id);
-          const currentCustomAttributes = conversation?.custom_attributes || {};
-          const { hasMissing } = checkMissingAttributes(
-            currentCustomAttributes
-          );
+      const { validIds, skippedIds, uncategorisedIds } =
+        selectedConversations.value.reduce(
+          (acc, id) => {
+            const conversation = store.getters.getConversationById(id);
+            const currentCustomAttributes =
+              conversation?.custom_attributes || {};
+            const { hasMissing } = checkMissingAttributes(
+              currentCustomAttributes
+            );
 
-          if (!hasMissing) {
-            acc.validIds.push(id);
-          } else {
-            acc.skippedIds.push(id);
-          }
-          return acc;
-        },
-        { validIds: [], skippedIds: [] }
-      );
+            if (!conversation?.meta?.category) {
+              acc.uncategorisedIds.push(id);
+            } else if (!hasMissing) {
+              acc.validIds.push(id);
+            } else {
+              acc.skippedIds.push(id);
+            }
+            return acc;
+          },
+          { validIds: [], skippedIds: [], uncategorisedIds: [] }
+        );
 
       conversationIds = validIds;
       skippedCount = skippedIds.length;
+      uncategorisedCount = uncategorisedIds.length;
+
+      if (uncategorisedCount > 0 && validIds.length === 0) {
+        useAlert(
+          t(
+            'BULK_ACTION.RESOLVE.CATEGORY_SKIPPED',
+            { n: uncategorisedCount },
+            uncategorisedCount
+          )
+        );
+        return;
+      }
 
       if (skippedCount > 0 && validIds.length === 0) {
         // All conversations have missing attributes
@@ -199,7 +217,7 @@ export function useBulkActions() {
 
     try {
       if (conversationIds.length > 0) {
-        await store.dispatch('bulkActions/process', {
+        const result = await store.dispatch('bulkActions/process', {
           type: 'Conversation',
           ids: conversationIds,
           fields: {
@@ -207,11 +225,20 @@ export function useBulkActions() {
           },
           snoozed_until: snoozedUntil,
         });
+        uncategorisedCount += result?.skipped_ids?.length || 0;
       }
 
       store.dispatch('bulkActions/clearSelectedConversationIds');
 
-      if (skippedCount > 0) {
+      if (uncategorisedCount > 0) {
+        useAlert(
+          t(
+            'BULK_ACTION.RESOLVE.CATEGORY_SKIPPED',
+            { n: uncategorisedCount },
+            uncategorisedCount
+          )
+        );
+      } else if (skippedCount > 0) {
         useAlert(t('BULK_ACTION.RESOLVE.PARTIAL_SUCCESS'));
       } else {
         useAlert(t('BULK_ACTION.UPDATE.UPDATE_SUCCESFUL'));

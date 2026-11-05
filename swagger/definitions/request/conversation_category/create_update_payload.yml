@@ -1,0 +1,21 @@
+type: object
+properties:
+  conversation_category:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the category, unique among its siblings
+        example: Pending approval
+      parent_id:
+        type: number
+        description: The ID of the parent category (create only; categories can't be moved). Leave out for a top-level category.
+        example: 1
+      position:
+        type: number
+        description: Order among sibling categories
+        example: 0
+      archived:
+        type: boolean
+        description: Set to true to archive, or false to restore, the category and everything below it (update only)
+        example: false

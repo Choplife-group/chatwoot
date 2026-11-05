@@ -2453,6 +2453,70 @@
           }
         }
       },
+      "market": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the market"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the market, e.g. Uganda"
+          },
+          "code": {
+            "type": "string",
+            "description": "Two-letter ISO country code of the market, e.g. UG"
+          },
+          "position": {
+            "type": "number",
+            "description": "Sort order; lower numbers are listed first"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Archived markets stay on existing conversations but can't be chosen any more"
+          }
+        }
+      },
+      "conversation_category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the category"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the category, e.g. Pending approval"
+          },
+          "parent_id": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The ID of the parent category; null for a top-level category"
+          },
+          "depth": {
+            "type": "number",
+            "description": "Level in the tree, from 1 (top level) to 5"
+          },
+          "ancestor_ids": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "IDs of the parent categories, top level first"
+          },
+          "position": {
+            "type": "number",
+            "description": "Order among sibling categories"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Archived categories stay on existing conversations but can't be chosen any more"
+          }
+        }
+      },
       "label": {
         "type": "object",
         "properties": {
@@ -5086,6 +5150,66 @@
           }
         }
       },
+      "market_create_update_payload": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the market",
+                "example": "Uganda"
+              },
+              "code": {
+                "type": "string",
+                "description": "Two-letter ISO country code, unique in the account",
+                "example": "UG"
+              },
+              "position": {
+                "type": "number",
+                "description": "Sort order; lower numbers are listed first",
+                "example": 1
+              },
+              "archived": {
+                "type": "boolean",
+                "description": "Set to false to restore an archived market (update only)",
+                "example": false
+              }
+            }
+          }
+        }
+      },
+      "conversation_category_create_update_payload": {
+        "type": "object",
+        "properties": {
+          "conversation_category": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the category, unique among its siblings",
+                "example": "Pending approval"
+              },
+              "parent_id": {
+                "type": "number",
+                "description": "The ID of the parent category (create only; categories can't be moved). Leave out for a top-level category.",
+                "example": 1
+              },
+              "position": {
+                "type": "number",
+                "description": "Order among sibling categories",
+                "example": 0
+              },
+              "archived": {
+                "type": "boolean",
+                "description": "Set to true to archive, or false to restore, the category and everything below it (update only)",
+                "example": false
+              }
+            }
+          }
+        }
+      },
       "label_create_update_payload": {
         "type": "object",
         "properties": {
@@ -7675,6 +7799,24 @@
         },
         "required": true,
         "description": "The ID of the team to be updated"
+      },
+      "market_id": {
+        "in": "path",
+        "name": "market_id",
+        "schema": {
+          "type": "integer"
+        },
+        "required": true,
+        "description": "The ID of the market"
+      },
+      "conversation_category_id": {
+        "in": "path",
+        "name": "conversation_category_id",
+        "schema": {
+          "type": "integer"
+        },
+        "required": true,
+        "description": "The ID of the conversation category"
       },
       "inbox_id": {
         "in": "path",

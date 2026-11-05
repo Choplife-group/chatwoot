@@ -72,6 +72,10 @@ platform_account:
   $ref: ./resource/platform_account.yml
 team:
   $ref: ./resource/team.yml
+market:
+  $ref: ./resource/market.yml
+conversation_category:
+  $ref: ./resource/conversation_category.yml
 label:
   $ref: ./resource/label.yml
 integrations_app:
@@ -181,6 +185,10 @@ inbox_update_sms_channel_payload:
 # Team
 team_create_update_payload:
   $ref: ./request/team/create_update_payload.yml
+market_create_update_payload:
+  $ref: ./request/market/create_update_payload.yml
+conversation_category_create_update_payload:
+  $ref: ./request/conversation_category/create_update_payload.yml
 
 # Label
 label_create_update_payload:

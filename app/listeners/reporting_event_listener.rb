@@ -15,6 +15,8 @@ class ReportingEventListener < BaseListener
       inbox_id: conversation.inbox_id,
       user_id: conversation.assignee_id,
       conversation_id: conversation.id,
+      # Snapshot at resolution, so recategorising later doesn't change historical reports
+      market_id: conversation.market_id, category_id: conversation.category_id,
       event_start_time: conversation.created_at,
       event_end_time: event_end_time
     )

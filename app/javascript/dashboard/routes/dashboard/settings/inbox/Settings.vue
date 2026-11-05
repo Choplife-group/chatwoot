@@ -116,6 +116,7 @@ export default {
       replyTime: '',
       selectedTabIndex: 0,
       selectedPortalSlug: '',
+      selectedMarketId: '',
       showBusinessNameInput: false,
       healthData: null,
       isLoadingHealth: false,
@@ -135,6 +136,7 @@ export default {
       isMetaMessageSendingDisabled: 'globalConfig/isMetaMessageSendingDisabled',
       uiFlags: 'inboxes/getUIFlags',
       portals: 'portals/allPortals',
+      markets: 'markets/getActiveMarkets',
     }),
     isInboundEmailEnabled() {
       return this.isFeatureEnabledonAccount(
@@ -573,6 +575,7 @@ export default {
       this.selectedPortalSlug = this.inbox.help_center
         ? this.inbox.help_center.slug
         : '';
+      this.selectedMarketId = this.inbox.market_id || '';
 
       const savedBubbleSettings = LocalStorage.get(
         this.widgetBuilderStorageKey
@@ -701,6 +704,7 @@ export default {
               )?.id || null
             : null,
           lock_to_single_conversation: this.locktoSingleConversation,
+          market_id: this.selectedMarketId || null,
           sender_name_type: this.senderNameType,
           business_name: this.businessName || null,
           channel: {
@@ -983,6 +987,22 @@ export default {
                 type="text"
                 disabled
                 class="!mb-0"
+              />
+            </SettingsFieldSection>
+
+            <SettingsFieldSection
+              :label="$t('INBOX_MGMT.MARKET.LABEL')"
+              :help-text="$t('INBOX_MGMT.MARKET.SUB_TEXT')"
+            >
+              <SelectInput
+                v-model="selectedMarketId"
+                :options="[
+                  { value: '', label: $t('INBOX_MGMT.MARKET.NONE') },
+                  ...markets.map(m => ({
+                    value: m.id,
+                    label: `${m.name} (${m.code})`,
+                  })),
+                ]"
               />
             </SettingsFieldSection>
 

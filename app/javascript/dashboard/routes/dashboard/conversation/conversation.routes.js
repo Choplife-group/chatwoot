@@ -140,6 +140,29 @@ export default {
       }),
     },
     {
+      path: frontendURL('accounts/:accountId/market/:marketId'),
+      name: 'market_conversations',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: route => ({ marketId: route.params.marketId }),
+    },
+    {
+      path: frontendURL(
+        'accounts/:accountId/market/:marketId/conversations/:conversationId'
+      ),
+      name: 'conversations_through_market',
+      meta: {
+        permissions: CONVERSATION_PERMISSIONS,
+      },
+      component: ConversationView,
+      props: route => ({
+        conversationId: route.params.conversationId,
+        marketId: route.params.marketId,
+      }),
+    },
+    {
       path: frontendURL('accounts/:accountId/custom_view/:id'),
       name: 'folder_conversations',
       meta: {

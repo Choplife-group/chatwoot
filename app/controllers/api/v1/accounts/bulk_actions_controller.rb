@@ -5,7 +5,7 @@ class Api::V1::Accounts::BulkActionsController < Api::V1::Accounts::BaseControll
     case normalized_type
     when 'Conversation'
       enqueue_conversation_job
-      head :ok
+      render json: { skipped_ids: uncategorised_ids_to_resolve }
     when 'Contact'
       check_authorization_for_contact_action
       enqueue_contact_job
@@ -40,6 +40,14 @@ class Api::V1::Accounts::BulkActionsController < Api::V1::Accounts::BaseControll
       user: current_user,
       params: conversation_params
     )
+  end
+
+  # Conversations the job won't resolve because they have no category yet, so the dashboard can say so
+  def uncategorised_ids_to_resolve
+    return [] unless conversation_params.dig(:fields, :status) == 'resolved' && Conversations::ResolveGuard.applies_to?(current_user)
+
+    scope = @current_account.conversations.where(display_id: conversation_params[:ids], category_id: nil)
+    Conversations::PermissionFilterService.new(scope, current_user, @current_account).perform.pluck(:display_id)
   end
 
   def enqueue_contact_job

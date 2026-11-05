@@ -1,0 +1,33 @@
+tags:
+  - Markets
+operationId: create-a-market
+summary: Create a market
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: Create a market. Only administrators can create markets.
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/market_create_update_payload'
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/market'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '422':
+    description: Validation error
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

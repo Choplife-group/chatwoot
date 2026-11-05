@@ -3,6 +3,9 @@ tags:
 operationId: toggle-status-of-a-conversation
 summary: Toggle Status
 description: |-
+  A person can't resolve a conversation that has no category: the request returns 422
+  "Choose a category and subcategory before resolving this conversation". Bots are not blocked.
+
   Toggle the status of a conversation. Pass `status` to explicitly set the
   conversation state. Use `snoozed` along with `snoozed_until` to snooze a
   conversation until a specific time. If `snoozed_until` is omitted, the

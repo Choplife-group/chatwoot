@@ -15,6 +15,8 @@ RSpec.describe Conversations::EventDataPresenter do
           assignee: conversation.assigned_entity&.push_event_data,
           assignee_type: conversation.assignee_type,
           team: conversation.team&.push_event_data,
+          market: conversation.market&.push_event_data,
+          category: conversation.category&.push_event_data,
           hmac_verified: conversation.contact_inbox.hmac_verified
         },
         id: conversation.display_id,

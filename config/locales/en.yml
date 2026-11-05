@@ -115,6 +115,8 @@ en:
       multi_account_invitation_not_allowed: Users associated with another account cannot be added while SAML is enabled
     conversations:
       resolved: Conversation is resolved and does not accept new messages
+      category_required: Choose a category and subcategory before resolving this conversation
+      invalid_category: Choose a category from the last level of the list
       unread_counts:
         feature_not_enabled: Conversation unread counts feature not enabled for this account
     data_import:
@@ -371,6 +373,14 @@ en:
         assigned: 'Assigned to %{team_name} by %{user_name}'
         assigned_with_assignee: 'Assigned to %{assignee_name} via %{team_name} by %{user_name}'
         removed: 'Unassigned from %{team_name} by %{user_name}'
+      category:
+        set: '%{user_name} set the category to %{category_path}'
+        removed: '%{user_name} removed the category'
+        resolve_skipped: 'Not resolved by %{user_name}: choose a category and subcategory first'
+      market:
+        added: '%{user_name} set the market to %{market_name}'
+        updated: '%{user_name} changed the market from %{old_market_name} to %{market_name}'
+        removed: '%{user_name} removed the market'
       labels:
         added: '%{user_name} added %{labels}'
         removed: '%{user_name} removed %{labels}'

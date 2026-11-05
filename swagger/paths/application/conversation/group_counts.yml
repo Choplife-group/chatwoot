@@ -1,0 +1,50 @@
+tags:
+  - Conversations
+operationId: conversation-group-counts
+summary: Open and waiting counts per team or market
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: Counts of open conversations, and of those waiting for a reply, per team or per market. Only conversations the user can see are counted.
+parameters:
+  - in: query
+    name: group_by
+    required: true
+    schema:
+      type: string
+      enum: [team, market]
+    description: Count per team or per market
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            payload:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: The ID of the team or market
+                  open_count:
+                    type: number
+                    description: Open conversations
+                  waiting_count:
+                    type: number
+                    description: Open conversations whose last customer message has no reply yet
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '422':
+    description: Validation error
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

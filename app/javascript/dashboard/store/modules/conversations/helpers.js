@@ -20,6 +20,11 @@ export const filterByTeam = (shouldFilter, teamId, chatTeamId) => {
   return teamId ? isOnTeam && shouldFilter : shouldFilter;
 };
 
+export const filterByMarket = (shouldFilter, marketId, chatMarketId) => {
+  const isOnMarket = Number(marketId) === chatMarketId;
+  return marketId ? isOnMarket && shouldFilter : shouldFilter;
+};
+
 export const filterByLabel = (shouldFilter, labels, chatLabels) => {
   const isOnLabel = labels.every(label => chatLabels.includes(label));
   return labels.length ? isOnLabel && shouldFilter : shouldFilter;
@@ -36,7 +41,14 @@ export const filterByUnattended = (
 };
 
 export const applyPageFilters = (conversation, filters) => {
-  const { inboxId, status, labels = [], teamId, conversationType } = filters;
+  const {
+    inboxId,
+    status,
+    labels = [],
+    teamId,
+    marketId,
+    conversationType,
+  } = filters;
   const {
     status: chatStatus,
     inbox_id: chatInboxId,
@@ -51,6 +63,7 @@ export const applyPageFilters = (conversation, filters) => {
   let shouldFilter = filterByStatus(chatStatus, status);
   shouldFilter = filterByInbox(shouldFilter, inboxId, chatInboxId);
   shouldFilter = filterByTeam(shouldFilter, teamId, chatTeamId);
+  shouldFilter = filterByMarket(shouldFilter, marketId, meta.market?.id);
   shouldFilter = filterByLabel(shouldFilter, labels, chatLabels);
   shouldFilter = filterByUnattended(
     shouldFilter,

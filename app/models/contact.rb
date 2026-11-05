@@ -22,12 +22,14 @@
 #  updated_at            :datetime         not null
 #  account_id            :integer          not null
 #  company_id            :bigint
+#  market_id             :bigint
 #
 # Indexes
 #
 #  index_contacts_on_account_id                          (account_id)
 #  index_contacts_on_account_id_and_contact_type         (account_id,contact_type)
 #  index_contacts_on_account_id_and_last_activity_at     (account_id,last_activity_at DESC NULLS LAST)
+#  index_contacts_on_account_id_and_market_id            (account_id,market_id)
 #  index_contacts_on_blocked                             (blocked)
 #  index_contacts_on_company_id                          (company_id)
 #  index_contacts_on_lower_email_account_id              (lower((email)::text), account_id)
@@ -56,6 +58,7 @@ class Contact < ApplicationRecord
             format: { with: /\A\+[1-9]\d{1,14}\z/, message: I18n.t('errors.contacts.phone_number.invalid') }
 
   belongs_to :account
+  belongs_to :market, optional: true
   has_many :conversations, dependent: :destroy_async
   has_many :contact_inboxes, dependent: :destroy_async
   has_many :csat_survey_responses, dependent: :destroy_async
@@ -145,6 +148,7 @@ class Contact < ApplicationRecord
       email: email,
       id: id,
       identifier: identifier,
+      market_id: market_id,
       name: name,
       phone_number: phone_number,
       thumbnail: avatar_url,

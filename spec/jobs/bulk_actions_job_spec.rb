@@ -80,6 +80,8 @@ RSpec.describe BulkActionsJob do
 
     it 'skips conversations whose inbox the agent does not belong to' do
       forbidden_conversation = create(:conversation, account_id: account.id, status: :open)
+      # A person can only resolve a categorised conversation
+      conversation_1.update!(category: account.conversation_categories.create!(name: 'Withdrawal'))
       params = {
         type: 'Conversation',
         fields: { status: 'resolved' },

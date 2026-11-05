@@ -69,6 +69,12 @@ export const AUTOMATIONS = {
         filterOperators: OPERATOR_TYPES_3,
       },
       {
+        key: 'market_id',
+        name: 'MARKET',
+        inputType: 'search_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+      {
         key: 'priority',
         name: 'PRIORITY',
         inputType: 'multi_select',
@@ -174,6 +180,12 @@ export const AUTOMATIONS = {
         name: 'STATUS',
         inputType: 'multi_select',
         filterOperators: OPERATOR_TYPES_1,
+      },
+      {
+        key: 'market_id',
+        name: 'MARKET',
+        inputType: 'search_select',
+        filterOperators: OPERATOR_TYPES_3,
       },
       {
         key: 'browser_language',
@@ -359,6 +371,12 @@ export const AUTOMATIONS = {
         filterOperators: OPERATOR_TYPES_3,
       },
       {
+        key: 'market_id',
+        name: 'MARKET',
+        inputType: 'search_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+      {
         key: 'email',
         name: 'EMAIL',
         inputType: 'plain_text',
@@ -506,6 +524,12 @@ export const AUTOMATIONS = {
         filterOperators: OPERATOR_TYPES_3,
       },
       {
+        key: 'market_id',
+        name: 'MARKET',
+        inputType: 'search_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+      {
         key: 'inbox_id',
         name: 'INBOX',
         inputType: 'multi_select',
@@ -639,6 +663,12 @@ export const AUTOMATIONS = {
       {
         key: 'team_id',
         name: 'TEAM_NAME',
+        inputType: 'search_select',
+        filterOperators: OPERATOR_TYPES_3,
+      },
+      {
+        key: 'market_id',
+        name: 'MARKET',
         inputType: 'search_select',
         filterOperators: OPERATOR_TYPES_3,
       },

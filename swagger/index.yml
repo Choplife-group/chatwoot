@@ -89,6 +89,10 @@ tags:
     description: User profile APIs
   - name: Reports
     description: Analytics and reporting APIs
+  - name: Markets
+    description: Market (country) management APIs
+  - name: Conversation Categories
+    description: Reason-for-contact category tree APIs
   - name: Teams
     description: Team management APIs
   - name: Webhooks

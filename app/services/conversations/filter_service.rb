@@ -27,7 +27,7 @@ class Conversations::FilterService < FilterService
     # :messages is deliberately not preloaded: the list payload fetches messages through
     # scoped queries (last message, last_non_activity_message), which bypass the preload.
     conversations = @account.conversations.includes(
-      :taggings, { assignee: { avatar_attachment: [:blob] } }, { contact: { avatar_attachment: [:blob] } }, :team,
+      :taggings, { assignee: { avatar_attachment: [:blob] } }, { contact: { avatar_attachment: [:blob] } }, :team, :market, :category,
       :contact_inbox
     ).preload(
       inbox: :channel,
@@ -40,6 +40,13 @@ class Conversations::FilterService < FilterService
       @account,
       plan_hint_selective_filter: label_filter_present?
     ).perform
+  end
+
+  # Filtering by a category also matches every category below it
+  def filter_values(query_hash)
+    return ConversationCategory.subtree_ids(@account, query_hash['values']) if query_hash['attribute_key'] == 'category_id'
+
+    super
   end
 
   def current_page

@@ -173,6 +173,7 @@ class Api::V1::Accounts::ContactsController < Api::V1::Accounts::BaseController
   def permitted_params
     permitted_params = params.permit(:name, :identifier, :email, :phone_number, :avatar, :avatar_url, :blocked,
                                      additional_attributes: {}, custom_attributes: {})
+    permitted_params = with_market_id(permitted_params)
     return permitted_params unless Current.account.feature_enabled?('companies') && params.key?(:company_id)
 
     company_id = params[:company_id]

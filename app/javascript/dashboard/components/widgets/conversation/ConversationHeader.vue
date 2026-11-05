@@ -42,7 +42,7 @@ const chatMetadata = computed(() => props.chat.meta);
 
 const backButtonUrl = computed(() => {
   const {
-    params: { inbox_id: inboxId, label, teamId, id: customViewId },
+    params: { inbox_id: inboxId, label, teamId, marketId, id: customViewId },
     name,
   } = route;
 
@@ -56,6 +56,7 @@ const backButtonUrl = computed(() => {
     inboxId,
     label,
     teamId,
+    marketId,
     conversationType: conversationTypeMap[name],
     customViewId,
   });

@@ -349,6 +349,11 @@
   $ref: ./application/conversation/meta.yml
 /api/v1/accounts/{account_id}/conversations:
   $ref: ./application/conversation/index.yml
+/api/v1/accounts/{account_id}/conversations/group_counts:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+  get:
+    $ref: ./application/conversation/group_counts.yml
 /api/v1/accounts/{account_id}/conversations/filter:
   parameters:
     - $ref: '#/components/parameters/account_id'
@@ -523,6 +528,49 @@
 # Profile
 /api/v1/profile:
   $ref: ./profile/index.yml
+
+# Markets
+/api/v1/accounts/{account_id}/markets:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+  get:
+    $ref: ./application/markets/index.yml
+  post:
+    $ref: ./application/markets/create.yml
+/api/v1/accounts/{account_id}/markets/{market_id}:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+    - $ref: '#/components/parameters/market_id'
+  get:
+    $ref: ./application/markets/show.yml
+  patch:
+    $ref: ./application/markets/update.yml
+  delete:
+    $ref: ./application/markets/delete.yml
+
+# Conversation categories
+/api/v1/accounts/{account_id}/conversation_categories:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+  get:
+    $ref: ./application/conversation_categories/index.yml
+  post:
+    $ref: ./application/conversation_categories/create.yml
+/api/v1/accounts/{account_id}/conversation_categories/reorder:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+  patch:
+    $ref: ./application/conversation_categories/reorder.yml
+/api/v1/accounts/{account_id}/conversation_categories/{conversation_category_id}:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+    - $ref: '#/components/parameters/conversation_category_id'
+  get:
+    $ref: ./application/conversation_categories/show.yml
+  patch:
+    $ref: ./application/conversation_categories/update.yml
+  delete:
+    $ref: ./application/conversation_categories/delete.yml
 
 # Teams
 /api/v1/accounts/{account_id}/teams:

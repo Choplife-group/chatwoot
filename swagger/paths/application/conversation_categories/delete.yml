@@ -1,0 +1,23 @@
+tags:
+  - Conversation Categories
+operationId: delete-a-conversation-category
+summary: Archive a conversation category
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: Archive a category and everything below it. Categories are not deleted, so existing conversations and reports keep their category. Only administrators can archive categories.
+responses:
+  '200':
+    description: Success
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '404':
+    description: The category does not exist in the account
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

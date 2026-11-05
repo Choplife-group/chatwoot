@@ -7,6 +7,8 @@
     "IDENTIFIER": "Identifier",
     "COPY_SUCCESSFUL": "Copied to clipboard successfully",
     "COMPANY": "Company",
+    "MARKET": "Market",
+    "NO_MARKET": "No market",
     "LOCATION": "Location",
     "BROWSER_LANGUAGE": "Browser Language",
     "CONVERSATION_TITLE": "Conversation Details",

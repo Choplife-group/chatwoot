@@ -182,6 +182,7 @@ Rails.application.routes.draw do
               get :meta
               get :search
               get :unread_counts, to: 'conversations/unread_counts#index'
+              get :group_counts, to: 'conversations/group_counts#index'
               post :filter
             end
             scope module: :conversations do
@@ -365,6 +366,12 @@ Rails.application.routes.draw do
           end
           resource :notification_settings, only: [:show, :update]
 
+          resources :markets, only: [:index, :show, :create, :update, :destroy]
+          resources :conversation_categories, only: [:index, :show, :create, :update, :destroy] do
+            collection do
+              patch :reorder
+            end
+          end
           resources :teams do
             resources :team_members, only: [:index, :create] do
               collection do

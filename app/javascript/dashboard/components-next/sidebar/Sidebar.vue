@@ -18,6 +18,8 @@ import SidebarProfileMenu from './SidebarProfileMenu.vue';
 import SidebarChangelogCard from './SidebarChangelogCard.vue';
 import SidebarChangelogButton from './SidebarChangelogButton.vue';
 import ChannelLeaf from './ChannelLeaf.vue';
+import QueueCountLeaf from './QueueCountLeaf.vue';
+import { useEmitter } from 'dashboard/composables/emitter';
 import ChannelIcon from 'next/icon/ChannelIcon.vue';
 import EmojiIcon from 'next/emoji-icon-picker/EmojiIcon.vue';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher.vue';
@@ -246,6 +248,30 @@ const getFolderUnreadCount = useMapGetter(
   'conversationUnreadCounts/getFolderUnreadCount'
 );
 const teams = useMapGetter('teams/getMyTeams');
+const activeMarkets = useMapGetter('markets/getActiveMarkets');
+const getQueueCount = useMapGetter('conversationGroupCounts/getCount');
+
+const queueCountLeaf =
+  (groupBy, id, leadingIcon = null) =>
+  leafProps => {
+    const { open_count: openCount, waiting_count: waitingCount } =
+      getQueueCount.value(groupBy, id);
+    return h(QueueCountLeaf, {
+      label: leafProps.label,
+      active: leafProps.active,
+      badgeCount: leafProps.badgeCount,
+      leadingIcon,
+      openCount,
+      waitingCount,
+    });
+  };
+
+useEmitter('fetch_conversation_stats', () =>
+  store.dispatch('conversationGroupCounts/refresh')
+);
+useEmitter('conversation_group_counts_changed', () =>
+  store.dispatch('conversationGroupCounts/refresh')
+);
 const contactCustomViews = useMapGetter('customViews/getContactCustomViews');
 const conversationCustomViews = useMapGetter(
   'customViews/getConversationCustomViews'
@@ -259,6 +285,9 @@ onMounted(() => {
   store.dispatch('inboxes/get');
   store.dispatch('notifications/unReadCount');
   store.dispatch('teams/get');
+  store.dispatch('markets/get');
+  store.dispatch('conversationCategories/get');
+  store.dispatch('conversationGroupCounts/get');
   store.dispatch('attributes/get');
   store.dispatch('customViews/get', 'conversation');
   store.dispatch('customViews/get', 'contact');
@@ -452,16 +481,40 @@ const menuItems = computed(() => {
             name: `${team.name}-${team.id}`,
             label: team.name,
             badgeCount: getTeamUnreadCount.value(team.id),
-            icon: team.icon
-              ? h(EmojiIcon, {
-                  value: team.icon,
-                  color: team.icon_color,
-                  class: 'size-3.5',
-                })
-              : undefined,
             to: accountScopedRoute('team_conversations', { teamId: team.id }),
+            component: queueCountLeaf(
+              'team',
+              team.id,
+              team.icon
+                ? h(EmojiIcon, {
+                    value: team.icon,
+                    color: team.icon_color,
+                    class: 'size-3.5',
+                  })
+                : null
+            ),
           })),
         },
+        ...(activeMarkets.value.length
+          ? [
+              {
+                name: 'Markets',
+                label: t('SIDEBAR.MARKETS'),
+                icon: 'i-lucide-globe',
+                activeOn: ['conversations_through_market'],
+                collapsible: true,
+                showTreeLine: true,
+                children: activeMarkets.value.map(market => ({
+                  name: `market-${market.id}`,
+                  label: `${market.name} (${market.code})`,
+                  to: accountScopedRoute('market_conversations', {
+                    marketId: market.id,
+                  }),
+                  component: queueCountLeaf('market', market.id),
+                })),
+              },
+            ]
+          : []),
         {
           name: 'Channels',
           label: t('SIDEBAR.CHANNELS'),
@@ -835,6 +888,18 @@ const menuItems = computed(() => {
             'settings_teams_edit_finish',
           ],
           to: accountScopedRoute('settings_teams_list'),
+        },
+        {
+          name: 'Settings Markets',
+          label: t('SIDEBAR.MARKETS'),
+          icon: 'i-lucide-globe',
+          to: accountScopedRoute('markets_list'),
+        },
+        {
+          name: 'Settings Categories',
+          label: t('SIDEBAR.CONVERSATION_CATEGORIES'),
+          icon: 'i-lucide-list-tree',
+          to: accountScopedRoute('conversation_categories_list'),
         },
         ...(hasAdvancedAssignment.value
           ? [

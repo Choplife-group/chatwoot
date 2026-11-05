@@ -13,6 +13,8 @@ export const CONVERSATION_ATTRIBUTES = {
   ASSIGNEE_ID: 'assignee_id',
   INBOX_ID: 'inbox_id',
   TEAM_ID: 'team_id',
+  MARKET_ID: 'market_id',
+  CATEGORY_ID: 'category_id',
   CONTACT_ID: 'contact_id',
   DISPLAY_ID: 'display_id',
   CAMPAIGN_ID: 'campaign_id',

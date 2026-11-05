@@ -1,0 +1,27 @@
+tags:
+  - Markets
+operationId: get-details-of-a-market
+summary: Get a market
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: Get the details of a market
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/market'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '404':
+    description: The market does not exist in the account
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
