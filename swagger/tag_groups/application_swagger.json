@@ -1912,6 +1912,11 @@
                           },
                           "description": "array of the attribute values to filter"
                         },
+                        "timezone": {
+                          "type": "string",
+                          "description": "IANA timezone for created_at and last_activity_at date comparisons, including days_before. Omit to retain UTC behavior. Date-only custom attributes are not converted.",
+                          "example": "America/Sao_Paulo"
+                        },
                         "query_operator": {
                           "type": "string",
                           "description": "query operator name",
@@ -3359,6 +3364,98 @@
         }
       }
     },
+    "/api/v1/accounts/{account_id}/conversations/group_counts": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Conversations"
+        ],
+        "operationId": "conversation-group-counts",
+        "summary": "Open and waiting counts per team or market",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Counts of open conversations, and of those waiting for a reply, per team or per market. Only conversations the user can see are counted.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "group_by",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "team",
+                "market"
+              ]
+            },
+            "description": "Count per team or per market"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "payload": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "The ID of the team or market"
+                          },
+                          "open_count": {
+                            "type": "number",
+                            "description": "Open conversations"
+                          },
+                          "waiting_count": {
+                            "type": "number",
+                            "description": "Open conversations whose last customer message has no reply yet"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/accounts/{account_id}/conversations/filter": {
       "parameters": [
         {
@@ -3442,6 +3539,11 @@
                             "type": "string"
                           },
                           "description": "array of the attribute values to filter"
+                        },
+                        "timezone": {
+                          "type": "string",
+                          "description": "IANA timezone for created_at and last_activity_at date comparisons, including days_before. Omit to retain UTC behavior. Date-only custom attributes are not converted.",
+                          "example": "America/Sao_Paulo"
                         },
                         "query_operator": {
                           "type": "string",
@@ -3604,6 +3706,22 @@
                     "description": "The priority of the conversation. Set to null to clear the priority.",
                     "example": "high"
                   },
+                  "market_id": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "The ID of an active market of the account. Set to null to clear it.",
+                    "example": 1
+                  },
+                  "category_id": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "The ID of an active category at the last level of its branch. Set to null to clear it.",
+                    "example": 12
+                  },
                   "sla_policy_id": {
                     "type": "number",
                     "description": "The ID of the SLA policy (Available only in Enterprise edition)",
@@ -3681,7 +3799,7 @@
         ],
         "operationId": "toggle-status-of-a-conversation",
         "summary": "Toggle Status",
-        "description": "Toggle the status of a conversation. Pass `status` to explicitly set the\nconversation state. Use `snoozed` along with `snoozed_until` to snooze a\nconversation until a specific time. If `snoozed_until` is omitted, the\nconversation is snoozed until the next reply from the contact. Regardless\nof the value provided, snoozed conversations always reopen on the next\nreply from the contact.",
+        "description": "A person can't resolve a conversation that has no category: the request returns 422\n\"Choose a category and subcategory before resolving this conversation\". Bots are not blocked.\n\nToggle the status of a conversation. Pass `status` to explicitly set the\nconversation state. Use `snoozed` along with `snoozed_until` to snooze a\nconversation until a specific time. If `snoozed_until` is omitted, the\nconversation is snoozed until the next reply from the contact. Regardless\nof the value provided, snoozed conversations always reopen on the next\nreply from the contact.",
         "security": [
           {
             "userBearerAuth": []
@@ -10877,6 +10995,70 @@
           }
         }
       },
+      "market": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the market"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the market, e.g. Uganda"
+          },
+          "code": {
+            "type": "string",
+            "description": "Two-letter ISO country code of the market, e.g. UG"
+          },
+          "position": {
+            "type": "number",
+            "description": "Sort order; lower numbers are listed first"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Archived markets stay on existing conversations but can't be chosen any more"
+          }
+        }
+      },
+      "conversation_category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the category"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the category, e.g. Pending approval"
+          },
+          "parent_id": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The ID of the parent category; null for a top-level category"
+          },
+          "depth": {
+            "type": "number",
+            "description": "Level in the tree, from 1 (top level) to 5"
+          },
+          "ancestor_ids": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "IDs of the parent categories, top level first"
+          },
+          "position": {
+            "type": "number",
+            "description": "Order among sibling categories"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Archived categories stay on existing conversations but can't be chosen any more"
+          }
+        }
+      },
       "label": {
         "type": "object",
         "properties": {
@@ -13510,6 +13692,66 @@
           }
         }
       },
+      "market_create_update_payload": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the market",
+                "example": "Uganda"
+              },
+              "code": {
+                "type": "string",
+                "description": "Two-letter ISO country code, unique in the account",
+                "example": "UG"
+              },
+              "position": {
+                "type": "number",
+                "description": "Sort order; lower numbers are listed first",
+                "example": 1
+              },
+              "archived": {
+                "type": "boolean",
+                "description": "Set to false to restore an archived market (update only)",
+                "example": false
+              }
+            }
+          }
+        }
+      },
+      "conversation_category_create_update_payload": {
+        "type": "object",
+        "properties": {
+          "conversation_category": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the category, unique among its siblings",
+                "example": "Pending approval"
+              },
+              "parent_id": {
+                "type": "number",
+                "description": "The ID of the parent category (create only; categories can't be moved). Leave out for a top-level category.",
+                "example": 1
+              },
+              "position": {
+                "type": "number",
+                "description": "Order among sibling categories",
+                "example": 0
+              },
+              "archived": {
+                "type": "boolean",
+                "description": "Set to true to archive, or false to restore, the category and everything below it (update only)",
+                "example": false
+              }
+            }
+          }
+        }
+      },
       "label_create_update_payload": {
         "type": "object",
         "properties": {
@@ -16099,6 +16341,24 @@
         },
         "required": true,
         "description": "The ID of the team to be updated"
+      },
+      "market_id": {
+        "in": "path",
+        "name": "market_id",
+        "schema": {
+          "type": "integer"
+        },
+        "required": true,
+        "description": "The ID of the market"
+      },
+      "conversation_category_id": {
+        "in": "path",
+        "name": "conversation_category_id",
+        "schema": {
+          "type": "integer"
+        },
+        "required": true,
+        "description": "The ID of the conversation category"
       },
       "inbox_id": {
         "in": "path",

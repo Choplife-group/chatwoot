@@ -4,7 +4,9 @@ RSpec.describe MacrosExecutionJob do
   let(:account) { create(:account) }
   let(:user) { create(:user, account: account, role: :agent) }
   let(:inbox) { create(:inbox, account: account) }
-  let(:conversation) { create(:conversation, account: account, inbox: inbox, status: :open) }
+  # A person can only resolve a categorised conversation (Conversations::ResolveGuard)
+  let(:category) { account.conversation_categories.create!(name: 'Withdrawal') }
+  let(:conversation) { create(:conversation, account: account, inbox: inbox, status: :open, category: category) }
   let(:macro) { create(:macro, account: account, actions: [{ 'action_name' => 'resolve_conversation' }]) }
 
   context 'when the user is an administrator' do
@@ -70,7 +72,7 @@ RSpec.describe MacrosExecutionJob do
 
   context 'when the user belongs to the conversation team' do
     let(:team) { create(:team, account: account, allow_auto_assign: false) }
-    let(:conversation) { create(:conversation, account: account, inbox: inbox, team: team, status: :open) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox, team: team, status: :open, category: category) }
 
     before { create(:team_member, user: user, team: team) }
 

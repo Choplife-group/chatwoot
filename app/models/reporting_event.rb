@@ -11,8 +11,10 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  account_id              :integer
+#  category_id             :bigint
 #  conversation_id         :integer
 #  inbox_id                :integer
+#  market_id               :bigint
 #  user_id                 :integer
 #
 # Indexes

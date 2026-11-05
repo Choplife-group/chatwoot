@@ -1,0 +1,6 @@
+in: path
+name: conversation_category_id
+schema:
+  type: integer
+required: true
+description: The ID of the conversation category

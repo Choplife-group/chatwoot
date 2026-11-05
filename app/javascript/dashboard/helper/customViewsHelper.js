@@ -88,6 +88,8 @@ export const getValuesForFilter = (filter, params) => {
     agents,
     inboxes,
     teams,
+    markets,
+    categories,
     campaigns,
     labels,
     priority,
@@ -102,6 +104,10 @@ export const getValuesForFilter = (filter, params) => {
       return getValuesName(values, inboxes, 'id', 'name');
     case 'team_id':
       return getValuesName(values, teams, 'id', 'name');
+    case 'market_id':
+      return getValuesName(values, markets, 'id', 'name');
+    case 'category_id':
+      return getValuesName(values, categories, 'id', 'name');
     case 'contact_id':
       return getValuesForContact(values, contacts);
     case 'campaign_id':

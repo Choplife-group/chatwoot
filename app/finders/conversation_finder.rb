@@ -65,6 +65,7 @@ class ConversationFinder
     find_all_conversations
     filter_by_status unless params[:q]
     filter_by_team
+    filter_by_market
     filter_by_labels
     filter_by_query
     filter_by_source_id
@@ -154,6 +155,12 @@ class ConversationFinder
     @conversations = @conversations.where(team: @team)
   end
 
+  def filter_by_market
+    return unless params[:market_id]
+
+    @conversations = @conversations.where(market_id: params[:market_id])
+  end
+
   def filter_by_labels
     return unless params[:labels]
 
@@ -192,7 +199,7 @@ class ConversationFinder
 
   def conversations_base_query
     @conversations.includes(
-      :taggings, :team, :contact_inbox, { assignee: { avatar_attachment: [:blob] } }, { contact: { avatar_attachment: [:blob] } }
+      :taggings, :team, :market, :category, :contact_inbox, { assignee: { avatar_attachment: [:blob] } }, { contact: { avatar_attachment: [:blob] } }
     ).preload(inbox: :channel, ai_assignee: { avatar_attachment: [:blob] })
   end
 

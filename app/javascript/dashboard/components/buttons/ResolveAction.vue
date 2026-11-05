@@ -1,10 +1,13 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { useAlert } from 'dashboard/composables';
 import { useToggle } from '@vueuse/core';
 import { useI18n } from 'vue-i18n';
 import { useStore, useStoreGetters } from 'dashboard/composables/store';
 import { useEmitter } from 'dashboard/composables/emitter';
+import { emitter } from 'shared/helpers/mitt';
+import { FOCUS_CATEGORY_PICKER } from 'dashboard/constants/categories';
+import { useUISettings } from 'dashboard/composables/useUISettings';
 import { useKeyboardEvents } from 'dashboard/composables/useKeyboardEvents';
 import { useConversationRequiredAttributes } from 'dashboard/composables/useConversationRequiredAttributes';
 
@@ -24,6 +27,7 @@ const store = useStore();
 const getters = useStoreGetters();
 const { t } = useI18n();
 const { checkMissingAttributes } = useConversationRequiredAttributes();
+const { updateUISettings } = useUISettings();
 
 const arrowDownButtonRef = ref(null);
 const isLoading = ref(false);
@@ -95,10 +99,17 @@ const toggleStatus = (status, snoozedUntil, customAttributes = null) => {
     payload.customAttributes = customAttributes;
   }
 
-  store.dispatch('toggleStatus', payload).then(() => {
-    useAlert(t('CONVERSATION.CHANGE_STATUS'));
-    isLoading.value = false;
-  });
+  store
+    .dispatch('toggleStatus', payload)
+    .then(() => {
+      useAlert(t('CONVERSATION.CHANGE_STATUS'));
+    })
+    .catch(error => {
+      useAlert(error.message);
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
 };
 
 const handleResolveWithAttributes = ({ attributes, context }) => {
@@ -118,6 +129,18 @@ const onCmdOpenConversation = () => {
 };
 
 const onCmdResolveConversation = () => {
+  if (!currentChat.value.meta?.category) {
+    useAlert(t('CONVERSATION.CATEGORY_REQUIRED'));
+    // Open the details panel on Conversation Actions so the category picker is in view
+    updateUISettings({
+      is_contact_sidebar_open: true,
+      is_copilot_panel_open: false,
+      is_conv_actions_open: true,
+    });
+    nextTick(() => emitter.emit(FOCUS_CATEGORY_PICKER));
+    return;
+  }
+
   const currentCustomAttributes = currentChat.value.custom_attributes || {};
   const { hasMissing, missing } = checkMissingAttributes(
     currentCustomAttributes

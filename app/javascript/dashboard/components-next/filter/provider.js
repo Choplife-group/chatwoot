@@ -61,6 +61,8 @@ export function useConversationFilterContext() {
   const agents = useMapGetter('agents/getAgents');
   const inboxes = useMapGetter('inboxes/getInboxes');
   const teams = useMapGetter('teams/getTeams');
+  const markets = useMapGetter('markets/getMarkets');
+  const categoryOptions = useMapGetter('conversationCategories/getPathOptions');
   const campaigns = useMapGetter('campaigns/getAllCampaigns');
 
   const {
@@ -191,6 +193,32 @@ export function useConversationFilterContext() {
             })
           : undefined,
       })),
+      dataType: 'number',
+      filterOperators: presenceOperators.value,
+      attributeModel: 'standard',
+    },
+    {
+      attributeKey: CONVERSATION_ATTRIBUTES.MARKET_ID,
+      value: CONVERSATION_ATTRIBUTES.MARKET_ID,
+      attributeName: t('FILTER.ATTRIBUTES.MARKET'),
+      label: t('FILTER.ATTRIBUTES.MARKET'),
+      inputType: 'searchSelect',
+      options: markets.value.map(market => ({
+        id: market.id,
+        name: `${market.name} (${market.code})`,
+      })),
+      dataType: 'number',
+      filterOperators: presenceOperators.value,
+      attributeModel: 'standard',
+    },
+    {
+      attributeKey: CONVERSATION_ATTRIBUTES.CATEGORY_ID,
+      value: CONVERSATION_ATTRIBUTES.CATEGORY_ID,
+      attributeName: t('FILTER.ATTRIBUTES.CATEGORY'),
+      label: t('FILTER.ATTRIBUTES.CATEGORY'),
+      inputType: 'searchSelect',
+      // Any level can be picked; a category also matches everything below it
+      options: categoryOptions.value,
       dataType: 'number',
       filterOperators: presenceOperators.value,
       attributeModel: 'standard',

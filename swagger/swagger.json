@@ -4951,6 +4951,98 @@
         }
       }
     },
+    "/api/v1/accounts/{account_id}/conversations/group_counts": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Conversations"
+        ],
+        "operationId": "conversation-group-counts",
+        "summary": "Open and waiting counts per team or market",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Counts of open conversations, and of those waiting for a reply, per team or per market. Only conversations the user can see are counted.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "group_by",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "team",
+                "market"
+              ]
+            },
+            "description": "Count per team or per market"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "payload": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "The ID of the team or market"
+                          },
+                          "open_count": {
+                            "type": "number",
+                            "description": "Open conversations"
+                          },
+                          "waiting_count": {
+                            "type": "number",
+                            "description": "Open conversations whose last customer message has no reply yet"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/accounts/{account_id}/conversations/filter": {
       "parameters": [
         {
@@ -5201,6 +5293,22 @@
                     "description": "The priority of the conversation. Set to null to clear the priority.",
                     "example": "high"
                   },
+                  "market_id": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "The ID of an active market of the account. Set to null to clear it.",
+                    "example": 1
+                  },
+                  "category_id": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "description": "The ID of an active category at the last level of its branch. Set to null to clear it.",
+                    "example": 12
+                  },
                   "sla_policy_id": {
                     "type": "number",
                     "description": "The ID of the SLA policy (Available only in Enterprise edition)",
@@ -5278,7 +5386,7 @@
         ],
         "operationId": "toggle-status-of-a-conversation",
         "summary": "Toggle Status",
-        "description": "Toggle the status of a conversation. Pass `status` to explicitly set the\nconversation state. Use `snoozed` along with `snoozed_until` to snooze a\nconversation until a specific time. If `snoozed_until` is omitted, the\nconversation is snoozed until the next reply from the contact. Regardless\nof the value provided, snoozed conversations always reopen on the next\nreply from the contact.",
+        "description": "A person can't resolve a conversation that has no category: the request returns 422\n\"Choose a category and subcategory before resolving this conversation\". Bots are not blocked.\n\nToggle the status of a conversation. Pass `status` to explicitly set the\nconversation state. Use `snoozed` along with `snoozed_until` to snooze a\nconversation until a specific time. If `snoozed_until` is omitted, the\nconversation is snoozed until the next reply from the contact. Regardless\nof the value provided, snoozed conversations always reopen on the next\nreply from the contact.",
         "security": [
           {
             "userBearerAuth": []
@@ -8405,6 +8513,627 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/markets": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Markets"
+        ],
+        "operationId": "list-all-markets",
+        "summary": "List all markets",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "List the markets of the account (archived ones included), in display order",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/market"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Markets"
+        ],
+        "operationId": "create-a-market",
+        "summary": "Create a market",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Create a market. Only administrators can create markets.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/market_create_update_payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/market"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/markets/{market_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        },
+        {
+          "$ref": "#/components/parameters/market_id"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Markets"
+        ],
+        "operationId": "get-details-of-a-market",
+        "summary": "Get a market",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Get the details of a market",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/market"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The market does not exist in the account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Markets"
+        ],
+        "operationId": "update-a-market",
+        "summary": "Update a market",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Rename, reorder or restore a market. Only administrators can update markets.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/market_create_update_payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/market"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The market does not exist in the account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Markets"
+        ],
+        "operationId": "delete-a-market",
+        "summary": "Archive a market",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Archive a market. Markets are not deleted, so existing conversations and reports keep their market. Only administrators can archive markets.",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The market does not exist in the account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/conversation_categories": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Conversation Categories"
+        ],
+        "operationId": "list-all-conversation-categories",
+        "summary": "List all conversation categories",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "List every category of the account (archived ones included) as a flat list; use parent_id and ancestor_ids to build the tree",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/conversation_category"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Conversation Categories"
+        ],
+        "operationId": "create-a-conversation-category",
+        "summary": "Create a conversation category",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Create a category, or a subcategory when parent_id is given (up to 5 levels). Only administrators can create categories.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/conversation_category_create_update_payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conversation_category"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/conversation_categories/reorder": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Conversation Categories"
+        ],
+        "operationId": "reorder-conversation-categories",
+        "summary": "Reorder conversation categories",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Set the order of sibling categories. Pass their IDs in the new order; they must share the same parent. Only administrators can reorder categories.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "description": "Sibling category IDs in their new order",
+                    "example": [
+                      3,
+                      1,
+                      2
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/conversation_categories/{conversation_category_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        },
+        {
+          "$ref": "#/components/parameters/conversation_category_id"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Conversation Categories"
+        ],
+        "operationId": "get-details-of-a-conversation-category",
+        "summary": "Get a conversation category",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Get the details of a category",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conversation_category"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The category does not exist in the account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Conversation Categories"
+        ],
+        "operationId": "update-a-conversation-category",
+        "summary": "Update a conversation category",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Rename or reorder a category, or archive / restore it with everything below it. A category can only be restored when its parent is active. Only administrators can update categories.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/conversation_category_create_update_payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conversation_category"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The category does not exist in the account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Conversation Categories"
+        ],
+        "operationId": "delete-a-conversation-category",
+        "summary": "Archive a conversation category",
+        "security": [
+          {
+            "userBearerAuth": []
+          },
+          {
+            "userApiKey": []
+          }
+        ],
+        "description": "Archive a category and everything below it. Categories are not deleted, so existing conversations and reports keep their category. Only administrators can archive categories.",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The category does not exist in the account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
           }
         }
       }
@@ -12510,6 +13239,70 @@
           }
         }
       },
+      "market": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the market"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the market, e.g. Uganda"
+          },
+          "code": {
+            "type": "string",
+            "description": "Two-letter ISO country code of the market, e.g. UG"
+          },
+          "position": {
+            "type": "number",
+            "description": "Sort order; lower numbers are listed first"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Archived markets stay on existing conversations but can't be chosen any more"
+          }
+        }
+      },
+      "conversation_category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The ID of the category"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the category, e.g. Pending approval"
+          },
+          "parent_id": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The ID of the parent category; null for a top-level category"
+          },
+          "depth": {
+            "type": "number",
+            "description": "Level in the tree, from 1 (top level) to 5"
+          },
+          "ancestor_ids": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "IDs of the parent categories, top level first"
+          },
+          "position": {
+            "type": "number",
+            "description": "Order among sibling categories"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Archived categories stay on existing conversations but can't be chosen any more"
+          }
+        }
+      },
       "label": {
         "type": "object",
         "properties": {
@@ -15143,6 +15936,66 @@
           }
         }
       },
+      "market_create_update_payload": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the market",
+                "example": "Uganda"
+              },
+              "code": {
+                "type": "string",
+                "description": "Two-letter ISO country code, unique in the account",
+                "example": "UG"
+              },
+              "position": {
+                "type": "number",
+                "description": "Sort order; lower numbers are listed first",
+                "example": 1
+              },
+              "archived": {
+                "type": "boolean",
+                "description": "Set to false to restore an archived market (update only)",
+                "example": false
+              }
+            }
+          }
+        }
+      },
+      "conversation_category_create_update_payload": {
+        "type": "object",
+        "properties": {
+          "conversation_category": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the category, unique among its siblings",
+                "example": "Pending approval"
+              },
+              "parent_id": {
+                "type": "number",
+                "description": "The ID of the parent category (create only; categories can't be moved). Leave out for a top-level category.",
+                "example": 1
+              },
+              "position": {
+                "type": "number",
+                "description": "Order among sibling categories",
+                "example": 0
+              },
+              "archived": {
+                "type": "boolean",
+                "description": "Set to true to archive, or false to restore, the category and everything below it (update only)",
+                "example": false
+              }
+            }
+          }
+        }
+      },
       "label_create_update_payload": {
         "type": "object",
         "properties": {
@@ -17733,6 +18586,24 @@
         "required": true,
         "description": "The ID of the team to be updated"
       },
+      "market_id": {
+        "in": "path",
+        "name": "market_id",
+        "schema": {
+          "type": "integer"
+        },
+        "required": true,
+        "description": "The ID of the market"
+      },
+      "conversation_category_id": {
+        "in": "path",
+        "name": "conversation_category_id",
+        "schema": {
+          "type": "integer"
+        },
+        "required": true,
+        "description": "The ID of the conversation category"
+      },
       "inbox_id": {
         "in": "path",
         "name": "inbox_id",
@@ -18024,6 +18895,14 @@
     {
       "name": "Reports",
       "description": "Analytics and reporting APIs"
+    },
+    {
+      "name": "Markets",
+      "description": "Market (country) management APIs"
+    },
+    {
+      "name": "Conversation Categories",
+      "description": "Reason-for-contact category tree APIs"
     },
     {
       "name": "Teams",

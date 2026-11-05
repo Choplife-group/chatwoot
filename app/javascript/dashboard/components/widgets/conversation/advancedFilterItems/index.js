@@ -47,6 +47,22 @@ const filterTypes = [
     attributeModel: 'standard',
   },
   {
+    attributeKey: 'market_id',
+    attributeI18nKey: 'MARKET',
+    inputType: 'search_select',
+    dataType: 'number',
+    filterOperators: OPERATOR_TYPES_2,
+    attributeModel: 'standard',
+  },
+  {
+    attributeKey: 'category_id',
+    attributeI18nKey: 'CATEGORY',
+    inputType: 'search_select',
+    dataType: 'number',
+    filterOperators: OPERATOR_TYPES_2,
+    attributeModel: 'standard',
+  },
+  {
     attributeKey: 'contact_id',
     attributeI18nKey: 'CONTACT',
     inputType: 'search_select',
@@ -140,6 +156,14 @@ export const filterAttributeGroups = [
       {
         key: 'team_id',
         i18nKey: 'TEAM_NAME',
+      },
+      {
+        key: 'market_id',
+        i18nKey: 'MARKET',
+      },
+      {
+        key: 'category_id',
+        i18nKey: 'CATEGORY',
       },
       {
         key: 'contact_id',

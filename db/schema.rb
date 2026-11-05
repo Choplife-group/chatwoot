@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_09_29_100000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_03_120001) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -810,10 +810,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_29_100000) do
     t.string "country_code", default: ""
     t.boolean "blocked", default: false, null: false
     t.bigint "company_id"
+    t.bigint "market_id"
     t.index "lower((email)::text), account_id", name: "index_contacts_on_lower_email_account_id"
     t.index ["account_id", "contact_type"], name: "index_contacts_on_account_id_and_contact_type"
     t.index ["account_id", "email", "phone_number", "identifier"], name: "index_contacts_on_nonempty_fields", where: "(((email)::text <> ''::text) OR ((phone_number)::text <> ''::text) OR ((identifier)::text <> ''::text))"
     t.index ["account_id", "last_activity_at"], name: "index_contacts_on_account_id_and_last_activity_at", order: { last_activity_at: "DESC NULLS LAST" }
+    t.index ["account_id", "market_id"], name: "index_contacts_on_account_id_and_market_id"
     t.index ["account_id"], name: "index_contacts_on_account_id"
     t.index ["account_id"], name: "index_resolved_contact_account_id", where: "(((email)::text <> ''::text) OR ((phone_number)::text <> ''::text) OR ((identifier)::text <> ''::text))"
     t.index ["blocked"], name: "index_contacts_on_blocked"
@@ -967,6 +969,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_29_100000) do
     t.index ["inbox_id"], name: "index_conversation_outcomes_on_inbox_id"
   end
 
+  create_table "conversation_categories", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "parent_id"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "depth", default: 1, null: false
+    t.integer "ancestor_ids", default: [], null: false, array: true
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "parent_id", "name"], name: "idx_on_account_id_parent_id_name_589e5e71b2", unique: true
+    t.index ["ancestor_ids"], name: "index_conversation_categories_on_ancestor_ids", using: :gin
+  end
+
   create_table "conversation_participants", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "user_id", null: false
@@ -1008,9 +1024,13 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_29_100000) do
     t.bigint "assignee_agent_bot_id"
     t.string "ai_assignee_type"
     t.datetime "status_changed_at"
+    t.bigint "market_id"
+    t.bigint "category_id"
     t.index ["account_id", "display_id"], name: "index_conversations_on_account_id_and_display_id", unique: true
     t.index ["account_id", "id"], name: "index_conversations_on_id_and_account_id"
+    t.index ["account_id", "category_id"], name: "index_conversations_on_account_id_and_category_id"
     t.index ["account_id", "inbox_id", "status", "assignee_id"], name: "conv_acid_inbid_stat_asgnid_idx"
+    t.index ["account_id", "market_id"], name: "index_conversations_on_account_id_and_market_id"
     t.index ["account_id", "status", "created_at"], name: "index_conversations_on_account_id_status_created_at"
     t.index ["account_id"], name: "index_conversations_on_account_id"
     t.index ["assignee_id", "account_id"], name: "index_conversations_on_assignee_id_and_account_id"
@@ -1276,8 +1296,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_29_100000) do
     t.integer "sender_name_type", default: 0, null: false
     t.string "business_name"
     t.jsonb "csat_config", default: {}, null: false
+    t.bigint "market_id"
     t.index ["account_id"], name: "index_inboxes_on_account_id"
     t.index ["channel_id", "channel_type"], name: "index_inboxes_on_channel_id_and_channel_type"
+    t.index ["market_id"], name: "index_inboxes_on_market_id"
     t.index ["portal_id"], name: "index_inboxes_on_portal_id"
   end
 
@@ -1344,6 +1366,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_29_100000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_macros_on_account_id"
+  end
+
+  create_table "markets", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.string "code", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "code"], name: "index_markets_on_account_id_and_code", unique: true
+    t.index ["account_id", "name"], name: "index_markets_on_account_id_and_name", unique: true
   end
 
   create_table "mentions", force: :cascade do |t|
@@ -1524,6 +1558,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_29_100000) do
     t.float "value_in_business_hours"
     t.datetime "event_start_time", precision: nil
     t.datetime "event_end_time", precision: nil
+    t.bigint "market_id"
+    t.bigint "category_id"
     t.index ["account_id", "name", "created_at"], name: "reporting_events__account_id__name__created_at"
     t.index ["account_id", "name", "inbox_id", "created_at"], name: "index_reporting_events_for_response_distribution"
     t.index ["account_id"], name: "index_reporting_events_on_account_id"

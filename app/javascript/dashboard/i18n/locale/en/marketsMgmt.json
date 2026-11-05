@@ -1,0 +1,62 @@
+{
+  "MARKETS_SETTINGS": {
+    "HEADER": "Markets",
+    "DESCRIPTION": "Markets are the countries you support. Map each market website’s inbox to its market so new conversations get their market automatically. Archived markets stay on old conversations but can’t be chosen any more.",
+    "LOADING": "Fetching markets",
+    "COUNT": "{n} market | {n} markets",
+    "SEARCH_PLACEHOLDER": "Search markets...",
+    "NO_RESULTS": "No markets found matching your search",
+    "API_ERROR": "Something went wrong. Please try again.",
+    "LIST": {
+      "404": "There are no markets on this account yet.",
+      "NO_INBOXES": "No inbox mapped",
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived",
+      "TABLE_HEADER": {
+        "NAME": "Name",
+        "CODE": "Code",
+        "INBOXES": "Inboxes",
+        "STATUS": "Status",
+        "ACTIONS": "Actions"
+      }
+    },
+    "ADD": {
+      "BUTTON": "Add market",
+      "TITLE": "Add market",
+      "DESCRIPTION": "Use the ISO country code, e.g. UG for Uganda.",
+      "SUBMIT": "Create",
+      "SUCCESS": "Market created"
+    },
+    "EDIT": {
+      "BUTTON": "Edit",
+      "TITLE": "Edit market",
+      "SUBMIT": "Save",
+      "SUCCESS": "Market updated"
+    },
+    "ARCHIVE": {
+      "BUTTON": "Archive",
+      "SUCCESS": "Market archived"
+    },
+    "RESTORE": {
+      "BUTTON": "Restore",
+      "SUCCESS": "Market restored"
+    },
+    "FORM": {
+      "NAME": {
+        "LABEL": "Name",
+        "PLACEHOLDER": "e.g. Uganda",
+        "ERROR": "Name is required"
+      },
+      "CODE": {
+        "LABEL": "Country code",
+        "PLACEHOLDER": "e.g. UG",
+        "HELP": "Two-letter ISO country code",
+        "ERROR": "Enter a two-letter country code"
+      },
+      "POSITION": {
+        "LABEL": "Sort order",
+        "HELP": "Lower numbers are listed first"
+      }
+    }
+  }
+}

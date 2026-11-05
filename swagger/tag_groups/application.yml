@@ -44,6 +44,10 @@ tags:
     description: Manage user profile
   - name: Reports
     description: Generate reports
+  - name: Markets
+    description: Manage markets
+  - name: Conversation Categories
+    description: Manage the conversation category tree
   - name: Teams
     description: Manage teams
   - name: Webhooks

@@ -1,0 +1,39 @@
+tags:
+  - Conversation Categories
+operationId: update-a-conversation-category
+summary: Update a conversation category
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: Rename or reorder a category, or archive / restore it with everything below it. A category can only be restored when its parent is active. Only administrators can update categories.
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/conversation_category_create_update_payload'
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/conversation_category'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '404':
+    description: The category does not exist in the account
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '422':
+    description: Validation error
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

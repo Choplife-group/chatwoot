@@ -22,6 +22,8 @@ class Seeders::AccountSeeder
     seed_custom_roles
     set_up_users
     seed_labels
+    seed_markets
+    seed_conversation_categories
     seed_canned_responses
     seed_inboxes
     seed_contacts
@@ -31,6 +33,8 @@ class Seeders::AccountSeeder
     @account.teams.destroy_all
     @account.conversations.destroy_all
     @account.labels.destroy_all
+    ConversationCategory.where(account: @account).delete_all
+    Market.where(account: @account).delete_all
     @account.inboxes.destroy_all
     @account.contacts.destroy_all
     @account.custom_roles.destroy_all if @account.respond_to?(:custom_roles)
@@ -57,6 +61,19 @@ class Seeders::AccountSeeder
   def seed_labels
     @account_data['labels'].each do |label|
       @account.labels.create!(label)
+    end
+  end
+
+  def seed_markets
+    @account_data['markets'].each_with_index do |market, position|
+      @account.markets.create!(market.merge(position: position))
+    end
+  end
+
+  def seed_conversation_categories(categories = @account_data['conversation_categories'], parent = nil)
+    categories.each_with_index do |category, position|
+      record = @account.conversation_categories.create!(name: category['name'], parent: parent, position: position)
+      seed_conversation_categories(category['children'], record) if category['children'].present?
     end
   end
 

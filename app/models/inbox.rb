@@ -26,12 +26,14 @@
 #  updated_at                    :datetime         not null
 #  account_id                    :integer          not null
 #  channel_id                    :integer          not null
+#  market_id                     :bigint
 #  portal_id                     :bigint
 #
 # Indexes
 #
 #  index_inboxes_on_account_id                   (account_id)
 #  index_inboxes_on_channel_id_and_channel_type  (channel_id,channel_type)
+#  index_inboxes_on_market_id                    (market_id)
 #  index_inboxes_on_portal_id                    (portal_id)
 #
 # Foreign Keys
@@ -58,6 +60,7 @@ class Inbox < ApplicationRecord
 
   belongs_to :account
   belongs_to :portal, optional: true
+  belongs_to :market, optional: true
 
   belongs_to :channel, polymorphic: true, dependent: :destroy
 
@@ -85,6 +88,7 @@ class Inbox < ApplicationRecord
 
   after_create_commit :dispatch_create_event
   after_update_commit :dispatch_update_event
+  after_update_commit -> { Inboxes::BackfillMarketJob.perform_later(self) }, if: :saved_change_to_market_id?
   after_destroy_commit :invalidate_filtered_unread_counts_after_destroy
 
   scope :order_by_name, -> { order('lower(name) ASC') }

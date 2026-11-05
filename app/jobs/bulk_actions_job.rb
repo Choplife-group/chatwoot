@@ -27,8 +27,15 @@ class BulkActionsJob < ApplicationJob
     records.each do |conversation|
       bulk_add_labels(conversation)
       bulk_snoozed_until(conversation)
-      conversation.update(params) if params
+      conversation.update(params_for(conversation, params)) if params
     end
+  end
+
+  # Uncategorised conversations keep their status when a person bulk-resolves (Conversations::ResolveGuard)
+  def params_for(conversation, params)
+    return params unless params[:status] == 'resolved' && Conversations::ResolveGuard.blocked?(conversation, @user)
+
+    params.except(:status)
   end
 
   def bulk_remove_labels

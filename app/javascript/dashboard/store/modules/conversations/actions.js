@@ -352,6 +352,28 @@ const actions = {
     commit(types.ASSIGN_TEAM, { team, conversationId });
   },
 
+  assignCategory: async ({ commit }, { conversationId, categoryId }) => {
+    const response = await ConversationApi.updateCategory({
+      conversationId,
+      categoryId,
+    });
+    commit(types.ASSIGN_CATEGORY, {
+      conversationId,
+      category: response.data.meta?.category || null,
+    });
+  },
+
+  assignMarket: async ({ commit }, { conversationId, market }) => {
+    const response = await ConversationApi.updateMarket({
+      conversationId,
+      marketId: market ? market.id : null,
+    });
+    commit(types.ASSIGN_MARKET, {
+      conversationId,
+      market: response.data.meta?.market || null,
+    });
+  },
+
   toggleStatus: async (
     { commit },
     { conversationId, status, snoozedUntil = null, customAttributes = null }
@@ -387,7 +409,8 @@ const actions = {
         snoozedUntil: updatedSnoozedUntil,
       });
     } catch (error) {
-      // Handle error
+      // Callers show the reason, e.g. a missing category when resolving
+      throw new Error(error?.response?.data?.error || error.message);
     }
   },
 

@@ -353,6 +353,7 @@
     },
     "VISIBLE_TO_AGENTS": "Private Note: Only visible to you and your team",
     "CHANGE_STATUS": "Conversation status changed",
+    "CATEGORY_REQUIRED": "Choose a category and subcategory before resolving this conversation",
     "CHANGE_STATUS_FAILED": "Conversation status change failed",
     "CHANGE_AGENT": "Conversation Assignee changed",
     "CHANGE_AGENT_FAILED": "Assignee change failed",
@@ -480,6 +481,28 @@
     "ASSIGNEE_LABEL": "Assigned Agent",
     "SELF_ASSIGN": "Assign to me",
     "TEAM_LABEL": "Assigned Team",
+    "MARKET_LABEL": "Market",
+    "MARKET": {
+      "SELECT_TITLE": "Select market",
+      "SEARCH_PLACEHOLDER": "Search markets",
+      "NO_RESULTS": "No markets found",
+      "NONE": "None",
+      "UPDATED": "Market updated",
+      "UPDATE_ERROR": "Could not update the market"
+    },
+    "CATEGORY_LABEL": "Category",
+    "CATEGORY": {
+      "SELECT_CATEGORY": "Select category",
+      "SELECT_SUBCATEGORY": "Select subcategory",
+      "CATEGORY_PLACEHOLDER": "Choose a category",
+      "SUBCATEGORY_PLACEHOLDER": "Choose a subcategory",
+      "SEARCH": "Search categories",
+      "NO_RESULTS": "No categories found",
+      "REQUIRED_HINT": "Pick down to the last level. Required before resolving.",
+      "NONE_CONFIGURED": "No categories yet. An admin can add them in Settings → Categories.",
+      "UPDATED": "Category updated",
+      "ERROR": "Could not update the category"
+    },
     "SELECT": {
       "PLACEHOLDER": "None"
     },

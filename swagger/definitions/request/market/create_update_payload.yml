@@ -1,0 +1,21 @@
+type: object
+properties:
+  market:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the market
+        example: Uganda
+      code:
+        type: string
+        description: Two-letter ISO country code, unique in the account
+        example: UG
+      position:
+        type: number
+        description: Sort order; lower numbers are listed first
+        example: 1
+      archived:
+        type: boolean
+        description: Set to false to restore an archived market (update only)
+        example: false

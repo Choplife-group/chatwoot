@@ -6,6 +6,7 @@ json.name resource.name
 json.phone_number resource.phone_number
 json.blocked resource.blocked
 json.identifier resource.identifier
+json.market_id resource.market_id
 json.company_id resource.company_id if Current.account&.feature_enabled?('companies')
 json.thumbnail resource.avatar_url
 json.custom_attributes resource.custom_attributes

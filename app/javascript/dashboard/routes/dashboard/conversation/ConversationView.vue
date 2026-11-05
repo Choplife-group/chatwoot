@@ -49,6 +49,10 @@ export default {
       type: String,
       default: '',
     },
+    marketId: {
+      type: String,
+      default: '',
+    },
     conversationType: {
       type: String,
       default: '',
@@ -203,6 +207,7 @@ export default {
       :conversation-inbox="inboxId"
       :label="label"
       :team-id="teamId"
+      :market-id="marketId"
       :conversation-type="conversationType"
       :folders-id="foldersId"
       :is-on-expanded-layout="isOnExpandedLayout"

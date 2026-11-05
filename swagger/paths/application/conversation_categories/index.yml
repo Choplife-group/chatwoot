@@ -1,0 +1,23 @@
+tags:
+  - Conversation Categories
+operationId: list-all-conversation-categories
+summary: List all conversation categories
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: List every category of the account (archived ones included) as a flat list; use parent_id and ancestor_ids to build the tree
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/conversation_category'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

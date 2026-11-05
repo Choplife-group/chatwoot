@@ -20,6 +20,14 @@ requestBody:
             enum: ['urgent', 'high', 'medium', 'low', null]
             description: 'The priority of the conversation. Set to null to clear the priority.'
             example: 'high'
+          market_id:
+            type: [number, "null"]
+            description: 'The ID of an active market of the account. Set to null to clear it.'
+            example: 1
+          category_id:
+            type: [number, "null"]
+            description: 'The ID of an active category at the last level of its branch. Set to null to clear it.'
+            example: 12
           sla_policy_id:
             type: number
             description: 'The ID of the SLA policy (Available only in Enterprise edition)'

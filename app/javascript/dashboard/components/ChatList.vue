@@ -53,6 +53,7 @@ import { ASSIGNEE_TYPE_TAB_PERMISSIONS } from 'dashboard/constants/permissions.j
 const props = defineProps({
   conversationInbox: { type: [String, Number], default: 0 },
   teamId: { type: [String, Number], default: 0 },
+  marketId: { type: [String, Number], default: 0 },
   label: { type: String, default: '' },
   conversationType: { type: String, default: '' },
   foldersId: { type: [String, Number], default: 0 },
@@ -103,6 +104,9 @@ const appliedContactFilter = useMapGetter('getAppliedContactFilter');
 const folders = useMapGetter('customViews/getConversationCustomViews');
 const agentList = useMapGetter('agents/getAgents');
 const teamsList = useMapGetter('teams/getTeams');
+const marketsList = useMapGetter('markets/getMarkets');
+const getMarketFn = useMapGetter('markets/getMarketById');
+const categoryOptions = useMapGetter('conversationCategories/getPathOptions');
 const inboxesList = useMapGetter('inboxes/getInboxes');
 const campaigns = useMapGetter('campaigns/getAllCampaigns');
 const labels = useMapGetter('labels/getLabels');
@@ -255,6 +259,7 @@ const conversationFilters = computed(() => {
     page: conversationListPagination.value,
     labels: props.label ? [props.label] : undefined,
     teamId: props.teamId || undefined,
+    marketId: props.marketId || undefined,
     conversationType: props.conversationType || undefined,
   };
 });
@@ -266,6 +271,10 @@ const activeTeam = computed(() => {
   return {};
 });
 
+const activeMarket = computed(() =>
+  props.marketId ? getMarketFn.value(props.marketId) : {}
+);
+
 const pageTitle = computed(() => {
   if (hasAppliedFilters.value) {
     return t('CHAT_LIST.TAB_HEADING');
@@ -275,6 +284,9 @@ const pageTitle = computed(() => {
   }
   if (activeTeam.value.name) {
     return activeTeam.value.name;
+  }
+  if (activeMarket.value.name) {
+    return activeMarket.value.name;
   }
   if (props.label) {
     return `#${props.label}`;
@@ -488,6 +500,8 @@ function setParamsForEditFolderModal() {
   return {
     agents: agentList.value,
     teams: teamsList.value,
+    markets: marketsList.value,
+    categories: categoryOptions.value,
     inboxes: inboxesList.value,
     labels: labels.value,
     campaigns: campaigns.value,
@@ -763,9 +777,14 @@ function toggleConversationStatus(
     payload.customAttributes = customAttributes;
   }
 
-  store.dispatch('toggleStatus', payload).then(() => {
-    useAlert(t('CONVERSATION.CHANGE_STATUS'));
-  });
+  store
+    .dispatch('toggleStatus', payload)
+    .then(() => {
+      useAlert(t('CONVERSATION.CHANGE_STATUS'));
+    })
+    .catch(error => {
+      useAlert(error.message);
+    });
 }
 
 function handleResolveConversation(conversationId, status, snoozedUntil) {
@@ -776,6 +795,10 @@ function handleResolveConversation(conversationId, status, snoozedUntil) {
 
   // Check for required attributes before resolving
   const conversation = getConversationById.value(conversationId);
+  if (!conversation?.meta?.category) {
+    useAlert(t('CONVERSATION.CATEGORY_REQUIRED'));
+    return;
+  }
   const currentCustomAttributes = conversation?.custom_attributes || {};
   const { hasMissing, missing } = checkMissingAttributes(
     currentCustomAttributes
@@ -874,6 +897,10 @@ provide('isConversationSelected', isConversationSelected);
 provide('deleteConversation', handleDelete);
 
 watch(activeTeam, () => resetAndFetchData());
+watch(
+  computed(() => props.marketId),
+  () => resetAndFetchData()
+);
 
 watch(
   computed(() => props.conversationInbox),
@@ -979,6 +1006,7 @@ watch(appliedFilters, () => resetBulkActions());
       :show-end-of-list-message="showEndOfListMessage"
       :label="label"
       :team-id="teamId"
+      :market-id="marketId"
       :folders-id="foldersId"
       :conversation-type="conversationType"
       :show-assignee="showAssigneeInConversationCard"

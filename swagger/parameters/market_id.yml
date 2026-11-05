@@ -1,0 +1,6 @@
+in: path
+name: market_id
+schema:
+  type: integer
+required: true
+description: The ID of the market

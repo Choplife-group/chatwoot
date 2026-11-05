@@ -87,6 +87,13 @@ const getValueFromConversation = (conversation, attributeKey) => {
       return conversation.inbox_id;
     case 'team_id':
       return conversation.meta?.team?.id;
+    case 'market_id':
+      return conversation.meta?.market?.id;
+    case 'category_id': {
+      // A filter on a category also matches the categories below it
+      const category = conversation.meta?.category;
+      return category ? [...category.ancestor_ids, category.id] : null;
+    }
     case 'browser_language':
     case 'referer':
       return conversation.additional_attributes?.[attributeKey];
@@ -143,6 +150,11 @@ const equalTo = (filterValue, conversationValue) => {
     if (!Array.isArray(conversationValue)) {
       return filterValue.includes(conversationValue);
     }
+  }
+
+  // A single filter value against a list (e.g. a category and its parents)
+  if (Array.isArray(conversationValue)) {
+    return conversationValue.includes(filterValue);
   }
 
   return conversationValue === filterValue;

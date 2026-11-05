@@ -22,6 +22,26 @@ class Macros::ExecutionService < ActionService
 
   private
 
+  # A person can't resolve an uncategorised conversation (Conversations::ResolveGuard); the macro leaves a note instead
+  def resolve_conversation(params)
+    return note_resolve_skipped if Conversations::ResolveGuard.blocked?(@conversation, @user)
+
+    super
+  end
+
+  def change_status(status)
+    return note_resolve_skipped if status[0] == 'resolved' && Conversations::ResolveGuard.blocked?(@conversation, @user)
+
+    super
+  end
+
+  def note_resolve_skipped
+    content = I18n.t('conversations.activity.category.resolve_skipped', user_name: @user.name)
+    ::Conversations::ActivityMessageJob.perform_later(
+      @conversation, { account_id: @conversation.account_id, inbox_id: @conversation.inbox_id, message_type: :activity, content: content }
+    )
+  end
+
   def assign_agent(agent_ids)
     agent_ids = agent_ids.map { |id| id == 'self' ? @user.id : id }
     super(agent_ids)

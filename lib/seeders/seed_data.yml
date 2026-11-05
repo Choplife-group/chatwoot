@@ -216,6 +216,27 @@ custom_roles:
       - 'conversation_unassigned_manage'
       - 'conversation_participating_manage'
       - 'contact_manage'
+markets:
+  - name: 'Uganda'
+    code: 'UG'
+  - name: 'Sierra Leone'
+    code: 'SL'
+conversation_categories:
+  - name: 'Withdrawal'
+    children:
+      - name: 'Pending approval'
+      - name: 'Not received'
+  - name: 'Deposit'
+    children:
+      - name: 'Not credited'
+      - name: 'Failed'
+  - name: 'Account'
+    children:
+      - name: 'Verification (KYC)'
+      - name: 'Login problem'
+  - name: 'Other'
+    children:
+      - name: 'Other'
 labels:
     - title: 'billing'
       color: '#28AD21'

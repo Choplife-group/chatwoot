@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { getLastMessage } from 'dashboard/helper/conversationHelper';
+import { useMapGetter } from 'dashboard/composables/store';
 import Avatar from 'next/avatar/Avatar.vue';
 import Icon from 'dashboard/components-next/icon/Icon.vue';
 import MessagePreview from './MessagePreview.vue';
@@ -50,8 +51,14 @@ const voiceCallData = computed(() => {
   };
 });
 
+const market = computed(() => props.chat?.meta?.market);
+const category = computed(() => props.chat?.meta?.category);
+const getCategoryPath = useMapGetter('conversationCategories/getPath');
+
 const showMetaSection = computed(() => {
   return (
+    market.value ||
+    category.value ||
     props.showInboxName ||
     (props.showAssignee && props.assignee.name) ||
     props.chat.priority
@@ -171,6 +178,20 @@ watch(
               class="size-3 text-n-slate-11 flex-shrink-0"
             />
             <span class="truncate">{{ assignee.name }}</span>
+          </span>
+          <span
+            v-if="category"
+            v-tooltip.top="getCategoryPath(category.id)"
+            class="text-n-slate-11 text-xs leading-3 py-0.5 truncate min-w-0 max-w-32"
+          >
+            {{ category.name }}
+          </span>
+          <span
+            v-if="market"
+            v-tooltip.top="market.name"
+            class="text-n-slate-11 text-xs font-medium leading-3 py-0.5 px-1 rounded bg-n-alpha-2 flex-shrink-0"
+          >
+            {{ market.code }}
           </span>
           <CardPriorityIcon
             :priority="chat.priority"

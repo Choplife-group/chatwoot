@@ -8,6 +8,7 @@ import {
 import { useExactTimestamp } from 'shared/composables/useExactTimestamp';
 import { useAdmin } from 'dashboard/composables/useAdmin';
 import ContactInfoRow from './ContactInfoRow.vue';
+import ContactMarketRow from './ContactMarketRow.vue';
 import ViewAllConversations from './ViewAllConversations.vue';
 import Avatar from 'next/avatar/Avatar.vue';
 import SocialIcons from './SocialIcons.vue';
@@ -23,6 +24,7 @@ export default {
   components: {
     NextButton,
     ContactInfoRow,
+    ContactMarketRow,
     ViewAllConversations,
     EditContact,
     Avatar,
@@ -315,6 +317,10 @@ export default {
                   },
                 })
             "
+          />
+          <ContactMarketRow
+            :market-id="contact.market_id"
+            @update="value => updateContactField({ market_id: value })"
           />
           <ContactInfoRow
             v-if="location || additionalAttributes.location"

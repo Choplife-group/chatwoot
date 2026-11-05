@@ -1,0 +1,36 @@
+{
+  "CATEGORIES_SETTINGS": {
+    "HEADER": "Categories",
+    "DESCRIPTION": "The reasons players contact support, e.g. Withdrawal › Pending approval. Up to 5 levels. Agents must pick a category down to the last level before resolving a conversation. Archived categories stay on old conversations and reports.",
+    "LOADING": "Fetching categories",
+    "EMPTY": "No categories yet. Add the first one to get started.",
+    "API_ERROR": "Something went wrong. Please try again.",
+    "SAVED": "Category saved",
+    "SAVE": "Save",
+    "ARCHIVED": "Archived",
+    "ARCHIVE": "Archive with everything below it",
+    "RESTORE": "Restore with everything below it",
+    "ARCHIVED_MESSAGE": "Category archived",
+    "RESTORED": "Category restored",
+    "MOVE_UP": "Move up",
+    "MOVE_DOWN": "Move down",
+    "ADD": {
+      "BUTTON": "Add category",
+      "TITLE": "Add category"
+    },
+    "ADD_CHILD": {
+      "BUTTON": "Add subcategory",
+      "TITLE": "Add subcategory under {parent}"
+    },
+    "RENAME": {
+      "BUTTON": "Rename",
+      "TITLE": "Rename category"
+    },
+    "FORM": {
+      "NAME": {
+        "LABEL": "Name",
+        "PLACEHOLDER": "e.g. Withdrawal"
+      }
+    }
+  }
+}

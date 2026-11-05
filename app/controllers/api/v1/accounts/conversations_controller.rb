@@ -1,9 +1,11 @@
+# rubocop:disable Metrics/ClassLength -- one line over after adding the resolve guard; toggle_status still has an upstream FIXME to move into a service
 class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseController
   include Events::Types
   include DateRangeHelper
   include HmacConcern
   include ConversationCustomAttributesConcern
   include ConversationAssignmentTargetsConcern
+  include ConversationResolveGuardConcern
 
   before_action :conversation, except: [:index, :meta, :search, :create, :filter]
   before_action :validate_assignment_targets, :inbox, :contact, :contact_inbox, only: [:create]
@@ -143,7 +145,7 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
     # TODO: Move the other conversation attributes to this method and remove specific endpoints for each attribute
     raise ActionController::ParameterMissing, :priority unless params[:priority].nil? || Conversation.priorities.key?(params[:priority])
 
-    params.permit(:priority)
+    with_category_id(with_market_id(params.permit(:priority)))
   end
 
   def attachment_params
@@ -238,3 +240,4 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
 end
 
 Api::V1::Accounts::ConversationsController.prepend_mod_with('Api::V1::Accounts::ConversationsController')
+# rubocop:enable Metrics/ClassLength

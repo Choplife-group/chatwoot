@@ -6,6 +6,10 @@ agent_bot_id:
 
 team_id:
   $ref: ./team_id.yml
+market_id:
+  $ref: ./market_id.yml
+conversation_category_id:
+  $ref: ./conversation_category_id.yml
 
 inbox_id:
   $ref: ./inbox_id.yml

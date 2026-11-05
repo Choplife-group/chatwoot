@@ -608,6 +608,8 @@ RSpec.describe 'Conversations API', type: :request do
 
       it 'toggles the conversation status if status is empty' do
         expect(conversation.status).to eq('open')
+        # A person can only resolve a categorised conversation
+        conversation.update!(category: account.conversation_categories.create!(name: 'Withdrawal'))
 
         post "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/toggle_status",
              headers: agent.create_new_auth_token,

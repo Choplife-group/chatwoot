@@ -1,0 +1,33 @@
+tags:
+  - Conversation Categories
+operationId: create-a-conversation-category
+summary: Create a conversation category
+security:
+  - userBearerAuth: []
+  - userApiKey: []
+description: Create a category, or a subcategory when parent_id is given (up to 5 levels). Only administrators can create categories.
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/conversation_category_create_update_payload'
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/conversation_category'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '422':
+    description: Validation error
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
