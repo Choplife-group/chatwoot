@@ -3,6 +3,7 @@ import {
   getUserPermissions,
   hasPermissions,
   filterItemsByPermission,
+  getPermissionGroupSummary,
 } from '../permissionsHelper';
 
 describe('#getCurrentAccount', () => {
@@ -149,5 +150,28 @@ describe('filterItemsByPermission', () => {
     expect(result).toContainEqual(
       expect.objectContaining({ key: 'item1', name: 'Item 1' })
     );
+  });
+});
+
+describe('#getPermissionGroupSummary', () => {
+  it('counts per module and leaves out modules with none', () => {
+    expect(
+      getPermissionGroupSummary([
+        'conversation_manage',
+        'vip_manage',
+        'report_manage',
+      ])
+    ).toEqual([
+      {
+        key: 'CONVERSATIONS',
+        selected: ['conversation_manage', 'vip_manage'],
+        total: 4,
+      },
+      { key: 'REPORTS', selected: ['report_manage'], total: 1 },
+    ]);
+  });
+
+  it('returns nothing for a role with no known permissions', () => {
+    expect(getPermissionGroupSummary()).toEqual([]);
   });
 });

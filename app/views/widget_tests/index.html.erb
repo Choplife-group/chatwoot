@@ -3,8 +3,10 @@
 </body>
 
 <%
+  # A signed identity in the page lets any visitor act as this contact, so it's only available locally
+  signed_user = !Rails.env.production?
   user_id = 1
-  user_hash = OpenSSL::HMAC.hexdigest(
+  user_hash = signed_user && OpenSSL::HMAC.hexdigest(
     'sha256',
     @web_widget.hmac_token,
     user_id.to_s
@@ -42,6 +44,7 @@ window.chatwootSettings = {
 
 window.addEventListener('chatwoot:ready', function() {
   console.log('chatwoot:ready', window.$chatwoot);
+  <% if signed_user %>
   if (window.location.search.includes('setUser')) {
     window.$chatwoot.setUser('<%= user_id %>', {
       identifier_hash: '<%= user_hash %>',
@@ -50,6 +53,7 @@ window.addEventListener('chatwoot:ready', function() {
       phone_number: ''
     });
   }
+  <% end %>
 })
 
 window.addEventListener('chatwoot:error', function(e) {

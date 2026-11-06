@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useAlert } from 'dashboard/composables';
 import Avatar from 'next/avatar/Avatar.vue';
 import { useAdmin } from 'dashboard/composables/useAdmin';
+import { usePolicy } from 'dashboard/composables/usePolicy';
 import SettingsLayout from '../SettingsLayout.vue';
 import BaseSettingsHeader from '../components/BaseSettingsHeader.vue';
 import {
@@ -22,6 +23,10 @@ const getters = useStoreGetters();
 const store = useStore();
 const { t } = useI18n();
 const { isAdmin } = useAdmin();
+const { checkPermissions } = usePolicy();
+const canManageInboxes = computed(() =>
+  checkPermissions(['administrator', 'inbox_manage'])
+);
 
 const showDeletePopup = ref(false);
 const selectedInbox = ref({});
@@ -112,7 +117,10 @@ const openDelete = inbox => {
           </span>
         </template>
         <template #actions>
-          <router-link v-if="isAdmin" :to="{ name: 'settings_inbox_new' }">
+          <router-link
+            v-if="canManageInboxes"
+            :to="{ name: 'settings_inbox_new' }"
+          >
             <Button :label="$t('SETTINGS.INBOXES.NEW_INBOX')" size="sm" />
           </router-link>
         </template>
@@ -187,7 +195,7 @@ const openDelete = inbox => {
               }"
             >
               <Button
-                v-if="isAdmin"
+                v-if="canManageInboxes"
                 v-tooltip.top="$t('INBOX_MGMT.SETTINGS')"
                 icon="i-woot-settings"
                 slate

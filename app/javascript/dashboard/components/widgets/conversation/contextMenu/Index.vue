@@ -1,6 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-import { useAdmin } from 'dashboard/composables/useAdmin';
+import { usePolicy } from 'dashboard/composables/usePolicy';
 import { useAlert } from 'dashboard/composables';
 import { copyTextToClipboard } from 'shared/helpers/clipboard';
 import {
@@ -97,9 +97,9 @@ export default {
     'close',
   ],
   setup() {
-    const { isAdmin } = useAdmin();
+    const { checkPermissions } = usePolicy();
     return {
-      isAdmin,
+      canDelete: checkPermissions(['administrator', 'conversation_delete']),
     };
   },
   data() {
@@ -466,7 +466,7 @@ export default {
         @click.stop="copyConversationLink"
       />
     </template>
-    <template v-if="isAdmin && isAllowed([MENU.DELETE])">
+    <template v-if="canDelete && isAllowed([MENU.DELETE])">
       <hr class="m-1 rounded border-b border-n-weak dark:border-n-weak" />
       <MenuItem
         :option="deleteOption"

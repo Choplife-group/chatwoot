@@ -104,6 +104,128 @@ RSpec.describe 'Support role permissions', type: :request do
     end
   end
 
+  describe 'conversation_delete' do
+    let(:inbox) { create(:inbox, account: account) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox) }
+    let(:url) { "#{base}/conversations/#{conversation.display_id}" }
+
+    before { create(:inbox_member, user: user, inbox: inbox) }
+
+    it 'deletes a conversation they can see' do
+      give('conversation_delete')
+
+      expect { delete url, headers: headers, as: :json }.to have_enqueued_job(DeleteObjectJob)
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'does not delete one they can\'t see' do
+      give('conversation_delete')
+      account.enable_features!('restricted_inbox_access')
+
+      expect { delete url, headers: headers, as: :json }.not_to have_enqueued_job(DeleteObjectJob)
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'stays closed without it' do
+      give('conversation_manage')
+
+      expect { delete url, headers: headers, as: :json }.not_to have_enqueued_job(DeleteObjectJob)
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
+  describe 'inbox_manage' do
+    let(:inbox) { create(:inbox, account: account) }
+    let(:api_inbox) { create(:channel_api, account: account, webhook_url: 'https://safe.example.com').inbox }
+    let(:member) { create(:user, account: account, role: :agent) }
+
+    before { give('inbox_manage') }
+
+    it 'lists every inbox and opens one they are not in' do
+      inbox
+
+      get "#{base}/inboxes", headers: headers, as: :json
+      expect(response.parsed_body['payload'].pluck('id')).to include(inbox.id)
+
+      get "#{base}/inboxes/#{inbox.id}", headers: headers, as: :json
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'changes inbox settings and widget appearance' do
+      patch "#{base}/inboxes/#{inbox.id}", params: { name: 'Renamed', channel: { widget_color: '#000000' } }, headers: headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(inbox.reload.name).to eq('Renamed')
+      expect(inbox.channel.widget_color).to eq('#000000')
+    end
+
+    it 'does not change a widget\'s identity or domain protection' do
+      patch "#{base}/inboxes/#{inbox.id}", params: { channel: { hmac_mandatory: true, allowed_domains: 'evil.example.com' } },
+                                           headers: headers, as: :json
+
+      expect(inbox.channel.reload).to have_attributes(hmac_mandatory: false, allowed_domains: '')
+    end
+
+    it 'does not change a channel\'s connection' do
+      patch "#{base}/inboxes/#{api_inbox.id}", params: { channel: { webhook_url: 'https://evil.example.com' } }, headers: headers, as: :json
+
+      expect(api_inbox.channel.reload.webhook_url).to eq('https://safe.example.com')
+    end
+
+    it 'does not return secrets' do
+      get "#{base}/inboxes/#{inbox.id}", headers: headers, as: :json
+
+      expect(response.parsed_body).not_to have_key('hmac_token')
+    end
+
+    it 'does not delete an inbox or rotate its secrets' do
+      delete "#{base}/inboxes/#{inbox.id}", headers: headers, as: :json
+      expect(response).to have_http_status(:unauthorized)
+
+      post "#{base}/inboxes/#{inbox.id}/rotate_hmac_token", headers: headers, as: :json
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'manages members, but they can\'t add themselves' do
+      patch "#{base}/inbox_members", params: { inbox_id: inbox.id, user_ids: [member.id] }, headers: headers, as: :json
+      expect(inbox.reload.members).to contain_exactly(member)
+
+      patch "#{base}/inbox_members", params: { inbox_id: inbox.id, user_ids: [member.id, user.id.to_s] }, headers: headers, as: :json
+      expect(response).to have_http_status(:unauthorized)
+
+      post "#{base}/inbox_members", params: { inbox_id: inbox.id, user_ids: [user.id] }, headers: headers, as: :json
+      expect(response).to have_http_status(:unauthorized)
+      expect(inbox.reload.members).not_to include(user)
+    end
+
+    it 'does not open the inbox\'s conversations' do
+      conversation = create(:conversation, account: account, inbox: inbox)
+
+      get "#{base}/conversations/#{conversation.display_id}", headers: headers, as: :json
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'does not let them start a conversation in it' do
+      contact_inbox = create(:contact_inbox, inbox: inbox, contact: create(:contact, account: account))
+
+      post "#{base}/conversations", params: { source_id: contact_inbox.source_id }, headers: headers, as: :json
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
+  it 'keeps inboxes closed without inbox_manage' do
+    give('market_manage')
+    inbox = create(:inbox, account: account)
+
+    get "#{base}/inboxes/#{inbox.id}", headers: headers, as: :json
+    expect(response).to have_http_status(:unauthorized)
+
+    post "#{base}/inboxes", params: { name: 'New', channel: { type: 'api' } }, headers: headers, as: :json
+    expect(response).to have_http_status(:unauthorized)
+  end
+
   it 'gives nothing when support_roles is off' do
     give('market_manage')
     account.disable_features!('support_roles')
@@ -116,7 +238,7 @@ RSpec.describe 'Support role permissions', type: :request do
   it 'leaves everything else closed for the full role' do
     give(*SupportRole::PERMISSIONS)
 
-    post "#{base}/inboxes", params: { name: 'New' }, headers: headers, as: :json
+    post "#{base}/agent_bots", params: { name: 'Bot' }, headers: headers, as: :json
     expect(response).to have_http_status(:unauthorized)
 
     post "#{base}/automation_rules", params: { name: 'Rule' }, headers: headers, as: :json

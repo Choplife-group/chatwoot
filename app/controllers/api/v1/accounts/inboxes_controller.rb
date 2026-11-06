@@ -86,7 +86,7 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
 
   def fetch_inbox
     @inbox = Current.account.inboxes.find(params[:id])
-    authorize @inbox, :show?
+    authorize @inbox, :view_settings?
   end
 
   def fetch_agent_bot
@@ -108,7 +108,7 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
   end
 
   def update_channel
-    channel_attributes = get_channel_attributes(@inbox.channel_type)
+    channel_attributes = editable_channel_attributes
     return if permitted_params(channel_attributes)[:channel].blank?
 
     validate_and_update_email_channel(channel_attributes) if @inbox.inbox_type == 'Email'
@@ -118,7 +118,15 @@ class Api::V1::Accounts::InboxesController < Api::V1::Accounts::BaseController
   end
 
   def channel_update_required?
-    permitted_params(get_channel_attributes(@inbox.channel_type))[:channel].present?
+    permitted_params(editable_channel_attributes)[:channel].present?
+  end
+
+  # With inbox_manage, only the look of a website widget can change. Connection fields stay with administrators.
+  def editable_channel_attributes
+    attributes = get_channel_attributes(@inbox.channel_type)
+    return attributes if policy(@inbox).update_connection?
+
+    @inbox.web_widget? ? attributes - [:hmac_mandatory, :allowed_domains] : []
   end
 
   def validate_and_update_email_channel(channel_attributes)

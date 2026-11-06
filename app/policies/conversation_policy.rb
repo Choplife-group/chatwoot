@@ -4,7 +4,7 @@ class ConversationPolicy < ApplicationPolicy
   end
 
   def destroy?
-    administrator?
+    account_user&.can?('conversation_delete')
   end
 
   def show?

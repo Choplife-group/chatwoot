@@ -1,3 +1,5 @@
+import { CUSTOM_ROLE_PERMISSION_GROUPS } from 'dashboard/constants/permissions';
+
 export const hasPermissions = (
   requiredPermissions = [],
   availablePermissions = []
@@ -53,3 +55,16 @@ export const filterItemsByPermission = (
     .filter(([, item]) => hasRequiredPermissions(item)) // Keep only items with required permissions
     .map(([key, item]) => transformItem(key, item)); // Transform each remaining item
 };
+
+/**
+ * How many permissions a role has in each module, leaving out modules it has none in.
+ *
+ * @param {Array} permissions - The role's permissions.
+ * @returns {Array} The groups with their `selected` permissions and `total`.
+ */
+export const getPermissionGroupSummary = (permissions = []) =>
+  CUSTOM_ROLE_PERMISSION_GROUPS.map(group => ({
+    key: group.key,
+    selected: group.permissions.filter(item => permissions.includes(item)),
+    total: group.permissions.length,
+  })).filter(group => group.selected.length > 0);

@@ -1,11 +1,32 @@
-export const AVAILABLE_CUSTOM_ROLE_PERMISSIONS = [
+export const CUSTOM_ROLE_PERMISSION_GROUPS = [
+  {
+    key: 'CONVERSATIONS',
+    permissions: [
+      'conversation_manage',
+      'conversation_assign',
+      'conversation_delete',
+      'vip_manage',
+    ],
+  },
+  { key: 'REPORTS', permissions: ['report_manage'] },
+  { key: 'INBOXES', permissions: ['inbox_manage'] },
+  { key: 'SUPPORT_SETUP', permissions: ['category_manage', 'market_manage'] },
+  {
+    key: 'PEOPLE_AND_ACCESS',
+    permissions: ['team_manage', 'agent_manage', 'role_manage'],
+  },
+];
+
+export const AVAILABLE_CUSTOM_ROLE_PERMISSIONS =
+  CUSTOM_ROLE_PERMISSION_GROUPS.flatMap(group => group.permissions);
+
+// These have side effects worth explaining when the permission is ticked
+export const CUSTOM_ROLE_PERMISSIONS_WITH_HINTS = [
   'conversation_manage',
-  'conversation_assign',
-  'vip_manage',
+  'conversation_delete',
   'report_manage',
-  'category_manage',
+  'inbox_manage',
   'team_manage',
-  'market_manage',
   'agent_manage',
   'role_manage',
 ];

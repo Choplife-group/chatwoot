@@ -32,14 +32,32 @@
         "ACTIONS": "Actions"
       }
     },
+    "PERMISSION_GROUPS": {
+      "CONVERSATIONS": "Conversations",
+      "REPORTS": "Reports",
+      "INBOXES": "Inboxes",
+      "SUPPORT_SETUP": "Support setup",
+      "PEOPLE_AND_ACCESS": "People and access"
+    },
+    "PERMISSION_HINTS": {
+      "CONVERSATION_MANAGE": "Only applies when restricted inbox access is on for the account.",
+      "CONVERSATION_DELETE": "Permanent. Deleted conversations can't be recovered.",
+      "REPORT_MANAGE": "Includes data from every market and team.",
+      "INBOX_MANAGE": "Deleting inboxes, connection details and secrets stay with administrators.",
+      "TEAM_MANAGE": "A team lead sees their team's full queue. They can't make themselves a lead.",
+      "AGENT_MANAGE": "They can't change administrators, their own role, or give access they don't have.",
+      "ROLE_MANAGE": "They can't add permissions they don't have, or edit their own role."
+    },
     "PERMISSIONS": {
       "CONVERSATION_MANAGE": "See all conversations",
       "CONVERSATION_ASSIGN": "Change assignee and team",
+      "CONVERSATION_DELETE": "Delete conversations",
       "VIP_MANAGE": "Add and remove VIP",
       "REPORT_MANAGE": "View reports",
       "CATEGORY_MANAGE": "Manage conversation categories",
       "TEAM_MANAGE": "Manage teams and team leads",
       "MARKET_MANAGE": "Manage markets",
+      "INBOX_MANAGE": "Manage inboxes",
       "AGENT_MANAGE": "Add, edit and remove agents",
       "ROLE_MANAGE": "Create and edit custom roles"
     },
@@ -56,7 +74,9 @@
       },
       "PERMISSIONS": {
         "LABEL": "Permissions",
-        "ERROR": "Permissions are required."
+        "ERROR": "Permissions are required.",
+        "SELECT_ALL": "Select all",
+        "CLEAR_ALL": "Clear all"
       },
       "CANCEL_BUTTON_TEXT": "Cancel",
       "API": {

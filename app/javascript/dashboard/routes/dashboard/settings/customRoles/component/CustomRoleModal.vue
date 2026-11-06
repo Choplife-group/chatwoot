@@ -5,7 +5,10 @@ import { useI18n } from 'vue-i18n';
 import { useVuelidate } from '@vuelidate/core';
 import { required, minLength } from '@vuelidate/validators';
 import { useAlert } from 'dashboard/composables';
-import { AVAILABLE_CUSTOM_ROLE_PERMISSIONS } from 'dashboard/constants/permissions.js';
+import {
+  CUSTOM_ROLE_PERMISSION_GROUPS,
+  CUSTOM_ROLE_PERMISSIONS_WITH_HINTS,
+} from 'dashboard/constants/permissions.js';
 import { useEscalationGuard } from 'dashboard/composables/useEscalationGuard';
 
 import Button from 'dashboard/components-next/button/Button.vue';
@@ -54,6 +57,25 @@ const resetForm = () => {
 };
 
 const { holds } = useEscalationGuard();
+
+// Select all only covers what this user can hand out
+const selectablePermissions = group =>
+  group.permissions.filter(permission => holds([permission]));
+
+const isGroupSelected = group =>
+  selectablePermissions(group).every(permission =>
+    selectedPermissions.value.includes(permission)
+  );
+
+const toggleGroup = group => {
+  const selectable = selectablePermissions(group);
+  const others = selectedPermissions.value.filter(
+    permission => !selectable.includes(permission)
+  );
+  selectedPermissions.value = isGroupSelected(group)
+    ? others
+    : [...others, ...selectable];
+};
 
 const populateEditForm = () => {
   name.value = props.selectedRole.name || '';
@@ -155,25 +177,59 @@ const isSubmitDisabled = computed(
         <label :class="{ 'text-n-ruby-9': v$.selectedPermissions.$error }">
           {{ $t('CUSTOM_ROLE.FORM.PERMISSIONS.LABEL') }}
         </label>
-        <div class="flex flex-col gap-2.5 mb-4 mt-2">
-          <div
-            v-for="permission in AVAILABLE_CUSTOM_ROLE_PERMISSIONS"
-            :key="permission"
-            class="flex items-center"
+        <div class="flex flex-col gap-4 mb-4 mt-2">
+          <fieldset
+            v-for="group in CUSTOM_ROLE_PERMISSION_GROUPS"
+            :key="group.key"
+            class="flex flex-col gap-2 p-0 m-0 border-0"
           >
-            <input
-              :id="permission"
-              v-model="selectedPermissions"
-              type="checkbox"
-              :value="permission"
-              :disabled="!holds([permission])"
-              name="permissions"
-              class="ltr:mr-2 rtl:ml-2"
-            />
-            <label :for="permission" class="text-sm font-normal">
-              {{ $t(`CUSTOM_ROLE.PERMISSIONS.${permission.toUpperCase()}`) }}
-            </label>
-          </div>
+            <legend class="w-full p-0 mb-2">
+              <span class="flex items-center justify-between gap-2">
+                <span class="text-sm font-medium text-n-slate-11">
+                  {{ $t(`CUSTOM_ROLE.PERMISSION_GROUPS.${group.key}`) }}
+                </span>
+                <Button
+                  v-if="selectablePermissions(group).length > 1"
+                  link
+                  xs
+                  :label="
+                    isGroupSelected(group)
+                      ? $t('CUSTOM_ROLE.FORM.PERMISSIONS.CLEAR_ALL')
+                      : $t('CUSTOM_ROLE.FORM.PERMISSIONS.SELECT_ALL')
+                  "
+                  @click="toggleGroup(group)"
+                />
+              </span>
+            </legend>
+            <div
+              v-for="permission in group.permissions"
+              :key="permission"
+              class="flex items-start"
+            >
+              <input
+                :id="permission"
+                v-model="selectedPermissions"
+                type="checkbox"
+                :value="permission"
+                :disabled="!holds([permission])"
+                name="permissions"
+                class="mt-0.5 ltr:mr-2 rtl:ml-2"
+              />
+              <label :for="permission" class="text-sm font-normal">
+                {{ $t(`CUSTOM_ROLE.PERMISSIONS.${permission.toUpperCase()}`) }}
+                <span
+                  v-if="CUSTOM_ROLE_PERMISSIONS_WITH_HINTS.includes(permission)"
+                  class="block text-xs text-n-slate-11"
+                >
+                  {{
+                    $t(
+                      `CUSTOM_ROLE.PERMISSION_HINTS.${permission.toUpperCase()}`
+                    )
+                  }}
+                </span>
+              </label>
+            </div>
+          </fieldset>
         </div>
       </div>
 

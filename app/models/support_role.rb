@@ -21,7 +21,7 @@ class SupportRole < ApplicationRecord
   self.table_name = 'custom_roles'
 
   PERMISSIONS = %w[
-    conversation_manage conversation_assign vip_manage report_manage category_manage team_manage market_manage agent_manage role_manage
+    conversation_manage conversation_assign conversation_delete vip_manage report_manage category_manage team_manage market_manage inbox_manage agent_manage role_manage
   ].freeze
 
   belongs_to :account
