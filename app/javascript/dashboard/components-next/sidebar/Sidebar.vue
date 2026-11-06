@@ -250,6 +250,19 @@ const getFolderUnreadCount = useMapGetter(
 const teams = useMapGetter('teams/getMyTeams');
 const activeMarkets = useMapGetter('markets/getActiveMarkets');
 const getQueueCount = useMapGetter('conversationGroupCounts/getCount');
+const currentRole = useMapGetter('getCurrentRole');
+
+// Only hides the list: the Market picker on a conversation still offers every market
+const sidebarMarkets = computed(() => {
+  if (currentRole.value === 'administrator') return activeMarkets.value;
+
+  const inboxMarketIds = inboxes.value.map(inbox => inbox.market_id);
+  return activeMarkets.value.filter(
+    market =>
+      inboxMarketIds.includes(market.id) ||
+      getQueueCount.value('market', market.id).open_count > 0
+  );
+});
 
 const queueCountLeaf =
   (groupBy, id, leadingIcon = null) =>
@@ -495,7 +508,7 @@ const menuItems = computed(() => {
             ),
           })),
         },
-        ...(activeMarkets.value.length
+        ...(sidebarMarkets.value.length
           ? [
               {
                 name: 'Markets',
@@ -504,7 +517,7 @@ const menuItems = computed(() => {
                 activeOn: ['conversations_through_market'],
                 collapsible: true,
                 showTreeLine: true,
-                children: activeMarkets.value.map(market => ({
+                children: sidebarMarkets.value.map(market => ({
                   name: `market-${market.id}`,
                   label: `${market.name} (${market.code})`,
                   to: accountScopedRoute('market_conversations', {

@@ -2,6 +2,7 @@ import {
   setAuthCredentials,
   throwErrorMessage,
   clearLocalStorageOnLogout,
+  deleteIndexedDBOnLogout,
   parseAPIErrorResponse,
 } from 'dashboard/store/utils/api';
 import wootAPI from './apiClient';
@@ -40,6 +41,8 @@ export const login = async ({
 
     setAuthCredentials(response);
     clearLocalStorageOnLogout();
+    // A session that expired never logged out, so the last user's inboxes and teams may still be cached
+    await deleteIndexedDBOnLogout();
     window.location = getLoginRedirectURL({
       ssoAccountId,
       ssoConversationId,
