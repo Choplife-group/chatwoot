@@ -19,12 +19,13 @@ export default {
           path: 'list',
           name: 'custom_roles_list',
           meta: {
-            featureFlag: FEATURE_FLAGS.CUSTOM_ROLES,
+            featureFlag: FEATURE_FLAGS.SUPPORT_ROLES,
             installationTypes: [
               INSTALLATION_TYPES.CLOUD,
               INSTALLATION_TYPES.ENTERPRISE,
+              INSTALLATION_TYPES.COMMUNITY,
             ],
-            permissions: ['administrator'],
+            permissions: ['administrator', 'role_manage'],
           },
           component: CustomRolesHome,
         },

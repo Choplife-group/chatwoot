@@ -446,4 +446,17 @@ RSpec.describe 'Profile API', type: :request do
       end
     end
   end
+
+  it 'returns the custom role and its permissions' do
+    account.enable_features!('support_roles')
+    role = create(:support_role, account: account, name: 'Head of Support', permissions: ['report_manage'])
+    user = create(:user, account: account, role: :agent)
+    user.account_users.first.update!(custom_role_id: role.id)
+
+    get '/api/v1/profile', headers: user.create_new_auth_token, as: :json
+
+    current = response.parsed_body['accounts'].first
+    expect(current).to include('custom_role_id' => role.id, 'permissions' => %w[agent report_manage])
+    expect(current['custom_role']).to include('name' => 'Head of Support')
+  end
 end

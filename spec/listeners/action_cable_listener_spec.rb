@@ -410,4 +410,24 @@ describe ActionCableListener do
       end.not_to raise_error
     end
   end
+
+  context 'when a role has conversation_manage and restricted_inbox_access is on' do
+    let!(:head) { create(:user, account: account, role: :agent) }
+    let(:message) { create(:message, account: account, inbox: inbox, conversation: conversation) }
+
+    before do
+      account.enable_features!('support_roles', 'restricted_inbox_access')
+      role = create(:support_role, account: account, permissions: ['conversation_manage'])
+      head.account_users.first.update!(custom_role_id: role.id)
+    end
+
+    it 'sends them live updates' do
+      message
+      allow(ActionCableBroadcastJob).to receive(:perform_later)
+
+      listener.message_created(Events::Base.new(:'message.created', Time.zone.now, message: message))
+
+      expect(ActionCableBroadcastJob).to have_received(:perform_later).with(array_including(head.pubsub_token), 'message.created', anything)
+    end
+  end
 end

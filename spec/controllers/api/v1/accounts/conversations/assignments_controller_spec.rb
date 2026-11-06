@@ -248,4 +248,35 @@ RSpec.describe 'Conversation Assignment API', type: :request do
       expect(conversation.reload.assignee).to eq(outsider)
     end
   end
+
+  context 'when a role has conversation_assign' do
+    let(:account) { create(:account) }
+    let(:inbox) { create(:inbox, account: account) }
+    let(:head) { create(:user, account: account, role: :agent) }
+    let(:other_agent) { create(:user, account: account, role: :agent) }
+    let(:conversation) { create(:conversation, account: account, inbox: inbox, assignee: head) }
+    let(:url) { "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/assignments" }
+
+    before do
+      account.enable_features!('support_roles', 'restricted_inbox_access')
+      role = create(:support_role, account: account, permissions: ['conversation_assign'])
+      head.account_users.first.update!(custom_role_id: role.id)
+    end
+
+    it 'assigns anyone, on a conversation they can see' do
+      post url, params: { assignee_id: other_agent.id }, headers: head.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(conversation.reload.assignee).to eq(other_agent)
+    end
+
+    it 'does not open conversations they can\'t see' do
+      hidden = create(:conversation, account: account, inbox: inbox)
+
+      post "/api/v1/accounts/#{account.id}/conversations/#{hidden.display_id}/assignments",
+           params: { assignee_id: head.id }, headers: head.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
 end

@@ -609,6 +609,29 @@
   delete:
     $ref: ./application/team_members/delete.yml
 
+### Custom Roles goes here
+
+/api/v1/accounts/{account_id}/custom_roles:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+  get:
+    $ref: ./application/custom_roles/index.yml
+  post:
+    $ref: ./application/custom_roles/create.yml
+/api/v1/accounts/{account_id}/custom_roles/{id}:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: The ID of the custom role
+  patch:
+    $ref: ./application/custom_roles/update.yml
+  delete:
+    $ref: ./application/custom_roles/delete.yml
+
 ### Custom Filters goes here
 
 # Custom Filters

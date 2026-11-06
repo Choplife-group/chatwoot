@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n';
 import { getI18nKey } from 'dashboard/routes/dashboard/settings/helper/settingsHelper';
 
 import Button from 'dashboard/components-next/button/Button.vue';
+import { useEscalationGuard } from 'dashboard/composables/useEscalationGuard';
 import { BaseTableRow, BaseTableCell } from 'dashboard/components-next/table';
 
 defineProps({
@@ -19,6 +20,7 @@ defineProps({
 const emit = defineEmits(['edit', 'delete']);
 
 const { t } = useI18n();
+const { canManageRole } = useEscalationGuard();
 
 const getFormattedPermissions = role => {
   return role.permissions
@@ -55,6 +57,7 @@ const getFormattedPermissions = role => {
       <BaseTableCell align="end" class="w-24">
         <div class="flex gap-3 justify-end flex-shrink-0">
           <Button
+            v-if="canManageRole(customRole)"
             v-tooltip.top="$t('CUSTOM_ROLE.EDIT.BUTTON_TEXT')"
             icon="i-woot-edit-pen"
             slate
@@ -62,6 +65,7 @@ const getFormattedPermissions = role => {
             @click="emit('edit', customRole)"
           />
           <Button
+            v-if="canManageRole(customRole)"
             v-tooltip.top="$t('CUSTOM_ROLE.DELETE.BUTTON_TEXT')"
             icon="i-woot-bin"
             slate

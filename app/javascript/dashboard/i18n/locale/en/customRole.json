@@ -33,12 +33,15 @@
       }
     },
     "PERMISSIONS": {
-      "CONVERSATION_MANAGE": "Manage all conversations",
-      "CONVERSATION_UNASSIGNED_MANAGE": "Manage unassigned conversations and those assigned to them",
-      "CONVERSATION_PARTICIPATING_MANAGE": "Manage participating conversations and those assigned to them",
-      "CONTACT_MANAGE": "Manage contacts",
-      "REPORT_MANAGE": "Manage reports",
-      "KNOWLEDGE_BASE_MANAGE": "Manage knowledge base"
+      "CONVERSATION_MANAGE": "See all conversations",
+      "CONVERSATION_ASSIGN": "Change assignee and team",
+      "VIP_MANAGE": "Add and remove VIP",
+      "REPORT_MANAGE": "View reports",
+      "CATEGORY_MANAGE": "Manage conversation categories",
+      "TEAM_MANAGE": "Manage teams and team leads",
+      "MARKET_MANAGE": "Manage markets",
+      "AGENT_MANAGE": "Add, edit and remove agents",
+      "ROLE_MANAGE": "Create and edit custom roles"
     },
     "FORM": {
       "NAME": {

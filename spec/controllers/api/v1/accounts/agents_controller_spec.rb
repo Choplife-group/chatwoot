@@ -294,4 +294,45 @@ RSpec.describe 'Agents API', type: :request do
       end
     end
   end
+
+  describe 'custom roles' do
+    let(:role) { create(:support_role, account: account) }
+    let(:account_user) { agent.account_users.find_by(account: account) }
+
+    it 'gives a role when adding an agent' do
+      post "/api/v1/accounts/#{account.id}/agents",
+           params: { agent: { name: 'New', email: 'new.role@example.com', custom_role_id: role.id } },
+           headers: admin.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body['custom_role_id']).to eq(role.id)
+    end
+
+    it 'gives and takes away a role on update' do
+      patch "/api/v1/accounts/#{account.id}/agents/#{agent.id}", params: { agent: { custom_role_id: role.id } },
+                                                                 headers: admin.create_new_auth_token, as: :json
+      expect(account_user.reload.custom_role_id).to eq(role.id)
+
+      patch "/api/v1/accounts/#{account.id}/agents/#{agent.id}", params: { agent: { role: 'agent', custom_role_id: nil } },
+                                                                 headers: admin.create_new_auth_token, as: :json
+      expect(account_user.reload.custom_role_id).to be_nil
+    end
+
+    it 'keeps the role when updating something else' do
+      account_user.update!(custom_role_id: role.id)
+
+      patch "/api/v1/accounts/#{account.id}/agents/#{agent.id}", params: { agent: { name: 'Renamed' } },
+                                                                 headers: admin.create_new_auth_token, as: :json
+
+      expect(account_user.reload.custom_role_id).to eq(role.id)
+    end
+
+    it 'does not let an agent give themselves a role' do
+      patch "/api/v1/accounts/#{account.id}/agents/#{agent.id}", params: { agent: { custom_role_id: role.id } },
+                                                                 headers: agent.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(account_user.reload.custom_role_id).to be_nil
+    end
+  end
 end

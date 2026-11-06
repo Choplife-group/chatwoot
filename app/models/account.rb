@@ -94,6 +94,7 @@ class Account < ApplicationRecord
   has_many :mentions, dependent: :destroy_async
   has_many :messages, dependent: :destroy_async
   has_many :markets, dependent: :destroy_async
+  has_many :support_roles, dependent: :destroy_async
   has_many :notes, dependent: :destroy_async
   has_many :notification_settings, dependent: :destroy_async
   has_many :notifications, dependent: :destroy_async

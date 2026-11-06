@@ -30,12 +30,16 @@ class AccountUser < ApplicationRecord
   belongs_to :account
   belongs_to :user
   belongs_to :inviter, class_name: 'User', optional: true
+  belongs_to :support_role, foreign_key: :custom_role_id, optional: true, inverse_of: :account_users
 
   enum role: { agent: 0, administrator: 1 }
   enum availability: { online: 0, offline: 1, busy: 2 }
 
   accepts_nested_attributes_for :account
 
+  scope :with_permission, ->(permission) { joins(:support_role).where('? = ANY(custom_roles.permissions)', permission) }
+
+  before_validation :sync_role_with_support_role
   after_create_commit :notify_creation, :create_notification_setting
   after_destroy :notify_deletion, :remove_user_from_account
   after_save :update_presence_in_redis, if: :saved_change_to_availability?
@@ -43,6 +47,7 @@ class AccountUser < ApplicationRecord
   after_update_commit :invalidate_filtered_unread_count_visibility_update, if: :filtered_unread_count_visibility_changed?
 
   validates :user_id, uniqueness: { scope: :account_id }
+  validate :support_role_in_account
 
   def create_notification_setting
     setting = user.notification_settings.new(account_id: account.id)
@@ -56,7 +61,18 @@ class AccountUser < ApplicationRecord
   end
 
   def permissions
-    administrator? ? ['administrator'] : ['agent']
+    return ['administrator'] if administrator?
+
+    ['agent', *support_role_permissions]
+  end
+
+  def can?(permission)
+    administrator? || permissions.include?(permission)
+  end
+
+  # conversation_manage lifts the limits of restricted_inbox_access. Without that switch, agents keep seeing their inboxes and teams.
+  def sees_all_conversations?
+    administrator? || (account.feature_enabled?('restricted_inbox_access') && can?('conversation_manage'))
   end
 
   def push_event_data
@@ -69,6 +85,22 @@ class AccountUser < ApplicationRecord
   end
 
   private
+
+  def support_role_permissions
+    return [] unless support_role && account.feature_enabled?('support_roles')
+
+    support_role.permissions
+  end
+
+  # A support role sits on top of the agent role, and administrators don't need one
+  def sync_role_with_support_role
+    self.role = :agent if custom_role_id_changed? && custom_role_id.present?
+    self.custom_role_id = nil if administrator?
+  end
+
+  def support_role_in_account
+    errors.add(:custom_role_id, :invalid) if custom_role_id.present? && support_role&.account_id != account_id
+  end
 
   def notify_creation
     Rails.configuration.dispatcher.dispatch(AGENT_ADDED, Time.zone.now, account: account)

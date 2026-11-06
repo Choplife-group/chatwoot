@@ -1,0 +1,45 @@
+tags:
+  - Custom Roles
+operationId: create-custom-role
+summary: Create a custom role
+description: Creates a named set of permissions
+security:
+  - userApiKey: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+            example: Head of Support
+          description:
+            type: string
+          permissions:
+            type: array
+            items:
+              type: string
+            example: [conversation_manage, report_manage]
+responses:
+  '200':
+    description: Success
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '403':
+    description: Custom roles aren't enabled for this account
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '422':
+    description: Invalid name or permissions
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

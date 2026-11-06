@@ -1,5 +1,5 @@
 # loaded once here; per-row lookups below would otherwise cost a query per membership
-account_users = resource.account_users.includes(:account)
+account_users = resource.account_users.includes(:account, :support_role)
 account_users = account_users.includes(:custom_role) if ChatwootApp.enterprise?
 led_teams_by_account = resource.team_members.leads.joins(:team).pluck('teams.account_id', :team_id).group_by(&:first)
 # full-precision timestamps, nils last, matching ORDER BY active_at DESC NULLS LAST
@@ -33,6 +33,8 @@ json.accounts do
     json.active_at account_user.active_at
     json.role account_user.role
     json.permissions account_user.permissions
+    json.custom_role_id account_user.custom_role_id
+    json.custom_role account_user.support_role&.slice(:id, :name, :description, :permissions)
     json.led_team_ids led_teams_by_account.fetch(account_user.account_id, []).map(&:last)
     # the actual availability user has configured
     json.availability account_user.availability

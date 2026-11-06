@@ -1,4 +1,5 @@
 # Who gets a conversation's live updates. Administrators are added by the caller, as they always see everything.
+# People whose role has conversation_manage are included here, as the caller doesn't know about them.
 class Conversations::AudienceService
   pattr_initialize [:conversation!]
 
@@ -27,6 +28,12 @@ class Conversations::AudienceService
   end
 
   def audience_for(assignee_id, team_id)
-    User.where(id: assignee_id).or(User.where(id: TeamMember.leads.where(team_id: team_id).select(:user_id)))
+    User.where(id: assignee_id).or(User.where(id: TeamMember.leads.where(team_id: team_id).select(:user_id))).or(User.where(id: see_all_user_ids))
+  end
+
+  def see_all_user_ids
+    return AccountUser.none.select(:user_id) unless conversation.account.feature_enabled?('support_roles')
+
+    conversation.account.account_users.with_permission('conversation_manage').select(:user_id)
   end
 end

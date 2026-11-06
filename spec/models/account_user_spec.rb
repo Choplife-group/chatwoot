@@ -81,4 +81,74 @@ RSpec.describe AccountUser do
       expect(invalidator).to have_received(:user_visibility_changed!).with(user_id: user.id).twice
     end
   end
+
+  describe 'support roles' do
+    let(:role) { create(:support_role, account: account_user.account, permissions: %w[report_manage vip_manage]) }
+
+    before { account_user.update!(role: :agent) }
+
+    it 'adds the role\'s permissions to the agent\'s when the feature is on' do
+      account_user.account.enable_features!('support_roles')
+      account_user.update!(custom_role_id: role.id)
+
+      expect(account_user.reload.permissions).to eq(%w[agent report_manage vip_manage])
+    end
+
+    it 'ignores the role when the feature is off' do
+      account_user.update!(custom_role_id: role.id)
+
+      expect(account_user.reload.permissions).to eq(['agent'])
+    end
+
+    it 'turns an administrator given a role into an agent' do
+      account_user.update!(role: :administrator)
+
+      account_user.update!(custom_role_id: role.id)
+
+      expect(account_user.reload).to have_attributes(role: 'agent', custom_role_id: role.id)
+    end
+
+    it 'clears the role when someone becomes an administrator' do
+      account_user.update!(custom_role_id: role.id)
+
+      account_user.update!(role: :administrator)
+
+      expect(account_user.reload.custom_role_id).to be_nil
+    end
+
+    it 'rejects a role from another account' do
+      expect(account_user.update(custom_role_id: create(:support_role).id)).to be(false)
+    end
+  end
+
+  describe 'conversation permissions' do
+    let(:account) { account_user.account }
+    let(:role) { create(:support_role, account: account, permissions: ['conversation_manage']) }
+
+    before do
+      account_user.update!(role: :agent, custom_role_id: role.id)
+      account.enable_features!('support_roles')
+    end
+
+    it 'checks a single permission, and administrators have them all' do
+      expect(account_user.reload.can?('conversation_manage')).to be(true)
+      expect(account_user.can?('vip_manage')).to be(false)
+
+      account_user.update!(role: :administrator)
+      expect(account_user.reload.can?('vip_manage')).to be(true)
+    end
+
+    it 'only lifts the conversation limits when restricted_inbox_access is on' do
+      expect(account_user.reload.sees_all_conversations?).to be(false)
+
+      account.enable_features!('restricted_inbox_access')
+
+      expect(account_user.reload.sees_all_conversations?).to be(true)
+    end
+
+    it 'finds people by a permission in their role' do
+      expect(described_class.with_permission('conversation_manage')).to include(account_user)
+      expect(described_class.with_permission('vip_manage')).not_to include(account_user)
+    end
+  end
 end

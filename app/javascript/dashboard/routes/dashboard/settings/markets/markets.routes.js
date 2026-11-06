@@ -13,7 +13,7 @@ export default {
           path: '',
           name: 'markets_list',
           meta: {
-            permissions: ['administrator'],
+            permissions: ['administrator', 'market_manage'],
           },
           component: Index,
         },

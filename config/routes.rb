@@ -160,7 +160,7 @@ Rails.application.routes.draw do
             post :execute, on: :member
           end
           resources :sla_policies, only: [:index, :create, :show, :update, :destroy]
-          resources :custom_roles, only: [:index, :create, :show, :update, :destroy]
+          resources :custom_roles, controller: 'support_roles', only: [:index, :create, :show, :update, :destroy]
           resources :agent_capacity_policies, only: [:index, :create, :show, :update, :destroy] do
             scope module: :agent_capacity_policies do
               resources :users, only: [:index, :create, :destroy]

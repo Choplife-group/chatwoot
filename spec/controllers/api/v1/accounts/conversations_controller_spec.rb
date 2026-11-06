@@ -1645,4 +1645,35 @@ RSpec.describe 'Conversations API', type: :request do
       expect(response.parsed_body['payload'].pluck('id')).to eq([vip_conversation.display_id])
     end
   end
+
+  context 'when a role has vip_manage and conversation_manage' do
+    let(:account) { create(:account) }
+    let(:inbox) { create(:inbox, account: account) }
+    let(:head) { create(:user, account: account, role: :agent) }
+    let(:contact) { create(:contact, account: account) }
+    let!(:contact_inbox) { create(:contact_inbox, contact: contact, inbox: inbox) }
+    let!(:conversation) { create(:conversation, account: account, inbox: inbox) }
+
+    before do
+      account.enable_features!('support_roles', 'restricted_inbox_access')
+      role = create(:support_role, account: account, permissions: %w[conversation_manage vip_manage])
+      head.account_users.first.update!(custom_role_id: role.id)
+    end
+
+    it 'changes VIP on any conversation' do
+      post "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/vip",
+           params: { vip: true }, headers: head.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(conversation.reload.vip).to be(true)
+    end
+
+    it 'does not force an assignee on what they start' do
+      post "/api/v1/accounts/#{account.id}/conversations", params: { source_id: contact_inbox.source_id },
+                                                           headers: head.create_new_auth_token, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(Conversation.last.assignee_id).to be_nil
+    end
+  end
 end
