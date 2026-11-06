@@ -1,0 +1,22 @@
+tags:
+  - Custom Roles
+operationId: list-custom-roles
+summary: List custom roles
+description: Lists the custom roles of the account
+security:
+  - userApiKey: []
+responses:
+  '200':
+    description: Success
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '403':
+    description: Custom roles aren't enabled for this account
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

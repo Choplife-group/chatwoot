@@ -1,4 +1,5 @@
 <script setup>
+import { useEscalationGuard } from 'dashboard/composables/useEscalationGuard';
 import { useAlert } from 'dashboard/composables';
 import { computed, onMounted, ref } from 'vue';
 import Avatar from 'next/avatar/Avatar.vue';
@@ -80,12 +81,14 @@ const verifiedAdministrators = computed(() => {
   );
 });
 
+const { canManageAgent } = useEscalationGuard();
+
 const showEditAction = agent => {
-  return currentUserId.value !== agent.id;
+  return currentUserId.value !== agent.id && canManageAgent(agent);
 };
 
 const showDeleteAction = agent => {
-  if (currentUserId.value === agent.id) {
+  if (currentUserId.value === agent.id || !canManageAgent(agent)) {
     return false;
   }
 

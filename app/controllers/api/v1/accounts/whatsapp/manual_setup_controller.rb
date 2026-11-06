@@ -42,7 +42,7 @@ class Api::V1::Accounts::Whatsapp::ManualSetupController < Api::V1::Accounts::Ba
 
   def fetch_inbox
     @inbox = Current.account.inboxes.find(params[:inbox_id])
-    authorize @inbox, :update?
+    authorize @inbox, :update_connection?
     channel = @inbox.channel
     return if channel.is_a?(Channel::Whatsapp) && channel.provider_config['source'] == 'manual_setup_v2'
 

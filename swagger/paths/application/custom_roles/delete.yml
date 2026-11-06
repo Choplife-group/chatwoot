@@ -1,0 +1,22 @@
+tags:
+  - Custom Roles
+operationId: delete-custom-role
+summary: Delete a custom role
+description: Deletes a custom role. Its holders become plain agents
+security:
+  - userApiKey: []
+responses:
+  '200':
+    description: Success
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '403':
+    description: Custom roles aren't enabled for this account
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

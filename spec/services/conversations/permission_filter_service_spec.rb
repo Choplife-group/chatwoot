@@ -121,5 +121,25 @@ RSpec.describe Conversations::PermissionFilterService do
         expect(visible_to(agent)).to include(conversation, team_queue, other_team_queue)
       end
     end
+
+    context 'when a role has conversation_manage' do
+      let(:role) { create(:support_role, account: account, permissions: ['conversation_manage']) }
+      let(:head) { create(:user, account: account, role: :agent) }
+
+      before do
+        account.enable_features!('support_roles', 'restricted_inbox_access')
+        head.account_users.first.update!(custom_role_id: role.id)
+      end
+
+      it 'shows every conversation, without inbox membership' do
+        expect(described_class.new(account.conversations, head, account).perform).to include(conversation, another_conversation)
+      end
+
+      it 'shows nothing extra when support_roles is off' do
+        account.disable_features!('support_roles')
+
+        expect(described_class.new(account.conversations, head.reload, account.reload).perform).to be_empty
+      end
+    end
   end
 end

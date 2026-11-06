@@ -69,6 +69,13 @@ class Api::V1::Accounts::TeamMembersController < Api::V1::Accounts::BaseControll
   def validate_lead_ids
     return unless params.key?(:lead_ids)
 
-    render_could_not_create_error('Team leads must be team members') if (params[:lead_ids] - params[:user_ids]).present?
+    return render_could_not_create_error('Team leads must be team members') if (params[:lead_ids] - params[:user_ids]).present?
+
+    # Being a lead opens the team's conversations, so someone with team_manage can't give it to themselves
+    raise Pundit::NotAuthorizedError if leading_themselves? && !Current.account_user.administrator?
+  end
+
+  def leading_themselves?
+    params[:lead_ids].include?(Current.user.id) && lead_ids.exclude?(Current.user.id)
   end
 end

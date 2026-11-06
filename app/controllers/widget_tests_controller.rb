@@ -1,4 +1,5 @@
 class WidgetTestsController < ActionController::Base
+  before_action :ensure_page_enabled
   before_action :ensure_web_widget
   before_action :ensure_widget_position
   before_action :ensure_widget_type
@@ -10,6 +11,11 @@ class WidgetTestsController < ActionController::Base
   end
 
   private
+
+  # Off by default in every environment. ENABLE_WIDGET_TEST_PAGE=true turns it on.
+  def ensure_page_enabled
+    head :not_found unless ActiveModel::Type::Boolean.new.cast(ENV.fetch('ENABLE_WIDGET_TEST_PAGE', false))
+  end
 
   def ensure_widget_style
     @widget_style = params[:widget_style] || 'standard'

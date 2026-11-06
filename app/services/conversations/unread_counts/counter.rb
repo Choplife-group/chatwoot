@@ -165,8 +165,8 @@ class Conversations::UnreadCounts::Counter
         :unassigned_and_mine
       elsif permissions.include?(PARTICIPATING_PERMISSION)
         :mine
-      else
-        :none
+      else # rubocop:disable Lint/DuplicateBranch -- our support roles never narrow an agent's conversations below the base rules
+        :base
       end
   end
 

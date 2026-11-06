@@ -4,10 +4,15 @@ import { useConversationAccess } from '../useConversationAccess';
 
 vi.mock('dashboard/composables/store');
 
-const setup = ({ enabled = true, role = 'agent', ledTeamIds = [] } = {}) => {
+const setup = ({
+  enabled = true,
+  role = 'agent',
+  ledTeamIds = [],
+  permissions = ['agent'],
+} = {}) => {
   const getters = {
     getCurrentUser: ref({
-      accounts: [{ id: 1, led_team_ids: ledTeamIds }],
+      accounts: [{ id: 1, led_team_ids: ledTeamIds, permissions }],
     }),
     getCurrentRole: ref(role),
     getCurrentAccountId: ref(1),
@@ -66,5 +71,29 @@ describe('useConversationAccess', () => {
     expect(setup({ role: 'administrator' }).canChangeVip({ meta: {} })).toBe(
       true
     );
+  });
+
+  it('follows the permissions of a custom role', () => {
+    const headOfSupport = setup({
+      permissions: [
+        'agent',
+        'conversation_manage',
+        'conversation_assign',
+        'vip_manage',
+      ],
+    });
+
+    expect(headOfSupport.isRestricted.value).toBe(false);
+    expect(headOfSupport.canSeeQueues.value).toBe(true);
+    expect(headOfSupport.canAssign(conversationInTeam(9))).toBe(true);
+    expect(headOfSupport.canChangeVip(conversationInTeam(9))).toBe(true);
+  });
+
+  it('treats each permission separately', () => {
+    const reviewer = setup({ permissions: ['agent', 'conversation_manage'] });
+
+    expect(reviewer.canSeeQueues.value).toBe(true);
+    expect(reviewer.canAssign(conversationInTeam(9))).toBe(false);
+    expect(reviewer.canChangeVip(conversationInTeam(9))).toBe(false);
   });
 });

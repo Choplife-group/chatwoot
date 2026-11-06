@@ -299,3 +299,7 @@
   display_name: Restricted Inbox Access
   enabled: false
   column: feature_flags_ext_1
+- name: support_roles
+  display_name: Support Roles
+  enabled: false
+  column: feature_flags_ext_1

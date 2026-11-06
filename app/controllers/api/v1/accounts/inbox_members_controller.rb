@@ -1,9 +1,10 @@
 class Api::V1::Accounts::InboxMembersController < Api::V1::Accounts::BaseController
   before_action :fetch_inbox
   before_action :current_agents_ids, only: [:create, :update]
+  before_action :ensure_not_joining_inbox, only: [:create, :update]
 
   def show
-    authorize @inbox, :show?
+    authorize @inbox, :view_settings?
     fetch_updated_agents
   end
 
@@ -22,7 +23,7 @@ class Api::V1::Accounts::InboxMembersController < Api::V1::Accounts::BaseControl
   end
 
   def destroy
-    authorize @inbox, :destroy?
+    authorize @inbox, :update?
     ActiveRecord::Base.transaction do
       @inbox.remove_members(params[:user_ids])
     end
@@ -30,6 +31,13 @@ class Api::V1::Accounts::InboxMembersController < Api::V1::Accounts::BaseControl
   end
 
   private
+
+  # Membership can open an inbox's conversations, so someone with inbox_manage can't give it to themselves
+  def ensure_not_joining_inbox
+    return if Current.account_user.administrator? || @current_agents_ids.include?(Current.user.id)
+
+    raise Pundit::NotAuthorizedError if params[:user_ids].map(&:to_i).include?(Current.user.id)
+  end
 
   def fetch_updated_agents
     @agents = Current.account.users.where(id: @inbox.members.select(:user_id))

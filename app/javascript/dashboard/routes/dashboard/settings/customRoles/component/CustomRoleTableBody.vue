@@ -1,8 +1,10 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
+import { getPermissionGroupSummary } from 'dashboard/helper/permissionsHelper';
 import { getI18nKey } from 'dashboard/routes/dashboard/settings/helper/settingsHelper';
 
 import Button from 'dashboard/components-next/button/Button.vue';
+import { useEscalationGuard } from 'dashboard/composables/useEscalationGuard';
 import { BaseTableRow, BaseTableCell } from 'dashboard/components-next/table';
 
 defineProps({
@@ -19,12 +21,12 @@ defineProps({
 const emit = defineEmits(['edit', 'delete']);
 
 const { t } = useI18n();
+const { canManageRole } = useEscalationGuard();
 
-const getFormattedPermissions = role => {
-  return role.permissions
-    .map(event => t(getI18nKey('CUSTOM_ROLE.PERMISSIONS', event)))
+const permissionNames = permissions =>
+  permissions
+    .map(permission => t(getI18nKey('CUSTOM_ROLE.PERMISSIONS', permission)))
     .join(', ');
-};
 </script>
 
 <template>
@@ -47,14 +49,23 @@ const getFormattedPermissions = role => {
       </BaseTableCell>
 
       <BaseTableCell>
-        <span class="text-body-main text-n-slate-11 block">
-          {{ getFormattedPermissions(customRole) }}
-        </span>
+        <div class="flex flex-wrap gap-1.5">
+          <span
+            v-for="group in getPermissionGroupSummary(customRole.permissions)"
+            :key="group.key"
+            v-tooltip.top="permissionNames(group.selected)"
+            class="px-2 py-0.5 text-xs rounded-md whitespace-nowrap bg-n-alpha-2 text-n-slate-11"
+          >
+            {{ $t(`CUSTOM_ROLE.PERMISSION_GROUPS.${group.key}`) }}
+            {{ group.selected.length }}/{{ group.total }}
+          </span>
+        </div>
       </BaseTableCell>
 
       <BaseTableCell align="end" class="w-24">
         <div class="flex gap-3 justify-end flex-shrink-0">
           <Button
+            v-if="canManageRole(customRole)"
             v-tooltip.top="$t('CUSTOM_ROLE.EDIT.BUTTON_TEXT')"
             icon="i-woot-edit-pen"
             slate
@@ -62,6 +73,7 @@ const getFormattedPermissions = role => {
             @click="emit('edit', customRole)"
           />
           <Button
+            v-if="canManageRole(customRole)"
             v-tooltip.top="$t('CUSTOM_ROLE.DELETE.BUTTON_TEXT')"
             icon="i-woot-bin"
             slate

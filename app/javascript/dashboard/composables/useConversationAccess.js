@@ -1,6 +1,7 @@
 import { computed } from 'vue';
 import { useMapGetter } from 'dashboard/composables/store';
 import { FEATURE_FLAGS } from 'dashboard/featureFlags';
+import { getUserPermissions } from 'dashboard/helper/permissionsHelper';
 
 /**
  * What the current user can do when restricted_inbox_access is on.
@@ -19,8 +20,16 @@ export function useConversationAccess() {
     )
   );
 
+  const permissions = computed(() =>
+    getUserPermissions(currentUser.value, accountId.value)
+  );
+  const hasPermission = permission =>
+    currentRole.value === 'administrator' ||
+    permissions.value.includes(permission);
+
+  // Restricted users can only assign within the teams they lead
   const isRestricted = computed(
-    () => isAccountRestricted.value && currentRole.value !== 'administrator'
+    () => isAccountRestricted.value && !hasPermission('conversation_assign')
   );
 
   const ledTeamIds = computed(() => {
@@ -32,7 +41,10 @@ export function useConversationAccess() {
   });
 
   const canSeeQueues = computed(
-    () => !isRestricted.value || ledTeamIds.value.length > 0
+    () =>
+      !isAccountRestricted.value ||
+      hasPermission('conversation_manage') ||
+      ledTeamIds.value.length > 0
   );
 
   const canAssign = conversation =>
@@ -41,7 +53,7 @@ export function useConversationAccess() {
 
   // Doesn't depend on restricted_inbox_access: the VIP mark is always limited to leads and above
   const canChangeVip = conversation =>
-    currentRole.value === 'administrator' ||
+    hasPermission('vip_manage') ||
     ledTeamIds.value.includes(conversation?.meta?.team?.id);
 
   return {

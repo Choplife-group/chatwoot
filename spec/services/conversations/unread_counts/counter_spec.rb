@@ -146,4 +146,13 @@ RSpec.describe Conversations::UnreadCounts::Counter do
       expect(described_class.new(account: account, user: admin).perform[:all_count]).to eq(2)
     end
   end
+
+  it 'keeps the base counts for an agent whose role has no conversation permissions' do
+    account.enable_features!('support_roles')
+    role = create(:support_role, account: account, permissions: ['report_manage'])
+    agent.account_users.first.update!(custom_role_id: role.id)
+    create_unread_conversation(account: account, inbox: visible_inbox)
+
+    expect(described_class.new(account: account, user: agent).perform[:all_count]).to eq(1)
+  end
 end

@@ -11,7 +11,7 @@ class InboxPolicy < ApplicationPolicy
     end
 
     def resolve
-      user.assigned_inboxes
+      account_user.can?('inbox_manage') ? account.inboxes : user.assigned_inboxes
     end
   end
 
@@ -24,6 +24,16 @@ class InboxPolicy < ApplicationPolicy
     return true if @user.is_a?(AgentBot)
 
     Current.user.assigned_inboxes.include? record
+  end
+
+  # Opening an inbox in Settings. Separate from show?, which also lets someone start conversations in it.
+  def view_settings?
+    @account_user.can?('inbox_manage') || show?
+  end
+
+  # Changing how a channel connects. Its credentials and webhook URLs can redirect or expose messages, so this stays with administrators.
+  def update_connection?
+    @account_user.administrator?
   end
 
   def assignable_agents?
@@ -39,15 +49,15 @@ class InboxPolicy < ApplicationPolicy
   end
 
   def campaigns?
-    @account_user.administrator?
+    @account_user.can?('inbox_manage')
   end
 
   def create?
-    @account_user.administrator?
+    @account_user.can?('inbox_manage')
   end
 
   def update?
-    @account_user.administrator?
+    @account_user.can?('inbox_manage')
   end
 
   def destroy?
@@ -55,15 +65,15 @@ class InboxPolicy < ApplicationPolicy
   end
 
   def set_agent_bot?
-    @account_user.administrator?
+    @account_user.can?('inbox_manage')
   end
 
   def avatar?
-    @account_user.administrator?
+    @account_user.can?('inbox_manage')
   end
 
   def sync_templates?
-    @account_user.administrator?
+    @account_user.can?('inbox_manage')
   end
 
   def whatsapp_business_management_token?

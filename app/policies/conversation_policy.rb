@@ -4,7 +4,7 @@ class ConversationPolicy < ApplicationPolicy
   end
 
   def destroy?
-    administrator?
+    account_user&.can?('conversation_delete')
   end
 
   def show?
@@ -16,7 +16,7 @@ class ConversationPolicy < ApplicationPolicy
   end
 
   def update_vip?
-    administrator? || user.team_members.leads.exists?(team_id: record.team_id)
+    account_user&.can?('vip_manage') || user.team_members.leads.exists?(team_id: record.team_id)
   end
 
   private

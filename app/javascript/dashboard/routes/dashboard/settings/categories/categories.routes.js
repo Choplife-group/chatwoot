@@ -13,7 +13,7 @@ export default {
           path: '',
           name: 'conversation_categories_list',
           meta: {
-            permissions: ['administrator'],
+            permissions: ['administrator', 'category_manage'],
           },
           component: Index,
         },

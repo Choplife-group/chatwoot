@@ -15,6 +15,7 @@ import NextButton from 'dashboard/components-next/button/Button.vue';
 import TextArea from 'next/textarea/TextArea.vue';
 import { sanitizeAllowedDomains } from 'dashboard/helper/URLHelper';
 import WhatsappBusinessManagementToken from './WhatsappBusinessManagementToken.vue';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import HmacSecretKey from './components/HmacSecretKey.vue';
 
 export default {
@@ -38,7 +39,8 @@ export default {
   },
   setup() {
     const { runEmbeddedSignup } = useWhatsappEmbeddedSignup();
-    return { v$: useVuelidate(), runEmbeddedSignup };
+    const { isAdmin } = useAdmin();
+    return { v$: useVuelidate(), runEmbeddedSignup, isAdmin };
   },
   data() {
     return {
@@ -246,6 +248,7 @@ export default {
   <div v-else-if="isAWebWidgetInbox">
     <div class="space-y-4">
       <SettingsToggleSection
+        v-if="isAdmin"
         :header="$t('INBOX_MGMT.SETTINGS_POPUP.ALLOWED_DOMAINS.TITLE')"
         :description="
           $t('INBOX_MGMT.SETTINGS_POPUP.ALLOWED_DOMAINS.DESCRIPTION')
@@ -281,6 +284,7 @@ export default {
     </div>
 
     <SettingsAccordion
+      v-if="isAdmin"
       :title="$t('INBOX_MGMT.SETTINGS_POPUP.IDENTITY_VALIDATION.TITLE')"
       class="mt-6"
     >
@@ -334,12 +338,14 @@ export default {
     </SettingsFieldSection>
 
     <SettingsFieldSection
+      v-if="isAdmin"
       :label="$t('INBOX_MGMT.SETTINGS_POPUP.HMAC_VERIFICATION')"
       :help-text="$t('INBOX_MGMT.SETTINGS_POPUP.HMAC_DESCRIPTION')"
     >
       <HmacSecretKey :inbox="inbox" />
     </SettingsFieldSection>
     <SettingsFieldSection
+      v-if="isAdmin"
       :label="$t('INBOX_MGMT.SETTINGS_POPUP.HMAC_MANDATORY_VERIFICATION')"
       :help-text="$t('INBOX_MGMT.SETTINGS_POPUP.HMAC_MANDATORY_DESCRIPTION')"
     >

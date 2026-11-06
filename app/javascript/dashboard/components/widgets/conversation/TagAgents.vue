@@ -37,6 +37,7 @@ const currentTeamId = computed(() => currentChat.value?.meta?.team?.id);
 // With restricted access, only people who can see the conversation can be mentioned
 const canSeeConversation = agent =>
   agent.role === 'administrator' ||
+  agent.permissions?.includes('conversation_manage') ||
   agent.id === currentChat.value?.meta?.assignee?.id ||
   getTeamMembers
     .value(currentTeamId.value)

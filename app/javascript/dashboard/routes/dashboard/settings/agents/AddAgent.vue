@@ -1,4 +1,5 @@
 <script setup>
+import { useEscalationGuard } from 'dashboard/composables/useEscalationGuard';
 import { ref, computed } from 'vue';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
 import { useI18n } from 'vue-i18n';
@@ -31,13 +32,19 @@ const v$ = useVuelidate(rules, {
 const uiFlags = useMapGetter('agents/getUIFlags');
 const getCustomRoles = useMapGetter('customRole/getCustomRoles');
 
+const { isAdministrator, holds } = useEscalationGuard();
+
 const roles = computed(() => {
   const defaultRoles = [
-    {
-      id: 'administrator',
-      name: 'administrator',
-      label: t('AGENT_MGMT.AGENT_TYPES.ADMINISTRATOR'),
-    },
+    ...(isAdministrator.value
+      ? [
+          {
+            id: 'administrator',
+            name: 'administrator',
+            label: t('AGENT_MGMT.AGENT_TYPES.ADMINISTRATOR'),
+          },
+        ]
+      : []),
     {
       id: 'agent',
       name: 'agent',
@@ -45,11 +52,13 @@ const roles = computed(() => {
     },
   ];
 
-  const customRoles = getCustomRoles.value.map(role => ({
-    id: role.id,
-    name: `custom_${role.id}`,
-    label: role.name,
-  }));
+  const customRoles = getCustomRoles.value
+    .filter(role => holds(role.permissions))
+    .map(role => ({
+      id: role.id,
+      name: `custom_${role.id}`,
+      label: role.name,
+    }));
 
   return [...defaultRoles, ...customRoles];
 });
