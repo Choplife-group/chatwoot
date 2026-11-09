@@ -20,6 +20,7 @@ class Market < ApplicationRecord
   belongs_to :account
   has_many :inboxes, dependent: :nullify
   has_many :contacts, dependent: :nullify
+  has_many :sla_targets, dependent: :destroy
   has_many :conversations, dependent: :nullify
 
   scope :active, -> { where(archived_at: nil) }

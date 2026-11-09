@@ -79,3 +79,9 @@ remove_orphan_conversations_job:
   cron: '0 */12 * * *'
   class: 'Internal::RemoveOrphanConversationsJob'
   queue: housekeeping
+
+# executed every 15 minutes: emails Insights reports whose schedule is due
+insights_trigger_report_schedules_job:
+  cron: '*/15 * * * *'
+  class: 'Insights::TriggerReportSchedulesJob'
+  queue: scheduled_jobs

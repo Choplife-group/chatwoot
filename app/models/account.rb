@@ -23,7 +23,7 @@
 #  index_accounts_on_status  (status)
 #
 
-class Account < ApplicationRecord
+class Account < ApplicationRecord # rubocop:disable Metrics/ClassLength
   # used for multi-flag bitset columns
   include FlagShihTzu
   include Reportable
@@ -94,6 +94,11 @@ class Account < ApplicationRecord
   has_many :mentions, dependent: :destroy_async
   has_many :messages, dependent: :destroy_async
   has_many :markets, dependent: :destroy_async
+  has_many :sla_targets, dependent: :destroy_async
+  has_many :saved_reports, dependent: :destroy_async
+  has_many :report_snapshots, dependent: :destroy_async
+  has_many :report_schedules, dependent: :destroy_async
+  has_many :insight_dashboards, dependent: :destroy_async
   has_many :support_roles, dependent: :destroy_async
   has_many :notes, dependent: :destroy_async
   has_many :notification_settings, dependent: :destroy_async

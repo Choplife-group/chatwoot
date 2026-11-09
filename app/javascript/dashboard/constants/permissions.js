@@ -10,7 +10,10 @@ export const CUSTOM_ROLE_PERMISSION_GROUPS = [
   },
   { key: 'REPORTS', permissions: ['report_manage'] },
   { key: 'INBOXES', permissions: ['inbox_manage'] },
-  { key: 'SUPPORT_SETUP', permissions: ['category_manage', 'market_manage'] },
+  {
+    key: 'SUPPORT_SETUP',
+    permissions: ['category_manage', 'market_manage', 'sla_manage'],
+  },
   {
     key: 'PEOPLE_AND_ACCESS',
     permissions: ['team_manage', 'agent_manage', 'role_manage'],

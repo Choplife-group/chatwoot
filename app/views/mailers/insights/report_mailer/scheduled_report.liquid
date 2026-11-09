@@ -1,0 +1,23 @@
+<p>Hi {{ meta.name }},</p>
+
+<p>Here is <strong>{{ meta.title }}</strong>.</p>
+
+<p style="color: #64748B;">
+{% for line in meta.period_lines %}{{ line }}<br />{% endfor %}
+</p>
+
+<table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+  {% for line in meta.summary %}
+  <tr>
+    <td style="padding: 8px 0; border-bottom: 1px solid #E2E8F0;">{{ line.label }}</td>
+    <td style="padding: 8px 0; border-bottom: 1px solid #E2E8F0; text-align: right;">
+      <strong>{{ line.value }}</strong>
+      {% if line.versus %}<br /><span style="color: #64748B; font-size: 12px;">{{ line.versus }}</span>{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<p>The full report is attached. You can also <a href="{{ action_url }}">open it in Insights</a>.</p>
+
+<p style="color: #64748B; font-size: 12px;">These figures only include conversations you're allowed to see.</p>

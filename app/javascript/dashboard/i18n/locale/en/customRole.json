@@ -57,6 +57,7 @@
       "CATEGORY_MANAGE": "Manage conversation categories",
       "TEAM_MANAGE": "Manage teams and team leads",
       "MARKET_MANAGE": "Manage markets",
+      "SLA_MANAGE": "Manage SLA targets",
       "INBOX_MANAGE": "Manage inboxes",
       "AGENT_MANAGE": "Add, edit and remove agents",
       "ROLE_MANAGE": "Create and edit custom roles"

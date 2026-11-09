@@ -1,0 +1,64 @@
+{
+  "SLA_TARGETS": {
+    "HEADER": "SLA targets",
+    "DESCRIPTION": "How fast conversations should get a first response and be resolved. Insights reports SLA compliance against these targets. A target for a market and priority beats one for just the market, which beats one for just the priority, which beats the default.",
+    "LOADING": "Fetching SLA targets",
+    "API_ERROR": "Something went wrong. Please try again.",
+    "ALL_MARKETS": "All markets",
+    "ANY_PRIORITY": "Any priority",
+    "PRIORITIES": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "UNITS": {
+      "MINUTES": "Minutes",
+      "HOURS": "Hours"
+    },
+    "LIST": {
+      "404": "There are no SLA targets yet. Add a default for all markets to start.",
+      "NO_TARGET": "No target",
+      "MINUTES": "{n} min",
+      "HOURS": "{n} h",
+      "BUSINESS_HOURS": "Business hours",
+      "CALENDAR_HOURS": "Around the clock",
+      "TABLE_HEADER": {
+        "MARKET": "Market",
+        "PRIORITY": "Priority",
+        "FIRST_RESPONSE": "First response",
+        "RESOLUTION": "Resolution",
+        "HOURS": "Counted in",
+        "ACTIONS": "Actions"
+      }
+    },
+    "ADD": {
+      "BUTTON": "Add target",
+      "TITLE": "Add SLA target",
+      "DESCRIPTION": "Leave market or priority empty to cover all of them."
+    },
+    "EDIT": {
+      "BUTTON": "Edit",
+      "TITLE": "Edit SLA target"
+    },
+    "SAVE": {
+      "BUTTON": "Save",
+      "SUCCESS": "SLA target saved"
+    },
+    "DELETE": {
+      "BUTTON": "Delete",
+      "SUCCESS": "SLA target deleted"
+    },
+    "FORM": {
+      "MARKET": "Market",
+      "PRIORITY": "Priority",
+      "FIRST_RESPONSE": "First response within",
+      "RESOLUTION": "Resolved within",
+      "UNIT": "Unit",
+      "NO_TARGET": "No target",
+      "BUSINESS_HOURS": "Count business hours only",
+      "BUSINESS_HOURS_HELP": "Uses each inbox's business hours.",
+      "NEEDS_A_TARGET": "Set a first response or resolution time."
+    }
+  }
+}

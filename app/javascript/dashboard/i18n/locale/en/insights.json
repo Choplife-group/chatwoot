@@ -1,0 +1,236 @@
+{
+  "INSIGHTS": {
+    "HEADER": "Insights",
+    "DESCRIPTION": "Build your own reports by market, team, category and agent. You only see figures for conversations you're allowed to see.",
+    "API_ERROR": "Something went wrong. Please try again.",
+    "NONE": "None",
+    "LOADING": "Working out the figures",
+    "INDEX": {
+      "NEW_REPORT": "New report",
+      "SAVED_REPORTS": "Saved reports",
+      "SNAPSHOTS": "Snapshots",
+      "DASHBOARDS": "Dashboards",
+      "NO_DASHBOARDS": "No dashboards yet. Make one to keep the figures you check most in one place.",
+      "NO_SAVED_REPORTS": "No saved reports yet. Build a report and save it to find it here.",
+      "NO_SNAPSHOTS": "No snapshots yet. Take one from a report to keep its figures as they are now.",
+      "SHARED": "Shared",
+      "BY": "By {name}",
+      "UPDATED": "Updated {time}",
+      "CAPTURED": "Taken {time}",
+      "OPEN": "Open",
+      "DELETE": "Delete",
+      "DELETED": "Deleted"
+    },
+    "BUILDER": {
+      "UNTITLED": "New report",
+      "BACK": "Insights",
+      "METRICS": "Metrics",
+      "METRICS_PLACEHOLDER": "Choose metrics",
+      "GROUP_BY": "Group by",
+      "ADD_GROUP": "Add grouping",
+      "REMOVE_GROUP": "Remove grouping",
+      "GROUP_LIMIT": "Up to {n} groupings",
+      "FILTERS": "Filters",
+      "FILTER_PLACEHOLDER": "All",
+      "PERIOD": "Period",
+      "FROM": "From",
+      "TO": "To",
+      "COMPARE": "Compare with",
+      "NO_COMPARISON": "No comparison",
+      "BUSINESS_HOURS": "Business hours only",
+      "BUSINESS_HOURS_HELP": "Count response and resolution times in each inbox's business hours.",
+      "SAVE": "Save",
+      "SAVE_AS": "Save as new",
+      "SNAPSHOT": "Take snapshot",
+      "SCHEDULE": "Schedule",
+      "SAVED": "Report saved",
+      "SNAPSHOT_TAKEN": "Snapshot taken. Find it under Insights."
+    },
+    "SAVE_DIALOG": {
+      "TITLE": "Save report",
+      "DESCRIPTION": "Saved reports keep their period as a name, so “Last month” always shows the month before you open it.",
+      "NAME": "Name",
+      "NAME_PLACEHOLDER": "e.g. Monthly by market and category",
+      "SHARED": "Share with everyone in the account",
+      "SHARED_HELP": "Each person sees only the figures they're allowed to see.",
+      "SUBMIT": "Save"
+    },
+    "SNAPSHOT_DIALOG": {
+      "TITLE": "Take snapshot",
+      "DESCRIPTION": "A snapshot keeps today's figures for this report. They won't change when conversations are moved to another market, team or category. Only you can see it.",
+      "NAME": "Name",
+      "SUBMIT": "Take snapshot"
+    },
+    "RESULTS": {
+      "TOTAL": "Total",
+      "NO_DATA": "No conversations match this report.",
+      "CHART_METRIC": "Chart",
+      "CURRENT": "This period",
+      "PREVIOUS": "Compared period",
+      "TRUNCATED": "Showing the first 1,000 rows. Add filters to narrow the report.",
+      "CHART_LIMIT": "The chart shows the first {n} rows.",
+      "CHANGE": "{change} vs compared period",
+      "DRILL": "See the conversations behind this figure"
+    },
+    "DASHBOARD": {
+      "NEW": "New dashboard",
+      "NEW_TITLE": "New dashboard",
+      "SETTINGS": "Settings",
+      "DIALOG_DESCRIPTION": "A dashboard shows widgets from your saved reports and refreshes on its own.",
+      "NAME": "Name",
+      "NAME_PLACEHOLDER": "e.g. Support floor",
+      "SAVE": "Save",
+      "WHO": "Who sees it",
+      "ROLE": "Role",
+      "CHOOSE_ROLE": "Choose a role",
+      "SHARE_HELP": "Everyone sees only the figures they're allowed to see.",
+      "REFRESH": "Refresh",
+      "EVERY_SECONDS": "Every {n} seconds",
+      "EVERY_MINUTES": "Every minute | Every {n} minutes",
+      "REFRESH_NOW": "Refresh now",
+      "UPDATED": "Updated {time}",
+      "EDIT": "Edit layout",
+      "DONE_EDITING": "Done",
+      "ADD_WIDGET": "Add widget",
+      "EDIT_WIDGET": "Edit widget",
+      "REMOVE_WIDGET": "Remove widget",
+      "MOVE_EARLIER": "Move earlier",
+      "MOVE_LATER": "Move later",
+      "SAVE_WIDGET": "Save widget",
+      "WIDGET_DESCRIPTION": "Widgets show a figure from one of your saved reports. Build and save a report first to use it here.",
+      "WIDGET_TITLE": "Title",
+      "WIDGET_ERROR": "This widget couldn't load.",
+      "REPORT": "Report",
+      "CHOOSE_REPORT": "Choose a saved report",
+      "NO_REPORTS": "You have no saved reports yet. Build one in Insights and save it first.",
+      "SHOW": "Show",
+      "AS": "As",
+      "EACH_WIDGET_PERIOD": "Each widget's own period",
+      "EMPTY": "This dashboard has no widgets yet.",
+      "EMPTY_EDITABLE": "Add a widget to start. Each one shows a figure from a saved report.",
+      "DISPLAYS": {
+        "NUMBER": "Number",
+        "BAR": "Bar chart",
+        "TABLE": "Table"
+      },
+      "AUDIENCES": {
+        "PRIVATE": "Only me",
+        "ROLE": "A role",
+        "EVERYONE": "Everyone"
+      }
+    },
+    "SCHEDULE": {
+      "TITLE": "Email this report",
+      "DESCRIPTION": "Send this report by email on a schedule, with the files attached. Each person gets the figures they're allowed to see.",
+      "ADD": "Add schedule",
+      "DONE": "Done",
+      "ADDED": "Schedule added",
+      "SENDING": "Sending now. It should arrive in a minute or two.",
+      "SEND_NOW": "Send now",
+      "DELETE": "Delete schedule",
+      "FREQUENCY": "How often",
+      "WEEKDAY": "On",
+      "DAY_OF_MONTH": "Day of the month",
+      "HOUR": "At",
+      "RECIPIENTS": "Send to",
+      "RECIPIENTS_HELP": "Sending to others needs the report to be shared, so they can open it.",
+      "ONLY_YOU": "This report will be emailed to you.",
+      "FILES": "Attach",
+      "PERIOD_HINT": "Each email covers the report's period, worked out on the day it's sent. For a weekly email, save the report with “Last week”.",
+      "NEXT": "Next: {time}",
+      "EVERY_DAY": "Every day",
+      "EVERY_WEEKDAY": "Every {day}",
+      "EVERY_MONTH": "Monthly on day {day}",
+      "SUMMARY": "{when} at {time} · {people} · {files}",
+      "PEOPLE": "{n} person | {n} people",
+      "FREQUENCIES": {
+        "DAILY": "Daily",
+        "WEEKLY": "Weekly",
+        "MONTHLY": "Monthly"
+      }
+    },
+    "EXPORT": {
+      "BUTTON": "Export",
+      "CSV": "CSV",
+      "XLSX": "Excel",
+      "PDF": "PDF",
+      "ERROR": "The file couldn't be made. Please try again."
+    },
+    "SNAPSHOT": {
+      "NOTICE": "Snapshot taken {time}. These figures are frozen and won't change.",
+      "PERIOD": "Period: {from} – {to}"
+    },
+    "DRILLDOWN": {
+      "TITLE": "{metric} · {row}",
+      "PREVIOUS": "compared period",
+      "COUNT": "{n} conversation | {n} conversations",
+      "EMPTY": "No conversations.",
+      "MET": "Met",
+      "MISSED": "Missed",
+      "PREV_PAGE": "Previous",
+      "NEXT_PAGE": "Next"
+    },
+    "METRICS": {
+      "RECEIVED": "Received",
+      "RESOLVED": "Resolved",
+      "OPEN": "Open",
+      "REOPENED": "Reopened",
+      "FIRST_RESPONSE_TIME": "Avg first response",
+      "MEDIAN_FIRST_RESPONSE_TIME": "Median first response",
+      "RESOLUTION_TIME": "Avg resolution time",
+      "MEDIAN_RESOLUTION_TIME": "Median resolution time",
+      "FIRST_RESPONSE_SLA": "First response SLA",
+      "RESOLUTION_SLA": "Resolution SLA"
+    },
+    "METRIC_HINTS": {
+      "OPEN": "Not resolved at the end of the period.",
+      "REOPENED": "Conversations opened again after being resolved.",
+      "FIRST_RESPONSE_SLA": "Share of first responses within the SLA target.",
+      "RESOLUTION_SLA": "Share of resolutions within the SLA target."
+    },
+    "DIMENSIONS": {
+      "MARKET": "Market",
+      "TEAM": "Team",
+      "CATEGORY": "Category",
+      "SUBCATEGORY": "Subcategory",
+      "AGENT": "Agent",
+      "INBOX": "Inbox",
+      "DAY": "Day",
+      "WEEK": "Week",
+      "MONTH": "Month",
+      "PRIORITY": "Priority"
+    },
+    "TIME_LABELS": {
+      "WEEK_OF": "Week of {date}"
+    },
+    "PERIODS": {
+      "TODAY": "Today",
+      "YESTERDAY": "Yesterday",
+      "LAST_7_DAYS": "Last 7 days",
+      "LAST_30_DAYS": "Last 30 days",
+      "LAST_90_DAYS": "Last 90 days",
+      "THIS_WEEK": "This week",
+      "LAST_WEEK": "Last week",
+      "THIS_MONTH": "This month",
+      "LAST_MONTH": "Last month",
+      "THIS_YEAR": "This year",
+      "CUSTOM": "Custom dates"
+    },
+    "COMPARISONS": {
+      "PREVIOUS_PERIOD": "Previous period",
+      "PREVIOUS_YEAR": "Same period last year"
+    },
+    "PRIORITIES": {
+      "LOW": "Low",
+      "MEDIUM": "Medium",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "STATUS": {
+      "OPEN": "Open",
+      "RESOLVED": "Resolved",
+      "PENDING": "Pending",
+      "SNOOZED": "Snoozed"
+    }
+  }
+}
