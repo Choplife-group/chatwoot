@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_05_130000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_09_130000) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -1306,6 +1306,22 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_05_130000) do
     t.index ["portal_id"], name: "index_inboxes_on_portal_id"
   end
 
+  create_table "insight_dashboards", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.integer "audience", default: 0, null: false
+    t.bigint "custom_role_id"
+    t.jsonb "widgets", default: [], null: false
+    t.jsonb "filters", default: {}, null: false
+    t.integer "refresh_seconds", default: 60, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_insight_dashboards_on_account_id"
+    t.index ["custom_role_id"], name: "index_insight_dashboards_on_custom_role_id"
+    t.index ["user_id"], name: "index_insight_dashboards_on_user_id"
+  end
+
   create_table "installation_configs", force: :cascade do |t|
     t.string "name", null: false
     t.jsonb "serialized_value", default: {}, null: false
@@ -1549,6 +1565,43 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_05_130000) do
     t.index ["related_category_id", "category_id"], name: "index_related_categories_on_related_category_id_and_category_id", unique: true
   end
 
+  create_table "report_schedules", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "saved_report_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "frequency", default: 0, null: false
+    t.integer "hour", default: 8, null: false
+    t.integer "weekday"
+    t.integer "day_of_month"
+    t.string "timezone", default: "UTC", null: false
+    t.bigint "recipient_ids", default: [], null: false, array: true
+    t.string "file_types", default: [], null: false, array: true
+    t.boolean "active", default: true, null: false
+    t.datetime "next_run_at"
+    t.datetime "last_sent_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_report_schedules_on_account_id"
+    t.index ["active", "next_run_at"], name: "index_report_schedules_on_active_and_next_run_at"
+    t.index ["saved_report_id"], name: "index_report_schedules_on_saved_report_id"
+    t.index ["user_id"], name: "index_report_schedules_on_user_id"
+  end
+
+  create_table "report_snapshots", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "saved_report_id"
+    t.string "name", null: false
+    t.jsonb "config", default: {}, null: false
+    t.jsonb "result", default: {}, null: false
+    t.datetime "captured_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_report_snapshots_on_account_id"
+    t.index ["saved_report_id"], name: "index_report_snapshots_on_saved_report_id"
+    t.index ["user_id"], name: "index_report_snapshots_on_user_id"
+  end
+
   create_table "reporting_events", force: :cascade do |t|
     t.string "name"
     t.float "value"
@@ -1563,7 +1616,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_05_130000) do
     t.datetime "event_end_time", precision: nil
     t.bigint "market_id"
     t.bigint "category_id"
+    t.bigint "team_id"
     t.index ["account_id", "name", "created_at"], name: "reporting_events__account_id__name__created_at"
+    t.index ["account_id", "name", "event_end_time"], name: "index_reporting_events_on_account_name_event_end_time"
     t.index ["account_id", "name", "inbox_id", "created_at"], name: "index_reporting_events_for_response_distribution"
     t.index ["account_id"], name: "index_reporting_events_on_account_id"
     t.index ["conversation_id"], name: "index_reporting_events_on_conversation_id"
@@ -1587,6 +1642,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_05_130000) do
     t.index ["account_id", "date", "dimension_type", "dimension_id", "metric"], name: "index_rollup_unique_key", unique: true
     t.index ["account_id", "dimension_type", "date"], name: "index_rollup_summary"
     t.index ["account_id", "metric", "date"], name: "index_rollup_timeseries"
+  end
+
+  create_table "saved_reports", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.jsonb "config", default: {}, null: false
+    t.boolean "shared", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_saved_reports_on_account_id"
+    t.index ["user_id"], name: "index_saved_reports_on_user_id"
   end
 
   create_table "sla_events", force: :cascade do |t|
@@ -1617,6 +1684,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_05_130000) do
     t.string "description"
     t.float "resolution_time_threshold"
     t.index ["account_id"], name: "index_sla_policies_on_account_id"
+  end
+
+  create_table "sla_targets", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "market_id"
+    t.integer "priority"
+    t.integer "first_response_seconds"
+    t.integer "resolution_seconds"
+    t.boolean "business_hours", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "account_id, COALESCE(market_id, (0)::bigint), COALESCE(priority, '-1'::integer)", name: "index_sla_targets_on_account_market_priority", unique: true
+    t.index ["account_id"], name: "index_sla_targets_on_account_id"
   end
 
   create_table "taggings", id: :serial, force: :cascade do |t|

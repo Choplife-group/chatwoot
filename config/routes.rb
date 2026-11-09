@@ -368,6 +368,7 @@ Rails.application.routes.draw do
           resource :notification_settings, only: [:show, :update]
 
           resources :markets, only: [:index, :show, :create, :update, :destroy]
+          resources :sla_targets, only: [:index, :create, :update, :destroy]
           resources :conversation_categories, only: [:index, :show, :create, :update, :destroy] do
             collection do
               patch :reorder
@@ -589,6 +590,25 @@ Rails.application.routes.draw do
               get :inbox_label_matrix
               get :first_response_time_distribution
               get :outgoing_messages_count
+            end
+          end
+          resources :insights, only: [] do
+            collection do
+              get :query
+              get :drilldown
+              get :export
+            end
+          end
+          resources :saved_reports, only: [:index, :show, :create, :update, :destroy]
+          resources :insight_dashboards, only: [:index, :show, :create, :update, :destroy]
+          resources :report_schedules, only: [:index, :create, :update, :destroy] do
+            member do
+              post :deliver
+            end
+          end
+          resources :report_snapshots, only: [:index, :show, :create, :destroy] do
+            member do
+              get :export
             end
           end
           resource :year_in_review, only: [:show]

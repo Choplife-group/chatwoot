@@ -757,6 +757,17 @@ const menuItems = computed(() => {
       icon: 'i-lucide-chart-spline',
       children: [
         {
+          name: 'Reports Insights',
+          label: t('SIDEBAR.REPORTS_INSIGHTS'),
+          to: accountScopedRoute('insights_index'),
+          activeOn: [
+            'insights_new',
+            'insights_report',
+            'insights_snapshot',
+            'insights_dashboard',
+          ],
+        },
+        {
           name: 'Report Overview',
           label: t('SIDEBAR.REPORTS_OVERVIEW'),
           to: accountScopedRoute('account_overview_reports'),
@@ -913,6 +924,12 @@ const menuItems = computed(() => {
           label: t('SIDEBAR.CONVERSATION_CATEGORIES'),
           icon: 'i-lucide-list-tree',
           to: accountScopedRoute('conversation_categories_list'),
+        },
+        {
+          name: 'Settings SLA Targets',
+          label: t('SIDEBAR.SLA_TARGETS'),
+          icon: 'i-lucide-timer',
+          to: accountScopedRoute('sla_targets_list'),
         },
         ...(hasAdvancedAssignment.value
           ? [

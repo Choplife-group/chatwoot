@@ -23,6 +23,7 @@ import categories from './categories/categories.routes';
 import reports from './reports/reports.routes';
 import store from '../../../store';
 import sla from './sla/sla.routes';
+import slaTargets from './slaTargets/slaTargets.routes';
 import teams from './teams/teams.routes';
 import customRoles from './customRoles/customRole.routes';
 import profile from './profile/profile.routes';
@@ -69,6 +70,7 @@ export default {
     ...categories.routes,
     ...reports.routes,
     ...sla.routes,
+    ...slaTargets.routes,
     ...teams.routes,
     ...customRoles.routes,
     ...profile.routes,

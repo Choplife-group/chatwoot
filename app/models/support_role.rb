@@ -21,11 +21,13 @@ class SupportRole < ApplicationRecord
   self.table_name = 'custom_roles'
 
   PERMISSIONS = %w[
-    conversation_manage conversation_assign conversation_delete vip_manage report_manage category_manage team_manage market_manage inbox_manage agent_manage role_manage
+    conversation_manage conversation_assign conversation_delete vip_manage report_manage
+    category_manage team_manage market_manage sla_manage inbox_manage agent_manage role_manage
   ].freeze
 
   belongs_to :account
   has_many :account_users, foreign_key: :custom_role_id, dependent: :nullify, inverse_of: :support_role
+  has_many :insight_dashboards, foreign_key: :custom_role_id, dependent: :nullify, inverse_of: :support_role
 
   validates :name, presence: true, length: { maximum: 255 }, uniqueness: { scope: :account_id }
   validates :permissions, presence: true

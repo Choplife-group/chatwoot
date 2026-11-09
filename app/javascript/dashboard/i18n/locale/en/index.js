@@ -23,6 +23,7 @@ import generalSettings from './generalSettings.json';
 import helpCenter from './helpCenter.json';
 import inbox from './inbox.json';
 import inboxMgmt from './inboxMgmt.json';
+import insights from './insights.json';
 import integrationApps from './integrationApps.json';
 import integrations from './integrations.json';
 import labelsMgmt from './labelsMgmt.json';
@@ -33,6 +34,7 @@ import categoriesMgmt from './categoriesMgmt.json';
 import report from './report.json';
 import resetPassword from './resetPassword.json';
 import search from './search.json';
+import slaTargets from './slaTargets.json';
 import setNewPassword from './setNewPassword.json';
 import settings from './settings.json';
 import signup from './signup.json';
@@ -73,6 +75,7 @@ export default {
   ...helpCenter,
   ...inbox,
   ...inboxMgmt,
+  ...insights,
   ...integrationApps,
   ...integrations,
   ...labelsMgmt,
@@ -83,6 +86,7 @@ export default {
   ...report,
   ...resetPassword,
   ...search,
+  ...slaTargets,
   ...setNewPassword,
   ...settings,
   ...signup,

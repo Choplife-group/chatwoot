@@ -75,6 +75,24 @@ en:
       cannot_revoke_current: You cannot revoke the current session.
 
   errors:
+    insights:
+      feature_not_enabled: Insights is not enabled for this account
+      invalid_range: Choose a period of at most one year
+      invalid_drilldown: Choose a metric and a row of this report
+      cannot_share: Only people who can view all reports can share them
+      invalid_file_type: Choose CSV, Excel or PDF
+      not_your_schedule: Only the person who set up this schedule can change it
+      not_your_dashboard: Only the person who made this dashboard can change it
+      share_dashboard: Only people who can view all reports can share dashboards with a role or everyone
+      schedule_for_others: Only people who can view all reports can email them to others
+      share_before_scheduling: Share the report before emailing it to others, so they can open it
+      invalid_compare_range: Choose a comparison period of at most one year
+      one_time_dimension: Group by only one of day, week or month
+      open_over_time: Open conversations can't be shown by day, week or month
+      compare_over_time: Comparing periods isn't available when grouping by day, week or month
+    sla_targets:
+      needs_a_target: Set a first response or resolution target
+      taken: There is already a target for this market and priority
     support_roles:
       feature_not_enabled: Custom roles are not enabled for this account
     account:
@@ -252,6 +270,38 @@ en:
       disabled: MFA disabled successfully
     account_saml_settings:
       invalid_certificate: must be a valid X.509 certificate in PEM format
+  insights:
+    title: Insights report
+    total: Total
+    none: None
+    compared: compared
+    versus: 'vs %{value}'
+    change: change %
+    minutes: minutes
+    period: '%{from} – %{to}'
+    compared_with: 'Compared with %{from} – %{to}'
+    generated: 'Generated %{time}'
+    metrics:
+      received: Received
+      resolved: Resolved
+      open: Open
+      reopened: Reopened
+      first_response_time: Avg first response
+      median_first_response_time: Median first response
+      resolution_time: Avg resolution time
+      median_resolution_time: Median resolution time
+      first_response_sla: First response SLA (%)
+      resolution_sla: Resolution SLA (%)
+    dimensions:
+      market: Market
+      team: Team
+      category: Category
+      subcategory: Subcategory
+      agent: Agent
+      inbox: Inbox
+      day: Day
+      week: Week
+      month: Month
   reports:
     period: Reporting period %{since} to %{until}
     utc_warning: The report generated is in UTC timezone

@@ -26,10 +26,20 @@ import LiveReports from './LiveReports.vue';
 import MonitorShow from './monitors/MonitorShow.vue';
 import MonitorsIndex from './monitors/MonitorsIndex.vue';
 import SLAReports from './SLAReports.vue';
+import InsightsIndex from './insights/InsightsIndex.vue';
+import InsightsBuilder from './insights/InsightsBuilder.vue';
+import InsightsSnapshot from './insights/InsightsSnapshot.vue';
+import InsightsDashboard from './insights/InsightsDashboard.vue';
 
 const meta = {
   featureFlag: FEATURE_FLAGS.REPORTS,
   permissions: ['administrator', 'report_manage'],
+};
+
+// Every agent can use Insights; the API limits each person to the figures they may see
+const insightsMeta = {
+  featureFlag: FEATURE_FLAGS.INSIGHTS,
+  permissions: ['administrator', 'agent'],
 };
 
 const monitorsMeta = {
@@ -155,6 +165,36 @@ export default {
         },
         ...oldReportRoutes,
         ...revisedReportRoutes,
+        {
+          path: 'insights',
+          name: 'insights_index',
+          meta: insightsMeta,
+          component: InsightsIndex,
+        },
+        {
+          path: 'insights/new',
+          name: 'insights_new',
+          meta: insightsMeta,
+          component: InsightsBuilder,
+        },
+        {
+          path: 'insights/reports/:reportId',
+          name: 'insights_report',
+          meta: insightsMeta,
+          component: InsightsBuilder,
+        },
+        {
+          path: 'insights/dashboards/:dashboardId',
+          name: 'insights_dashboard',
+          meta: insightsMeta,
+          component: InsightsDashboard,
+        },
+        {
+          path: 'insights/snapshots/:snapshotId',
+          name: 'insights_snapshot',
+          meta: insightsMeta,
+          component: InsightsSnapshot,
+        },
         {
           path: 'sla',
           name: 'sla_reports',

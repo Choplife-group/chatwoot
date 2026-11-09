@@ -1,0 +1,6 @@
+json.id resource.id
+json.market_id resource.market_id
+json.priority resource.priority
+json.first_response_seconds resource.first_response_seconds
+json.resolution_seconds resource.resolution_seconds
+json.business_hours resource.business_hours

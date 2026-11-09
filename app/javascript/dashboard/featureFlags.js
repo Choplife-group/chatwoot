@@ -58,6 +58,7 @@ export const FEATURE_FLAGS = {
   UNREAD_COUNT_FOR_FILTERS: 'unread_count_for_filters',
   RESTRICTED_INBOX_ACCESS: 'restricted_inbox_access',
   SUPPORT_ROLES: 'support_roles',
+  INSIGHTS: 'insights',
 };
 
 export const PREMIUM_FEATURES = [
