@@ -18,6 +18,9 @@ const initialState = {
   },
 };
 
+// Chopwin: the contact panel is open until a user closes it.
+const DEFAULT_UI_SETTINGS = { is_contact_sidebar_open: true };
+
 // getters
 export const getters = {
   isLoggedIn($state) {
@@ -29,7 +32,7 @@ export const getters = {
   },
 
   getUISettings($state) {
-    return $state.currentUser.ui_settings || {};
+    return { ...DEFAULT_UI_SETTINGS, ...$state.currentUser.ui_settings };
   },
 
   getAuthUIFlags($state) {

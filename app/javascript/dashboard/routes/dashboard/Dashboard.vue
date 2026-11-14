@@ -3,7 +3,6 @@ import { defineAsyncComponent, ref, computed } from 'vue';
 
 import NextSidebar from 'next/sidebar/Sidebar.vue';
 import WootKeyShortcutModal from 'dashboard/components/widgets/modal/WootKeyShortcutModal.vue';
-import AddAccountModal from 'dashboard/components/app/AddAccountModal.vue';
 import UpgradePage from 'dashboard/routes/dashboard/upgrade/UpgradePage.vue';
 
 import { useUISettings } from 'dashboard/composables/useUISettings';
@@ -25,6 +24,7 @@ import CopilotLauncher from 'dashboard/components-next/copilot/CopilotLauncher.v
 import CopilotContainer from 'dashboard/components/copilot/CopilotContainer.vue';
 
 import MobileSidebarLauncher from 'dashboard/components-next/sidebar/MobileSidebarLauncher.vue';
+import AppTopBar from 'dashboard/components-next/topbar/AppTopBar.vue';
 import { useCallsStore } from 'dashboard/stores/calls';
 
 export default {
@@ -32,12 +32,12 @@ export default {
     NextSidebar,
     CommandBar,
     WootKeyShortcutModal,
-    AddAccountModal,
     UpgradePage,
     CopilotLauncher,
     CopilotContainer,
     FloatingCallWidget,
     MobileSidebarLauncher,
+    AppTopBar,
   },
   setup() {
     const upgradePageRef = ref(null);
@@ -59,7 +59,6 @@ export default {
   data() {
     return {
       showAccountModal: false,
-      showCreateAccountModal: false,
       showShortcutModal: false,
       isMobileSidebarOpen: false,
     };
@@ -108,13 +107,6 @@ export default {
     closeMobileSidebar() {
       this.isMobileSidebarOpen = false;
     },
-    openCreateAccountModal() {
-      this.showAccountModal = false;
-      this.showCreateAccountModal = true;
-    },
-    closeCreateAccountModal() {
-      this.showCreateAccountModal = false;
-    },
     toggleAccountModal() {
       this.showAccountModal = !this.showAccountModal;
     },
@@ -135,43 +127,41 @@ export default {
       @toggle-account-modal="toggleAccountModal"
       @open-key-shortcut-modal="toggleKeyShortcutModal"
       @close-key-shortcut-modal="closeKeyShortcutModal"
-      @show-create-account-modal="openCreateAccountModal"
       @close-mobile-sidebar="closeMobileSidebar"
     />
 
-    <main
-      class="flex flex-1 h-full w-full min-h-0 px-0 overflow-hidden bg-n-surface-1"
-    >
-      <UpgradePage
-        v-show="showUpgradePage"
-        ref="upgradePageRef"
-        :bypass-upgrade-page="bypassUpgradePage"
+    <div class="flex flex-col flex-1 min-w-0 h-full">
+      <AppTopBar @open-key-shortcut-modal="toggleKeyShortcutModal" />
+      <main
+        class="flex flex-1 w-full min-h-0 px-0 overflow-hidden bg-n-surface-1"
       >
-        <MobileSidebarLauncher
-          :is-mobile-sidebar-open="isMobileSidebarOpen"
-          @toggle="toggleMobileSidebar"
+        <UpgradePage
+          v-show="showUpgradePage"
+          ref="upgradePageRef"
+          :bypass-upgrade-page="bypassUpgradePage"
+        >
+          <MobileSidebarLauncher
+            :is-mobile-sidebar-open="isMobileSidebarOpen"
+            @toggle="toggleMobileSidebar"
+          />
+        </UpgradePage>
+        <template v-if="!showUpgradePage">
+          <router-view />
+          <CopilotLauncher />
+          <MobileSidebarLauncher
+            :is-mobile-sidebar-open="isMobileSidebarOpen"
+            @toggle="toggleMobileSidebar"
+          />
+          <CopilotContainer />
+          <FloatingCallWidget v-if="hasActiveCall || hasIncomingCall" />
+        </template>
+        <CommandBar :is-paywalled="isAccountPaywalled" />
+        <WootKeyShortcutModal
+          v-model:show="showShortcutModal"
+          @close="closeKeyShortcutModal"
+          @clickaway="closeKeyShortcutModal"
         />
-      </UpgradePage>
-      <template v-if="!showUpgradePage">
-        <router-view />
-        <CopilotLauncher />
-        <MobileSidebarLauncher
-          :is-mobile-sidebar-open="isMobileSidebarOpen"
-          @toggle="toggleMobileSidebar"
-        />
-        <CopilotContainer />
-        <FloatingCallWidget v-if="hasActiveCall || hasIncomingCall" />
-      </template>
-      <CommandBar :is-paywalled="isAccountPaywalled" />
-      <AddAccountModal
-        :show="showCreateAccountModal"
-        @close-account-create-modal="closeCreateAccountModal"
-      />
-      <WootKeyShortcutModal
-        v-model:show="showShortcutModal"
-        @close="closeKeyShortcutModal"
-        @clickaway="closeKeyShortcutModal"
-      />
-    </main>
+      </main>
+    </div>
   </div>
 </template>

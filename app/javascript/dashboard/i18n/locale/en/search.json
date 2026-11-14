@@ -63,6 +63,11 @@
       "NO_AGENTS": "No agents found",
       "NO_CONTACTS": "Start by searching to see results",
       "NO_INBOXES": "No inboxes found"
+    },
+    "GLOBAL": {
+      "LABEL": "Search",
+      "PLACEHOLDER": "Search conversations or contacts",
+      "CLEAR": "Clear search"
     }
   }
 }

@@ -197,6 +197,19 @@ const hasActiveChild = computed(() => {
   return activeChild.value !== undefined;
 });
 
+const isChildListOpen = computed(
+  () => isExpanded.value || hasActiveChild.value
+);
+// Clip the list only while it is closed or animating, so dropdowns inside
+// an open group are not cut off
+const isChildListClipped = ref(!isChildListOpen.value);
+watch(isChildListOpen, isOpen => {
+  if (!isOpen) isChildListClipped.value = true;
+});
+const onChildListTransitionEnd = () => {
+  if (isChildListOpen.value) isChildListClipped.value = false;
+};
+
 // Groups that only hold children link to their first accessible child
 const linkTo = computed(() => props.to ?? accessibleItems.value[0]?.to);
 
@@ -259,6 +272,7 @@ watch(
       >
         <component
           :is="linkTo ? 'router-link' : 'button'"
+          v-tooltip.right="hasChildren ? null : label"
           :to="linkTo"
           type="button"
           class="flex items-center justify-center size-10 rounded-lg"
@@ -266,7 +280,7 @@ watch(
             'text-n-slate-12 bg-n-alpha-2': isActive || hasActiveChild,
             'text-n-slate-11 hover:bg-n-alpha-2': !isActive && !hasActiveChild,
           }"
-          :title="label"
+          :aria-label="label"
         >
           <Icon v-if="icon" :icon="icon" class="size-4" />
         </component>
@@ -297,35 +311,42 @@ watch(
         :is-expanded="isExpanded"
         @toggle="toggleTrigger"
       />
-      <ul
+      <div
         v-if="hasChildren"
-        v-show="isExpanded || hasActiveChild"
-        class="grid m-0 list-none min-w-0"
+        class="grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none"
+        :class="isChildListOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+        :inert="!isChildListOpen"
+        @transitionend.self="onChildListTransitionEnd"
       >
-        <template v-for="child in visibleChildren" :key="child.name">
-          <SidebarSubGroup
-            v-if="child.children"
-            :name="`${name}:${child.name}`"
-            :label="child.label"
-            :icon="child.icon"
-            :children="child.children"
-            :collapsible="child.collapsible"
-            :show-tree-line="child.showTreeLine"
-            :end-tree-line="child.showTreeLine && isLastVisibleChild(child)"
-            :is-expanded="isExpanded"
-            :active-child="activeChild"
-            :sort-options="child.sortOptions"
-            :active-sort="child.activeSort"
-            @update-sort="child.onSortChange"
-          />
-          <SidebarGroupLeaf
-            v-else-if="isAllowed(child.to)"
-            v-show="isExpanded || activeChild?.name === child.name"
-            v-bind="child"
-            :active="activeChild?.name === child.name"
-          />
-        </template>
-      </ul>
+        <ul
+          class="grid m-0 list-none min-w-0 min-h-0"
+          :class="{ 'overflow-hidden': isChildListClipped }"
+        >
+          <template v-for="child in visibleChildren" :key="child.name">
+            <SidebarSubGroup
+              v-if="child.children"
+              :name="`${name}:${child.name}`"
+              :label="child.label"
+              :icon="child.icon"
+              :children="child.children"
+              :collapsible="child.collapsible"
+              :show-tree-line="child.showTreeLine"
+              :end-tree-line="child.showTreeLine && isLastVisibleChild(child)"
+              :is-expanded="isExpanded"
+              :active-child="activeChild"
+              :sort-options="child.sortOptions"
+              :active-sort="child.activeSort"
+              @update-sort="child.onSortChange"
+            />
+            <SidebarGroupLeaf
+              v-else-if="isAllowed(child.to)"
+              v-show="isExpanded || activeChild?.name === child.name"
+              v-bind="child"
+              :active="activeChild?.name === child.name"
+            />
+          </template>
+        </ul>
+      </div>
       <ul v-else-if="isExpandable && isExpanded">
         <SidebarGroupEmptyLeaf />
       </ul>
