@@ -1,39 +1,16 @@
 <script>
 import SnackbarContainer from './components/SnackBar/Container.vue';
+import { setColorTheme } from 'dashboard/helper/themeHelper';
 
 export default {
   components: { SnackbarContainer },
-  data() {
-    return { theme: 'light' };
-  },
   mounted() {
-    this.setColorTheme();
-    this.listenToThemeChanges();
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    setColorTheme(mql.matches);
+    mql.onchange = e => setColorTheme(e.matches);
     this.setLocale(window.chatwootConfig.selectedLocale);
   },
   methods: {
-    setColorTheme() {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        this.theme = 'dark';
-        document.documentElement.classList.add('dark');
-      } else {
-        this.theme = 'light';
-        document.documentElement.classList.remove('dark');
-      }
-    },
-    listenToThemeChanges() {
-      const mql = window.matchMedia('(prefers-color-scheme: dark)');
-
-      mql.onchange = e => {
-        if (e.matches) {
-          this.theme = 'dark';
-          document.documentElement.classList.add('dark');
-        } else {
-          this.theme = 'light';
-          document.documentElement.classList.remove('dark');
-        }
-      };
-    },
     setLocale(locale) {
       if (locale) {
         this.$root.$i18n.locale = locale;
@@ -44,7 +21,7 @@ export default {
 </script>
 
 <template>
-  <div class="h-full min-h-screen w-full antialiased" :class="theme">
+  <div class="h-full min-h-screen w-full antialiased">
     <router-view />
     <SnackbarContainer />
   </div>
@@ -56,11 +33,19 @@ export default {
 @tailwind utilities;
 
 @import '../dashboard/assets/scss/next-colors';
+@import 'shared/assets/fonts/satoshi';
 
 html,
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'GT Standard',
+    'Satoshi',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
   @apply h-full w-full;
 
   input,
