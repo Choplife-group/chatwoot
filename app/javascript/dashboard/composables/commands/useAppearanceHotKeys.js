@@ -28,7 +28,7 @@ const getThemeOptions = t => [
   },
 ];
 
-const setAppearance = theme => {
+export const setAppearance = theme => {
   LocalStorage.set(LOCAL_STORAGE_KEYS.COLOR_SCHEME, theme);
   const isOSOnDarkMode = window.matchMedia(
     '(prefers-color-scheme: dark)'

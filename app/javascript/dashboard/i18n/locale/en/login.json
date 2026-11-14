@@ -1,6 +1,7 @@
 {
   "LOGIN": {
     "TITLE": "Login to Chatwoot",
+    "SUBTITLE": "Sign in to your account.",
     "EMAIL": {
       "LABEL": "Email",
       "PLACEHOLDER": "example{'@'}companyname.com",
@@ -20,9 +21,9 @@
       "BUSINESS_ACCOUNTS_ONLY": "You can't create a new account with a personal email address. Please sign up using your work email.",
       "NO_ACCOUNT_FOUND": "We couldn't find an account for your email address."
     },
-    "FORGOT_PASSWORD": "Forgot your password?",
+    "FORGOT_PASSWORD": "Forgot Password?",
     "CREATE_NEW_ACCOUNT": "Create a new account",
-    "SUBMIT": "Login",
+    "SUBMIT": "Sign in",
     "SAML": {
       "LABEL": "Login via SSO",
       "TITLE": "Initiate Single Sign-on (SSO)",

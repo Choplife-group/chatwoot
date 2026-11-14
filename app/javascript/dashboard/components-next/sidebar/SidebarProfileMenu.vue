@@ -15,10 +15,6 @@ import {
 } from 'next/dropdown-menu/base';
 import CustomBrandPolicyWrapper from '../../components/CustomBrandPolicyWrapper.vue';
 
-defineProps({
-  isCollapsed: { type: Boolean, default: false },
-});
-
 const emit = defineEmits(['close', 'openKeyShortcutModal']);
 
 defineOptions({
@@ -128,39 +124,48 @@ const allowedMenuItems = computed(() => {
 </script>
 
 <template>
-  <DropdownContainer
-    class="relative min-w-0"
-    :class="isCollapsed ? 'w-auto' : 'w-full'"
-    @close="emit('close')"
-  >
+  <DropdownContainer class="relative" @close="emit('close')">
     <template #trigger="{ toggle, isOpen }">
       <button
-        class="flex gap-2 items-center p-1 text-left rounded-lg cursor-pointer hover:bg-n-alpha-1"
-        :class="[
-          { 'bg-n-alpha-1': isOpen },
-          isCollapsed ? 'justify-center' : 'w-full',
-        ]"
-        :title="isCollapsed ? currentUser.available_name : undefined"
+        class="flex gap-1 items-center p-1 rounded-lg cursor-pointer hover:bg-n-alpha-1"
+        :class="{ 'bg-n-alpha-1': isOpen }"
+        :title="currentUser.available_name"
         @click="toggle"
       >
         <Avatar
-          :size="32"
+          :size="28"
           :name="currentUser.available_name"
           :src="currentUser.avatar_url"
           :status="currentUserAvailability"
           class="flex-shrink-0"
         />
-        <div v-if="!isCollapsed" class="min-w-0">
-          <div class="text-sm font-medium leading-4 truncate text-n-slate-12">
+        <span
+          class="size-4 text-n-slate-11"
+          :class="isOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+        />
+      </button>
+    </template>
+    <DropdownBody
+      class="top-full z-50 mt-2 w-80 max-w-[calc(100vw-1.5rem)] ltr:right-0 rtl:left-0"
+    >
+      <div class="flex gap-3 items-center px-2 py-2 min-w-0">
+        <Avatar
+          :size="36"
+          :name="currentUser.available_name"
+          :src="currentUser.avatar_url"
+          :status="currentUserAvailability"
+          class="flex-shrink-0"
+        />
+        <div class="min-w-0">
+          <div class="text-sm font-medium truncate text-n-slate-12">
             {{ currentUser.available_name }}
           </div>
           <div class="text-xs truncate text-n-slate-11">
             {{ currentUser.email }}
           </div>
         </div>
-      </button>
-    </template>
-    <DropdownBody class="bottom-12 z-50 mb-2 w-80 ltr:left-0 rtl:right-0">
+      </div>
+      <DropdownSeparator />
       <SidebarProfileMenuStatus />
       <DropdownSeparator />
       <template v-for="item in allowedMenuItems" :key="item.label">

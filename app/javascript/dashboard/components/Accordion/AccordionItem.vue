@@ -32,10 +32,12 @@ const onToggle = () => {
 </script>
 
 <template>
-  <div class="text-sm">
+  <div
+    class="overflow-hidden text-sm border rounded-xl border-n-weak bg-n-solid-2 shadow-sm"
+  >
     <button
-      class="flex items-center select-none w-full rounded-lg bg-n-slate-2 outline outline-1 outline-n-weak m-0 cursor-grab justify-between py-2 px-4 drag-handle"
-      :class="{ 'rounded-bl-none rounded-br-none': isOpen }"
+      class="flex items-center justify-between w-full px-4 py-3 m-0 select-none cursor-grab drag-handle"
+      :class="{ 'border-b border-n-weak': isOpen }"
       @click.stop="onToggle"
     >
       <div class="flex justify-between">
@@ -52,11 +54,7 @@ const onToggle = () => {
         </div>
       </div>
     </button>
-    <div
-      v-if="isOpen"
-      class="outline outline-1 outline-n-weak -mt-[-1px] border-t-0 rounded-br-lg rounded-bl-lg"
-      :class="compact ? 'p-0' : 'px-2 py-4'"
-    >
+    <div v-if="isOpen" :class="compact ? 'p-0' : 'px-2 py-4'">
       <slot />
     </div>
   </div>

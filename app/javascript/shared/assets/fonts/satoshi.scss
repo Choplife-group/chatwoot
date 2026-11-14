@@ -1,0 +1,60 @@
+// Satoshi ships as static weights. Each face covers a weight range so the
+// in-between weights the app uses (420, 460, 520, 620…) resolve to the nearest cut.
+@font-face {
+  font-family: 'Satoshi';
+  font-style: normal;
+  font-weight: 100 349;
+  font-display: swap;
+  src: url('shared/assets/fonts/Satoshi/Satoshi-Light.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  font-style: normal;
+  font-weight: 350 479;
+  font-display: swap;
+  src: url('shared/assets/fonts/Satoshi/Satoshi-Regular.otf')
+    format('opentype');
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  font-style: italic;
+  font-weight: 100 579;
+  font-display: swap;
+  src: url('shared/assets/fonts/Satoshi/Satoshi-Italic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  font-style: normal;
+  font-weight: 480 579;
+  font-display: swap;
+  src: url('shared/assets/fonts/Satoshi/Satoshi-Medium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  font-style: normal;
+  font-weight: 580 799;
+  font-display: swap;
+  src: url('shared/assets/fonts/Satoshi/Satoshi-Bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  font-style: italic;
+  font-weight: 580 900;
+  font-display: swap;
+  src: url('shared/assets/fonts/Satoshi/Satoshi-BoldItalic.otf')
+    format('opentype');
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  font-style: normal;
+  font-weight: 800 900;
+  font-display: swap;
+  src: url('shared/assets/fonts/Satoshi/Satoshi-Black.otf') format('opentype');
+}
+

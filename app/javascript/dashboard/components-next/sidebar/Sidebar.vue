@@ -3,7 +3,6 @@ import { h, ref, computed, onMounted, watch } from 'vue';
 import { provideSidebarContext, useSidebarResize } from './provider';
 import { useAccount } from 'dashboard/composables/useAccount';
 import { useConfig } from 'dashboard/composables/useConfig';
-import { useKbd } from 'dashboard/composables/utils/useKbd';
 import { useMapGetter } from 'dashboard/composables/store';
 import { useStore } from 'vuex';
 import { useI18n } from 'vue-i18n';
@@ -14,17 +13,15 @@ import { useWindowSize, useEventListener } from '@vueuse/core';
 
 import Button from 'dashboard/components-next/button/Button.vue';
 import SidebarGroup from './SidebarGroup.vue';
-import SidebarProfileMenu from './SidebarProfileMenu.vue';
 import SidebarChangelogCard from './SidebarChangelogCard.vue';
 import SidebarChangelogButton from './SidebarChangelogButton.vue';
+import SidebarThemeToggle from './SidebarThemeToggle.vue';
 import ChannelLeaf from './ChannelLeaf.vue';
 import QueueCountLeaf from './QueueCountLeaf.vue';
 import { useEmitter } from 'dashboard/composables/emitter';
 import ChannelIcon from 'next/icon/ChannelIcon.vue';
 import EmojiIcon from 'next/emoji-icon-picker/EmojiIcon.vue';
-import SidebarAccountSwitcher from './SidebarAccountSwitcher.vue';
 import Logo from 'next/icon/Logo.vue';
-import ComposeConversation from 'dashboard/components-next/NewConversation/ComposeConversation.vue';
 import {
   SIDEBAR_SORT_SECTIONS,
   getSidebarSortOptions,
@@ -42,7 +39,6 @@ const props = defineProps({
 const emit = defineEmits([
   'closeKeyShortcutModal',
   'openKeyShortcutModal',
-  'showCreateAccountModal',
   'closeMobileSidebar',
 ]);
 
@@ -55,12 +51,12 @@ const store = useStore();
 const isCallsAvailable = computed(
   () => isOnChatwootCloud.value || isEnterprise
 );
-const searchShortcut = useKbd([`$mod`, 'k']);
 const { t } = useI18n();
 
 const isACustomBrandedInstance = useMapGetter(
   'globalConfig/isACustomBrandedInstance'
 );
+const globalConfig = useMapGetter('globalConfig/get');
 const isRTL = useMapGetter('accounts/isRTL');
 
 const { width: windowWidth } = useWindowSize();
@@ -103,6 +99,17 @@ const hasFilteredUnreadCounts = computed(() => {
     )
   );
 });
+
+const hasInsights = computed(() => {
+  return isFeatureEnabledonAccount.value(
+    accountId.value,
+    FEATURE_FLAGS.INSIGHTS
+  );
+});
+
+const dashboardRoute = computed(() =>
+  accountScopedRoute(hasInsights.value ? 'insights_index' : 'home')
+);
 
 const hasDataImport = computed(() => {
   return isFeatureEnabledonAccount.value(
@@ -210,7 +217,7 @@ const onResizeEnd = () => {
   }
 };
 
-const onResizeHandleDoubleClick = () => {
+const toggleCollapsed = () => {
   if (isCollapsed.value) snapToExpanded();
   else snapToCollapsed();
 };
@@ -412,6 +419,22 @@ const reportRoutes = computed(() => newReportRoutes());
 
 const menuItems = computed(() => {
   return [
+    ...(hasInsights.value
+      ? [
+          {
+            name: 'Dashboard',
+            label: t('SIDEBAR.DASHBOARD'),
+            icon: 'i-lucide-layout-dashboard',
+            to: accountScopedRoute('insights_index'),
+            activeOn: [
+              'insights_new',
+              'insights_report',
+              'insights_snapshot',
+              'insights_dashboard',
+            ],
+          },
+        ]
+      : []),
     {
       name: 'Inbox',
       label: t('SIDEBAR.INBOX'),
@@ -757,17 +780,6 @@ const menuItems = computed(() => {
       icon: 'i-lucide-chart-spline',
       children: [
         {
-          name: 'Reports Insights',
-          label: t('SIDEBAR.REPORTS_INSIGHTS'),
-          to: accountScopedRoute('insights_index'),
-          activeOn: [
-            'insights_new',
-            'insights_report',
-            'insights_snapshot',
-            'insights_dashboard',
-          ],
-        },
-        {
           name: 'Report Overview',
           label: t('SIDEBAR.REPORTS_OVERVIEW'),
           to: accountScopedRoute('account_overview_reports'),
@@ -1087,77 +1099,37 @@ const menuItems = computed(() => {
     ]"
     :style="isMobile ? undefined : { width: `${sidebarWidth}px` }"
   >
+    <!-- Same height and divider as AppTopBar, so the logo reads as part of the top row -->
     <section
-      class="grid"
-      :class="isEffectivelyCollapsed ? 'mt-3 mb-6 gap-4' : 'mt-1 mb-4 gap-2'"
+      class="flex flex-shrink-0 items-center h-14 mb-2 border-b border-n-weak dark:border-n-strong dark:bg-n-solid-2"
     >
       <div
-        class="flex gap-2 items-center min-w-0"
+        class="flex flex-1 gap-2 items-center min-w-0"
         :class="{
           'justify-center px-1': isEffectivelyCollapsed,
           'px-2': !isEffectivelyCollapsed,
         }"
       >
-        <template v-if="isEffectivelyCollapsed">
-          <SidebarAccountSwitcher
-            is-collapsed
-            @show-create-account-modal="emit('showCreateAccountModal')"
-          />
-        </template>
-        <template v-else>
-          <div class="grid flex-shrink-0 place-content-center size-6">
-            <Logo class="size-4" />
-          </div>
-          <div class="flex-shrink-0 w-px h-3 bg-n-strong" />
-          <SidebarAccountSwitcher
-            class="flex-grow -mx-1 min-w-0"
-            @show-create-account-modal="emit('showCreateAccountModal')"
-          />
-        </template>
-      </div>
-      <div
-        class="flex gap-2"
-        :class="isEffectivelyCollapsed ? 'flex-col items-center' : 'px-2'"
-      >
+        <!-- Chopwin runs a single account: logo, plus the wordmark when expanded -->
         <RouterLink
-          v-if="!isEffectivelyCollapsed"
-          :to="{ name: 'search' }"
-          class="flex gap-2 items-center px-2 py-1 w-full h-7 rounded-lg outline outline-1 outline-n-weak bg-n-button-color transition-all duration-100 ease-out"
+          :to="dashboardRoute"
+          class="flex gap-2.5 items-center p-2 min-w-0 rounded-lg hover:bg-n-alpha-2"
+          :title="t('SIDEBAR.DASHBOARD')"
         >
-          <span class="flex-shrink-0 i-lucide-search size-4 text-n-slate-10" />
-          <span class="flex-grow text-start text-n-slate-10">
-            {{ t('COMBOBOX.SEARCH_PLACEHOLDER') }}
-          </span>
-          <span
-            class="hidden tracking-wide pointer-events-none select-none text-n-slate-10"
-          >
-            {{ searchShortcut }}
-          </span>
-        </RouterLink>
-        <RouterLink
-          v-else
-          :to="{ name: 'search' }"
-          class="flex items-center justify-center size-8 rounded-lg outline outline-1 outline-n-weak bg-n-button-color transition-all duration-100 ease-out hover:bg-n-alpha-2 dark:hover:bg-n-slate-9/30"
-          :title="t('COMBOBOX.SEARCH_PLACEHOLDER')"
-        >
-          <span class="i-lucide-search size-4 text-n-slate-11" />
-        </RouterLink>
-        <ComposeConversation align="start">
-          <template #trigger="{ isOpen }">
-            <Button
-              icon="i-lucide-pen-line"
-              color="slate"
-              size="sm"
-              class="dark:hover:!bg-n-slate-9/30"
-              :class="[
-                isEffectivelyCollapsed
-                  ? '!size-8 !outline-n-weak !text-n-slate-11'
-                  : '!h-7 !outline-n-weak !text-n-slate-11',
-                { '!bg-n-alpha-2 dark:!bg-n-slate-9/30': isOpen },
-              ]"
+          <Logo class="flex-shrink-0 size-7" />
+          <template v-if="!isEffectivelyCollapsed">
+            <img
+              :src="globalConfig.logo"
+              :alt="globalConfig.installationName"
+              class="block w-auto h-4 min-w-0 dark:hidden"
+            />
+            <img
+              :src="globalConfig.logoDark || globalConfig.logo"
+              :alt="globalConfig.installationName"
+              class="hidden w-auto h-4 min-w-0 dark:block"
             />
           </template>
-        </ComposeConversation>
+        </RouterLink>
       </div>
     </section>
     <nav
@@ -1196,12 +1168,32 @@ const menuItems = computed(() => {
         "
       />
       <div
-        class="px-1 py-1.5 flex-shrink-0 flex w-full z-50 gap-2 items-center border-t border-n-weak shadow-[0px_-2px_4px_0px_rgba(27,28,29,0.02)]"
-        :class="isEffectivelyCollapsed ? 'justify-center' : 'justify-between'"
+        class="flex flex-col gap-1 w-full px-2 pb-2"
+        :class="{ 'items-center px-1': isEffectivelyCollapsed }"
       >
-        <SidebarProfileMenu
-          :is-collapsed="isEffectivelyCollapsed"
-          @open-key-shortcut-modal="emit('openKeyShortcutModal')"
+        <SidebarThemeToggle :is-collapsed="isEffectivelyCollapsed" />
+        <Button
+          v-tooltip.right="
+            isEffectivelyCollapsed ? t('SIDEBAR.EXPAND_SIDEBAR') : undefined
+          "
+          :icon="
+            isEffectivelyCollapsed
+              ? 'i-lucide-chevrons-right'
+              : 'i-lucide-chevrons-left'
+          "
+          :label="isEffectivelyCollapsed ? '' : t('SIDEBAR.COLLAPSE_SIDEBAR')"
+          :aria-label="
+            isEffectivelyCollapsed
+              ? t('SIDEBAR.EXPAND_SIDEBAR')
+              : t('SIDEBAR.COLLAPSE_SIDEBAR')
+          "
+          slate
+          ghost
+          sm
+          :justify="isEffectivelyCollapsed ? 'center' : 'start'"
+          class="hidden md:flex rtl:[&>span:first-child]:rotate-180"
+          :class="isEffectivelyCollapsed ? '!size-8 !px-0' : 'w-full'"
+          @click="toggleCollapsed"
         />
       </div>
     </section>
@@ -1210,7 +1202,7 @@ const menuItems = computed(() => {
       class="hidden md:block absolute top-0 h-full w-1 cursor-col-resize z-40 ltr:right-0 rtl:left-0 group"
       @mousedown="onResizeStart"
       @touchstart="onResizeStart"
-      @dblclick="onResizeHandleDoubleClick"
+      @dblclick="toggleCollapsed"
     >
       <div
         class="absolute top-0 h-full w-px ltr:right-0 rtl:left-0 bg-transparent group-hover:bg-n-brand transition-colors"

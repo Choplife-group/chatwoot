@@ -78,8 +78,8 @@ const onClick = event => {
     </div>
     <span
       v-if="expandable"
-      v-show="isExpanded"
-      class="i-lucide-chevron-up size-3"
+      class="i-lucide-chevron-down flex-shrink-0 size-3.5 text-n-slate-10 transition-transform duration-200 ease-out motion-reduce:transition-none"
+      :class="{ 'rotate-180': isExpanded }"
       @click.stop.prevent="emit('toggle')"
     />
   </component>

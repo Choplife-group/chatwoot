@@ -41,8 +41,11 @@ const tailwindConfig = {
     extend: {
       fontFamily: {
         sans: defaultSansFonts,
-        inter: ['Inter', ...defaultSansFonts],
-        interDisplay: ['InterDisplay', ...defaultSansFonts],
+        // Chopwin brand fonts. Satoshi renders until the GT Standard and
+        // Choplife Display web fonts are added to shared/assets/fonts.
+        inter: ['"GT Standard"', 'Satoshi', ...defaultSansFonts],
+        interDisplay: ['"GT Standard"', 'Satoshi', ...defaultSansFonts],
+        heading: ['"Choplife Display"', 'Satoshi', ...defaultSansFonts],
       },
       fontWeight: {
         420: '420',

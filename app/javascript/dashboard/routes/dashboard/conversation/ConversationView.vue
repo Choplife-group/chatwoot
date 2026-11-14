@@ -201,7 +201,7 @@ export default {
 </script>
 
 <template>
-  <section class="flex w-full h-full min-w-0">
+  <section class="flex w-full h-full min-w-0 bg-n-background">
     <ChatList
       :show-conversation-list="showConversationList"
       :conversation-inbox="inboxId"

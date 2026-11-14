@@ -17,7 +17,8 @@ let globalCloseTimeout = null;
 export function useSidebarResize() {
   const { uiSettings, updateUISettings } = useUISettings();
 
-  const sidebarWidth = ref(uiSettings.value.sidebar_width || DEFAULT_WIDTH);
+  // Chopwin: start as the slim icon rail until a user widens it.
+  const sidebarWidth = ref(uiSettings.value.sidebar_width || MIN_WIDTH);
   const isCollapsed = computed(() => sidebarWidth.value < COLLAPSED_THRESHOLD);
 
   const setSidebarWidth = width => {

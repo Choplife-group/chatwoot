@@ -318,6 +318,8 @@
     "SWITCH": "Switch",
     "INBOX_VIEW": "Inbox View",
     "CONVERSATIONS": "Conversations",
+    "DASHBOARD": "Dashboard",
+    "NEW_CONVERSATION": "New conversation",
     "INBOX": "My Inbox",
     "ALL_CONVERSATIONS": "All Conversations",
     "MENTIONED_CONVERSATIONS": "Mentions",
@@ -370,7 +372,6 @@
     "NEW_LABEL": "New label",
     "NEW_TEAM": "New team",
     "NEW_INBOX": "New inbox",
-    "REPORTS_INSIGHTS": "Insights",
     "REPORTS_CONVERSATION": "Conversations",
     "CSAT": "CSAT",
     "LIVE_CHAT": "Live Chat",
@@ -424,7 +425,11 @@
     "DOCS": "Read docs",
     "SECURITY": "Security",
     "CAPTAIN_AI": "Captain",
-    "CONVERSATION_WORKFLOW": "Conversation Workflow"
+    "CONVERSATION_WORKFLOW": "Conversation Workflow",
+    "COLLAPSE_SIDEBAR": "Collapse sidebar",
+    "EXPAND_SIDEBAR": "Expand sidebar",
+    "LIGHT_MODE": "Light mode",
+    "DARK_MODE": "Dark mode"
   },
   "DATA_IMPORTS": {
     "HEADER": "Data",
