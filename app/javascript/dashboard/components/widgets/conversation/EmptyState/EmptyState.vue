@@ -2,13 +2,13 @@
 import { mapGetters } from 'vuex';
 import { useAdmin } from 'dashboard/composables/useAdmin';
 import { useAccount } from 'dashboard/composables/useAccount';
-import OnboardingView from '../OnboardingView.vue';
 import EmptyStateMessage from './EmptyStateMessage.vue';
+import NextButton from 'dashboard/components-next/button/Button.vue';
 
 export default {
   components: {
-    OnboardingView,
     EmptyStateMessage,
+    NextButton,
   },
   props: {
     isOnExpandedLayout: {
@@ -49,35 +49,34 @@ export default {
     newInboxURL() {
       return this.accountScopedUrl('settings/inboxes/new');
     },
-    emptyClassName() {
-      if (
-        !this.inboxesList.length &&
-        !this.uiFlags.isFetching &&
-        !this.loadingChatList &&
-        this.isAdmin
-      ) {
-        return 'h-full overflow-auto w-full';
-      }
-      return 'flex-1 min-w-0 px-0 flex flex-col items-center justify-center h-full bg-n-surface-1';
-    },
   },
 };
 </script>
 
 <template>
-  <div :class="emptyClassName">
+  <div
+    class="flex flex-col items-center justify-center flex-1 h-full min-w-0 px-0 bg-n-surface-1"
+  >
     <woot-loading-state
       v-if="uiFlags.isFetching || loadingChatList"
       :message="loadingIndicatorMessage"
     />
     <!-- No inboxes attached -->
-    <div
+    <EmptyStateMessage
       v-if="!inboxesList.length && !uiFlags.isFetching && !loadingChatList"
-      class="clearfix mx-auto"
+      :message="
+        isAdmin
+          ? $t('CONVERSATION.NO_INBOX_ADMIN')
+          : $t('CONVERSATION.NO_INBOX_AGENT')
+      "
     >
-      <OnboardingView v-if="isAdmin" />
-      <EmptyStateMessage v-else :message="$t('CONVERSATION.NO_INBOX_AGENT')" />
-    </div>
+      <NextButton
+        v-if="isAdmin"
+        class="mt-3"
+        :label="$t('CONVERSATION.CREATE_INBOX')"
+        @click="$router.push(newInboxURL)"
+      />
+    </EmptyStateMessage>
     <!-- Show empty state images if not loading -->
 
     <div
