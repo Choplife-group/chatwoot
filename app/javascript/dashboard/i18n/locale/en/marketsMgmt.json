@@ -1,14 +1,14 @@
 {
   "MARKETS_SETTINGS": {
-    "HEADER": "Markets",
-    "DESCRIPTION": "Markets are the countries you support. Map each market website’s inbox to its market so new conversations get their market automatically. Archived markets stay on old conversations but can’t be chosen any more.",
-    "LOADING": "Fetching markets",
-    "COUNT": "{n} market | {n} markets",
-    "SEARCH_PLACEHOLDER": "Search markets...",
-    "NO_RESULTS": "No markets found matching your search",
+    "HEADER": "Countries",
+    "DESCRIPTION": "The countries you support. Set each country website’s inbox to its country so new conversations get their country automatically. Archived countries stay on old conversations but can’t be chosen any more.",
+    "LOADING": "Fetching countries",
+    "COUNT": "{n} country | {n} countries",
+    "SEARCH_PLACEHOLDER": "Search countries...",
+    "NO_RESULTS": "No countries found matching your search",
     "API_ERROR": "Something went wrong. Please try again.",
     "LIST": {
-      "404": "There are no markets on this account yet.",
+      "404": "There are no countries on this account yet.",
       "NO_INBOXES": "No inbox mapped",
       "ACTIVE": "Active",
       "ARCHIVED": "Archived",
@@ -21,25 +21,25 @@
       }
     },
     "ADD": {
-      "BUTTON": "Add market",
-      "TITLE": "Add market",
+      "BUTTON": "Add country",
+      "TITLE": "Add country",
       "DESCRIPTION": "Use the ISO country code, e.g. UG for Uganda.",
       "SUBMIT": "Create",
-      "SUCCESS": "Market created"
+      "SUCCESS": "Country created"
     },
     "EDIT": {
       "BUTTON": "Edit",
-      "TITLE": "Edit market",
+      "TITLE": "Edit country",
       "SUBMIT": "Save",
-      "SUCCESS": "Market updated"
+      "SUCCESS": "Country updated"
     },
     "ARCHIVE": {
       "BUTTON": "Archive",
-      "SUCCESS": "Market archived"
+      "SUCCESS": "Country archived"
     },
     "RESTORE": {
       "BUTTON": "Restore",
-      "SUCCESS": "Market restored"
+      "SUCCESS": "Country restored"
     },
     "FORM": {
       "NAME": {

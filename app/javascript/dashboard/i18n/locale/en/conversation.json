@@ -463,14 +463,14 @@
     },
     "SELF_ASSIGN": "Assign to me",
     "TEAM_LABEL": "Assigned Team",
-    "MARKET_LABEL": "Market",
+    "MARKET_LABEL": "Country",
     "MARKET": {
-      "SELECT_TITLE": "Select market",
-      "SEARCH_PLACEHOLDER": "Search markets",
-      "NO_RESULTS": "No markets found",
+      "SELECT_TITLE": "Select country",
+      "SEARCH_PLACEHOLDER": "Search countries",
+      "NO_RESULTS": "No countries found",
       "NONE": "None",
-      "UPDATED": "Market updated",
-      "UPDATE_ERROR": "Could not update the market"
+      "UPDATED": "Country updated",
+      "UPDATE_ERROR": "Could not update the country"
     },
     "CATEGORY_LABEL": "Category",
     "CATEGORY": {

@@ -22,7 +22,7 @@ RSpec.describe Insights::ExportService do
 
   it 'writes a CSV with names, times in minutes, compared figures and totals' do
     expect(CSV.parse(export.to_csv)).to eq([
-                                             ['Market', 'Received', 'Received compared', 'Received change %',
+                                             ['Country', 'Received', 'Received compared', 'Received change %',
                                               'Avg first response (minutes)', 'Avg first response (minutes) compared',
                                               'Avg first response (minutes) change %'],
                                              ['Dar es Salaam ☕ Tanzania', '12', '8', '50.0', '2.5', '5.0', '-50.0'],

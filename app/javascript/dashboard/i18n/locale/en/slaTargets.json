@@ -1,10 +1,10 @@
 {
   "SLA_TARGETS": {
     "HEADER": "SLA targets",
-    "DESCRIPTION": "How fast conversations should get a first response and be resolved. Insights reports SLA compliance against these targets. A target for a market and priority beats one for just the market, which beats one for just the priority, which beats the default.",
+    "DESCRIPTION": "How fast conversations should get a first response and be resolved. Insights reports SLA compliance against these targets. A target for a country and priority beats one for just the country, which beats one for just the priority, which beats the default.",
     "LOADING": "Fetching SLA targets",
     "API_ERROR": "Something went wrong. Please try again.",
-    "ALL_MARKETS": "All markets",
+    "ALL_MARKETS": "All countries",
     "ANY_PRIORITY": "Any priority",
     "PRIORITIES": {
       "LOW": "Low",
@@ -17,14 +17,14 @@
       "HOURS": "Hours"
     },
     "LIST": {
-      "404": "There are no SLA targets yet. Add a default for all markets to start.",
+      "404": "There are no SLA targets yet. Add a default for all countries to start.",
       "NO_TARGET": "No target",
       "MINUTES": "{n} min",
       "HOURS": "{n} h",
       "BUSINESS_HOURS": "Business hours",
       "CALENDAR_HOURS": "Around the clock",
       "TABLE_HEADER": {
-        "MARKET": "Market",
+        "MARKET": "Country",
         "PRIORITY": "Priority",
         "FIRST_RESPONSE": "First response",
         "RESOLUTION": "Resolution",
@@ -35,7 +35,7 @@
     "ADD": {
       "BUTTON": "Add target",
       "TITLE": "Add SLA target",
-      "DESCRIPTION": "Leave market or priority empty to cover all of them."
+      "DESCRIPTION": "Leave country or priority empty to cover all of them."
     },
     "EDIT": {
       "BUTTON": "Edit",
@@ -50,7 +50,7 @@
       "SUCCESS": "SLA target deleted"
     },
     "FORM": {
-      "MARKET": "Market",
+      "MARKET": "Country",
       "PRIORITY": "Priority",
       "FIRST_RESPONSE": "First response within",
       "RESOLUTION": "Resolved within",

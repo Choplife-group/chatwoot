@@ -47,7 +47,7 @@ RSpec.describe MarketHandler do
 
     expect { conversation.update!(market: sierra_leone) }
       .to have_enqueued_job(Conversations::ActivityMessageJob)
-      .with(conversation, hash_including(content: 'Jane changed the market from Uganda to Sierra Leone'))
+      .with(conversation, hash_including(content: 'Jane changed the country from Uganda to Sierra Leone'))
   ensure
     Current.reset
   end

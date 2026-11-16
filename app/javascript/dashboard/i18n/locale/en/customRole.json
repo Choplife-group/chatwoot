@@ -42,7 +42,7 @@
     "PERMISSION_HINTS": {
       "CONVERSATION_MANAGE": "Only applies when restricted inbox access is on for the account.",
       "CONVERSATION_DELETE": "Permanent. Deleted conversations can't be recovered.",
-      "REPORT_MANAGE": "Includes data from every market and team.",
+      "REPORT_MANAGE": "Includes data from every country and team.",
       "INBOX_MANAGE": "Deleting inboxes, connection details and secrets stay with administrators.",
       "TEAM_MANAGE": "A team lead sees their team's full queue. They can't make themselves a lead.",
       "AGENT_MANAGE": "They can't change administrators, their own role, or give access they don't have.",
@@ -56,7 +56,7 @@
       "REPORT_MANAGE": "View reports",
       "CATEGORY_MANAGE": "Manage conversation categories",
       "TEAM_MANAGE": "Manage teams and team leads",
-      "MARKET_MANAGE": "Manage markets",
+      "MARKET_MANAGE": "Manage countries",
       "SLA_MANAGE": "Manage SLA targets",
       "INBOX_MANAGE": "Manage inboxes",
       "AGENT_MANAGE": "Add, edit and remove agents",

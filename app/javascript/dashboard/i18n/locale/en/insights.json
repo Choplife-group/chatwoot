@@ -1,7 +1,7 @@
 {
   "INSIGHTS": {
     "HEADER": "Insights",
-    "DESCRIPTION": "Build your own reports by market, team, category and agent. You only see figures for conversations you're allowed to see.",
+    "DESCRIPTION": "Build your own reports by country, team, category and agent. You only see figures for conversations you're allowed to see.",
     "API_ERROR": "Something went wrong. Please try again.",
     "NONE": "None",
     "LOADING": "Working out the figures",
@@ -50,14 +50,14 @@
       "TITLE": "Save report",
       "DESCRIPTION": "Saved reports keep their period as a name, so “Last month” always shows the month before you open it.",
       "NAME": "Name",
-      "NAME_PLACEHOLDER": "e.g. Monthly by market and category",
+      "NAME_PLACEHOLDER": "e.g. Monthly by country and category",
       "SHARED": "Share with everyone in the account",
       "SHARED_HELP": "Each person sees only the figures they're allowed to see.",
       "SUBMIT": "Save"
     },
     "SNAPSHOT_DIALOG": {
       "TITLE": "Take snapshot",
-      "DESCRIPTION": "A snapshot keeps today's figures for this report. They won't change when conversations are moved to another market, team or category. Only you can see it.",
+      "DESCRIPTION": "A snapshot keeps today's figures for this report. They won't change when conversations are moved to another country, team or category. Only you can see it.",
       "NAME": "Name",
       "SUBMIT": "Take snapshot"
     },
@@ -189,7 +189,7 @@
       "RESOLUTION_SLA": "Share of resolutions within the SLA target."
     },
     "DIMENSIONS": {
-      "MARKET": "Market",
+      "MARKET": "Country",
       "TEAM": "Team",
       "CATEGORY": "Category",
       "SUBCATEGORY": "Subcategory",
