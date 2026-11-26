@@ -31,7 +31,7 @@ class AutoAssignment::CapacityFilter
   def open_count(policy, user_id)
     scope = inbox.conversations.open.where(assignee_id: user_id)
     scope = scope.tagged_with(policy.excluded_labels, on: :labels, any: true, exclude: true) if policy.excluded_labels.any?
-    scope = scope.where(last_activity_at: policy.exclude_older_than_hours.hours.ago..) if policy.exclude_older_than_hours
+    scope = scope.where(last_activity_at: policy.exclude_older_than_minutes.minutes.ago..) if policy.exclude_older_than_minutes
     scope.count
   end
 end

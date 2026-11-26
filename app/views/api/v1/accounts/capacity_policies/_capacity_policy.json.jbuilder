@@ -4,7 +4,8 @@ json.name capacity_policy.name
 json.description capacity_policy.description
 json.exclusion_rules do
   json.excluded_labels capacity_policy.excluded_labels
-  json.exclude_older_than_hours capacity_policy.exclude_older_than_hours
+  # minutes, under the key the settings UI uses
+  json.exclude_older_than_hours capacity_policy.exclude_older_than_minutes
 end
 json.assigned_agent_count capacity_policy.account_users.count
 json.inbox_capacity_limits capacity_policy.capacity_limits do |capacity_limit|

@@ -3,7 +3,8 @@
 # AgentCapacityPolicy class (commercially licensed, stripped from our image), so ours has a different name.
 #
 # exclusion_rules: { 'excluded_labels' => [...], 'exclude_older_than_hours' => Integer }
-# Conversations matching either rule don't count towards an agent's limit.
+# Conversations matching either rule don't count towards an agent's limit. Despite its name, the settings UI
+# stores exclude_older_than_hours in minutes (its duration picker works in minutes), so we read it as minutes.
 class CapacityPolicy < ApplicationRecord
   self.table_name = 'agent_capacity_policies'
 
@@ -18,7 +19,7 @@ class CapacityPolicy < ApplicationRecord
     Array(exclusion_rules['excluded_labels'])
   end
 
-  def exclude_older_than_hours
+  def exclude_older_than_minutes
     exclusion_rules['exclude_older_than_hours'].presence&.to_i
   end
 
@@ -28,7 +29,7 @@ class CapacityPolicy < ApplicationRecord
     hours = exclusion_rules['exclude_older_than_hours']
     return if hours.blank? || (hours.to_s.match?(/\A\d+\z/) && hours.to_i.positive?)
 
-    errors.add(:exclusion_rules, 'exclude_older_than_hours must be a positive whole number')
+    errors.add(:exclusion_rules, 'exclude_older_than_hours must be a positive whole number of minutes')
   end
 end
 
