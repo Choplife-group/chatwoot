@@ -55,7 +55,9 @@ export default {
 
 <template>
   <div
-    v-if="globalConfig.brandName && !disableBranding && !globalConfig.hidePoweredBy"
+    v-if="
+      globalConfig.brandName && !disableBranding && !globalConfig.hidePoweredBy
+    "
     class="px-0 py-3 flex justify-center"
   >
     <a

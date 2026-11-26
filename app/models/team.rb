@@ -30,10 +30,10 @@ class Team < ApplicationRecord
 
   validates :name,
             presence: { message: I18n.t('errors.validations.presence') },
-            uniqueness: { scope: :account_id }
+            uniqueness: { scope: :account_id, case_sensitive: false }
 
   before_validation do
-    self.name = name.gsub(/[[:cntrl:]]/, '').strip.downcase if attribute_present?('name')
+    self.name = name.gsub(/[[:cntrl:]]/, '').strip if attribute_present?('name')
   end
 
   # Adds multiple members to the team
@@ -87,3 +87,5 @@ class Team < ApplicationRecord
 end
 
 Team.include_mod_with('Audit::Team')
+
+Team.include(ChopwinAudited)

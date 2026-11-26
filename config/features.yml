@@ -41,7 +41,7 @@
   enabled: false
 - name: help_center
   display_name: Help Center
-  enabled: false
+  enabled: true
   help_url: https://chwt.app/hc/help-center
 - name: agent_bots
   display_name: Agent Bots
@@ -110,8 +110,7 @@
   enabled: false
 - name: audit_logs
   display_name: Audit Logs
-  enabled: false
-  premium: true
+  enabled: true
 - name: custom_tools
   display_name: Custom Tools
   enabled: false
@@ -248,8 +247,7 @@
   premium: true
 - name: advanced_assignment
   display_name: Advanced Assignment
-  enabled: false
-  premium: true
+  enabled: true
 - name: whatsapp_manual_transfer
   display_name: WhatsApp Manual Transfer
   enabled: false
@@ -278,8 +276,7 @@
 - name: audit_log_ip_address
   display_name: Audit Log IP Address
   help_url: https://chwt.app/hc/audit-logs
-  enabled: false
-  premium: true
+  enabled: true
   column: feature_flags_ext_1
 - name: captain_classifier
   display_name: Captain Classifier

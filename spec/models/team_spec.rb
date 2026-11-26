@@ -10,14 +10,19 @@ RSpec.describe Team do
   describe 'name normalization' do
     let(:account) { create(:account) }
 
-    it 'downcases the name' do
+    it 'keeps the name as typed' do
       team = create(:team, account: account, name: 'Customer Support')
-      expect(team.name).to eq('customer support')
+      expect(team.name).to eq('Customer Support')
+    end
+
+    it 'treats names that differ only in case as duplicates' do
+      create(:team, account: account, name: 'Uganda Support')
+      expect(build(:team, account: account, name: 'uganda support')).not_to be_valid
     end
 
     it 'strips control characters and surrounding whitespace' do
       team = create(:team, account: account, name: "  Sales\n")
-      expect(team.name).to eq('sales')
+      expect(team.name).to eq('Sales')
     end
 
     it 'removes control characters embedded within the name' do

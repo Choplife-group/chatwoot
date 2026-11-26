@@ -31,7 +31,13 @@
         "AUTOMATION_RULES": "Automation rules",
         "MACROS": "Macros",
         "CONVERSATION_DELETIONS": "Conversation deletions",
-      "MESSAGE_DELETIONS": "Message deletions"
+        "MESSAGE_DELETIONS": "Message deletions",
+        "COUNTRIES": "Countries",
+        "CATEGORIES": "Categories",
+        "CUSTOM_ROLES": "Custom roles",
+        "SLA_TARGETS": "SLA targets",
+        "ASSIGNMENT_POLICIES": "Assignment policies",
+        "CAPACITY_POLICIES": "Agent capacity"
       },
       "SORT": {
         "NEWEST": "Newest first",
@@ -107,6 +113,36 @@
     },
     "MESSAGE": {
       "DELETE": "{agentName} deleted a message in conversation #{conversationId}"
+    },
+    "COUNTRY": {
+      "ADD": "{agentName} created a country (#{id})",
+      "EDIT": "{agentName} updated a country (#{id})",
+      "DELETE": "{agentName} deleted a country (#{id})"
+    },
+    "CATEGORY": {
+      "ADD": "{agentName} created a category (#{id})",
+      "EDIT": "{agentName} updated a category (#{id})",
+      "DELETE": "{agentName} deleted a category (#{id})"
+    },
+    "CUSTOM_ROLE": {
+      "ADD": "{agentName} created a custom role (#{id})",
+      "EDIT": "{agentName} updated a custom role (#{id})",
+      "DELETE": "{agentName} deleted a custom role (#{id})"
+    },
+    "SLA_TARGET": {
+      "ADD": "{agentName} created an SLA target (#{id})",
+      "EDIT": "{agentName} updated an SLA target (#{id})",
+      "DELETE": "{agentName} deleted an SLA target (#{id})"
+    },
+    "ASSIGNMENT_POLICY": {
+      "ADD": "{agentName} created an assignment policy (#{id})",
+      "EDIT": "{agentName} updated an assignment policy (#{id})",
+      "DELETE": "{agentName} deleted an assignment policy (#{id})"
+    },
+    "CAPACITY_POLICY": {
+      "ADD": "{agentName} created an agent capacity policy (#{id})",
+      "EDIT": "{agentName} updated an agent capacity policy (#{id})",
+      "DELETE": "{agentName} deleted an agent capacity policy (#{id})"
     }
   }
 }

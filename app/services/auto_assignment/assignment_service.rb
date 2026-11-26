@@ -70,9 +70,16 @@ class AutoAssignment::AssignmentService
     return nil if agents.nil?
 
     agents = filter_agents_by_rate_limit(agents)
+    agents = AutoAssignment::CapacityFilter.new(inbox: inbox).filter(agents)
     return nil if agents.empty?
 
-    round_robin_selector.select_agent(agents)
+    agent_selector.select_agent(agents)
+  end
+
+  def agent_selector
+    return AutoAssignment::LeastBusySelector.new(inbox: inbox) if inbox.assignment_policy&.assignment_order == 'balanced'
+
+    round_robin_selector
   end
 
   def filter_agents_by_team(agents, conversation)

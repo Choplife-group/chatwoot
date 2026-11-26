@@ -31,6 +31,7 @@ class AccountUser < ApplicationRecord
   belongs_to :user
   belongs_to :inviter, class_name: 'User', optional: true
   belongs_to :support_role, foreign_key: :custom_role_id, optional: true, inverse_of: :account_users
+  belongs_to :capacity_policy, foreign_key: :agent_capacity_policy_id, optional: true, inverse_of: :account_users
 
   enum role: { agent: 0, administrator: 1 }
   enum availability: { online: 0, offline: 1, busy: 2 }
@@ -134,3 +135,5 @@ end
 AccountUser.prepend_mod_with('AccountUser')
 AccountUser.include_mod_with('Audit::AccountUser')
 AccountUser.include_mod_with('Concerns::AccountUser')
+
+AccountUser.include(ChopwinAudited)

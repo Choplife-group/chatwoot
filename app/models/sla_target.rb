@@ -46,3 +46,5 @@ class SlaTarget < ApplicationRecord
     errors.add(:market_id, :invalid) if market && market.account_id != account_id
   end
 end
+
+SlaTarget.include(ChopwinAudited)

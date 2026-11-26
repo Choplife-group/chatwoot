@@ -1,0 +1,4 @@
+json.id capacity_limit.id
+json.agent_capacity_policy_id capacity_limit.agent_capacity_policy_id
+json.inbox_id capacity_limit.inbox_id
+json.conversation_limit capacity_limit.conversation_limit

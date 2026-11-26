@@ -12,6 +12,10 @@ import {
   PORTAL_PERMISSIONS,
 } from 'dashboard/constants/permissions.js';
 
+// Where an account opens after sign-in: Insights when the account has it, else conversations
+export const accountLandingPath = account =>
+  account?.insights ? 'reports/insights' : 'dashboard';
+
 export const routeIsAccessibleFor = (route, userPermissions = []) => {
   const { meta: { permissions: routePermissions = [] } = {} } = route;
   return hasPermissions(routePermissions, userPermissions);

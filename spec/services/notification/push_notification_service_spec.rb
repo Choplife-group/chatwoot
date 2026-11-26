@@ -29,6 +29,17 @@ describe Notification::PushNotificationService do
         end
       end
 
+      it 'includes the message preview in the webpush payload' do
+        with_modified_env VAPID_PUBLIC_KEY: 'test' do
+          create(:notification_subscription, user: notification.user)
+
+          described_class.new(notification: notification).perform
+          expect(WebPush).to have_received(:payload_send) do |payload|
+            expect(JSON.parse(payload[:message])['body']).to eq(notification.push_message_body)
+          end
+        end
+      end
+
       it 'sends a fcm notification for firebase subscription' do
         with_modified_env ENABLE_PUSH_RELAY_SERVER: 'false' do
           create(:notification_subscription, user: notification.user, subscription_type: 'fcm')

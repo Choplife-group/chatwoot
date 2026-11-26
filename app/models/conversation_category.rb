@@ -87,3 +87,5 @@ class ConversationCategory < ApplicationRecord
     errors.add(:parent_id, :invalid) if parent_id_changed?
   end
 end
+
+ConversationCategory.include(ChopwinAudited)

@@ -41,3 +41,5 @@ class SupportRole < ApplicationRecord
     errors.add(:permissions, :invalid) if (permissions - PERMISSIONS).present?
   end
 end
+
+SupportRole.include(ChopwinAudited)
