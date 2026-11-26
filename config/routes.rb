@@ -161,8 +161,9 @@ Rails.application.routes.draw do
           end
           resources :sla_policies, only: [:index, :create, :show, :update, :destroy]
           resources :custom_roles, controller: 'support_roles', only: [:index, :create, :show, :update, :destroy]
-          resources :agent_capacity_policies, only: [:index, :create, :show, :update, :destroy] do
-            scope module: :agent_capacity_policies do
+          # Choplife fork: served by our CapacityPolicies controllers (enterprise/ is stripped from the CE build)
+          resources :agent_capacity_policies, controller: 'capacity_policies', only: [:index, :create, :show, :update, :destroy] do
+            scope module: :capacity_policies do
               resources :users, only: [:index, :create, :destroy]
               resources :inbox_limits, only: [:create, :update, :destroy]
             end
