@@ -12,8 +12,8 @@
 #
 # Indexes
 #
-#  index_custom_roles_on_account_id  (account_id)
-#
+#  index_custom_roles_on_account_id           (account_id)
+#  index_custom_roles_on_account_id_and_name  (account_id,name) UNIQUE
 #
 
 # Available permissions for custom roles:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_14_090000) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_14_090000) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -513,8 +513,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_14_090000) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_captain_faq_suggestions_on_account_id"
     t.index ["account_id", "assistant_id", "status", "language"], name: "idx_cap_faq_suggestions_on_account_assistant_status_language"
+    t.index ["account_id"], name: "index_captain_faq_suggestions_on_account_id"
     t.index ["assistant_id"], name: "index_captain_faq_suggestions_on_assistant_id"
     t.index ["embedding"], name: "vector_idx_captain_faq_suggestions_embedding", opclass: :vector_cosine_ops, using: :ivfflat
   end
@@ -757,8 +757,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_14_090000) do
     t.jsonb "phone_number_health", default: {}, null: false
     t.datetime "phone_number_health_checked_at"
     t.string "phone_number_health_error", limit: 500
-    t.index ["phone_number_health_checked_at"], name: "index_channel_whatsapp_on_phone_number_health_checked_at"
     t.index ["phone_number"], name: "index_channel_whatsapp_on_phone_number", unique: true
+    t.index ["phone_number_health_checked_at"], name: "index_channel_whatsapp_on_phone_number_health_checked_at"
   end
 
   create_table "companies", force: :cascade do |t|
@@ -824,6 +824,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_14_090000) do
     t.index ["identifier", "account_id"], name: "uniq_identifier_per_account_contact", unique: true
     t.index ["name", "email", "phone_number", "identifier"], name: "index_contacts_on_name_email_phone_number_identifier", opclass: :gin_trgm_ops, using: :gin
     t.index ["phone_number", "account_id"], name: "index_contacts_on_phone_number_and_account_id"
+  end
+
+  create_table "conversation_categories", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "parent_id"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "depth", default: 1, null: false
+    t.integer "ancestor_ids", default: [], null: false, array: true
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "parent_id", "name"], name: "idx_on_account_id_parent_id_name_589e5e71b2", unique: true
+    t.index ["ancestor_ids"], name: "index_conversation_categories_on_ancestor_ids", using: :gin
   end
 
   create_table "conversation_monitor_automation_deliveries", force: :cascade do |t|
@@ -969,20 +983,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_14_090000) do
     t.index ["inbox_id"], name: "index_conversation_outcomes_on_inbox_id"
   end
 
-  create_table "conversation_categories", force: :cascade do |t|
-    t.bigint "account_id", null: false
-    t.bigint "parent_id"
-    t.string "name", null: false
-    t.integer "position", default: 0, null: false
-    t.integer "depth", default: 1, null: false
-    t.integer "ancestor_ids", default: [], null: false, array: true
-    t.datetime "archived_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["account_id", "parent_id", "name"], name: "idx_on_account_id_parent_id_name_589e5e71b2", unique: true
-    t.index ["ancestor_ids"], name: "index_conversation_categories_on_ancestor_ids", using: :gin
-  end
-
   create_table "conversation_participants", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "user_id", null: false
@@ -1027,9 +1027,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_14_090000) do
     t.bigint "market_id"
     t.bigint "category_id"
     t.boolean "vip", default: false, null: false
+    t.index ["account_id", "category_id"], name: "index_conversations_on_account_id_and_category_id"
     t.index ["account_id", "display_id"], name: "index_conversations_on_account_id_and_display_id", unique: true
     t.index ["account_id", "id"], name: "index_conversations_on_id_and_account_id"
-    t.index ["account_id", "category_id"], name: "index_conversations_on_account_id_and_category_id"
     t.index ["account_id", "inbox_id", "status", "assignee_id"], name: "conv_acid_inbid_stat_asgnid_idx"
     t.index ["account_id", "market_id"], name: "index_conversations_on_account_id_and_market_id"
     t.index ["account_id", "status", "created_at"], name: "index_conversations_on_account_id_status_created_at"
@@ -1233,10 +1233,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_14_090000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "inbox_id"
-    t.index ["account_id", "name", "template_type", "locale"], name: "index_email_templates_on_account_scope", unique: true, where: "(account_id IS NOT NULL) AND (inbox_id IS NULL)"
+    t.index ["account_id", "name", "template_type", "locale"], name: "index_email_templates_on_account_scope", unique: true, where: "((account_id IS NOT NULL) AND (inbox_id IS NULL))"
     t.index ["inbox_id", "name", "template_type", "locale"], name: "index_email_templates_on_inbox_scope", unique: true, where: "(inbox_id IS NOT NULL)"
     t.index ["inbox_id"], name: "index_email_templates_on_inbox_id"
-    t.index ["name", "template_type", "locale"], name: "index_email_templates_on_installation_scope", unique: true, where: "(account_id IS NULL) AND (inbox_id IS NULL)"
+    t.index ["name", "template_type", "locale"], name: "index_email_templates_on_installation_scope", unique: true, where: "((account_id IS NULL) AND (inbox_id IS NULL))"
   end
 
   create_table "folders", force: :cascade do |t|
