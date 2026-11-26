@@ -84,6 +84,17 @@ export function extractChangedAccountUserValues(auditedChanges) {
     );
   }
 
+  // Choplife fork: custom role and capacity policy, shown by id ("none" when cleared)
+  [
+    ['custom_role_id', 'custom role'],
+    ['agent_capacity_policy_id', 'capacity policy'],
+  ].forEach(([key, label]) => {
+    if (!(key in auditedChanges)) return;
+    const id = extractAttrChange(auditedChanges[key]);
+    changes.push(label);
+    values.push(id ? `#${id}` : 'none');
+  });
+
   return { changes, values };
 }
 
