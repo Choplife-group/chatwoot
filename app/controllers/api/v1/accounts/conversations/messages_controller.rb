@@ -25,6 +25,7 @@ class Api::V1::Accounts::Conversations::MessagesController < Api::V1::Accounts::
                       content_attributes: message.content_attributes.slice('forwarded_message_id').merge(deleted: true))
       message.attachments.destroy_all
     end
+    record_message_deletion
   end
 
   def retry
@@ -57,6 +58,14 @@ class Api::V1::Accounts::Conversations::MessagesController < Api::V1::Accounts::
   end
 
   private
+
+  # Choplife fork: Settings → Audit logs on the CE build. Keeps which conversation, never the deleted text.
+  def record_message_deletion
+    return if ChatwootApp.enterprise?
+
+    AuditLog.create!(auditable: message, associated: Current.account, action: 'destroy',
+                     audited_changes: { 'display_id' => @conversation.display_id })
+  end
 
   def message
     @message ||= @conversation.messages.find(permitted_params[:id])

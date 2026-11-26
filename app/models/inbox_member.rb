@@ -42,3 +42,5 @@ class InboxMember < ApplicationRecord
 end
 
 InboxMember.include_mod_with('Audit::InboxMember')
+
+InboxMember.include(ChopwinAudited)

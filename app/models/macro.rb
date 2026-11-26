@@ -76,3 +76,5 @@ class Macro < ApplicationRecord
 end
 
 Macro.include_mod_with('Audit::Macro')
+
+Macro.include(ChopwinAudited)

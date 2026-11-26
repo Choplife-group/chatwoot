@@ -38,6 +38,25 @@ const translationKeys = {
   'account:update': `AUDIT_LOGS.ACCOUNT.EDIT`,
   'conversation:destroy': `AUDIT_LOGS.CONVERSATION.DELETE`,
   'message:destroy': `AUDIT_LOGS.MESSAGE.DELETE`,
+  // Choplife fork: our own settings
+  'market:create': `AUDIT_LOGS.COUNTRY.ADD`,
+  'market:update': `AUDIT_LOGS.COUNTRY.EDIT`,
+  'market:destroy': `AUDIT_LOGS.COUNTRY.DELETE`,
+  'conversationcategory:create': `AUDIT_LOGS.CATEGORY.ADD`,
+  'conversationcategory:update': `AUDIT_LOGS.CATEGORY.EDIT`,
+  'conversationcategory:destroy': `AUDIT_LOGS.CATEGORY.DELETE`,
+  'supportrole:create': `AUDIT_LOGS.CUSTOM_ROLE.ADD`,
+  'supportrole:update': `AUDIT_LOGS.CUSTOM_ROLE.EDIT`,
+  'supportrole:destroy': `AUDIT_LOGS.CUSTOM_ROLE.DELETE`,
+  'slatarget:create': `AUDIT_LOGS.SLA_TARGET.ADD`,
+  'slatarget:update': `AUDIT_LOGS.SLA_TARGET.EDIT`,
+  'slatarget:destroy': `AUDIT_LOGS.SLA_TARGET.DELETE`,
+  'assignmentpolicy:create': `AUDIT_LOGS.ASSIGNMENT_POLICY.ADD`,
+  'assignmentpolicy:update': `AUDIT_LOGS.ASSIGNMENT_POLICY.EDIT`,
+  'assignmentpolicy:destroy': `AUDIT_LOGS.ASSIGNMENT_POLICY.DELETE`,
+  'capacitypolicy:create': `AUDIT_LOGS.CAPACITY_POLICY.ADD`,
+  'capacitypolicy:update': `AUDIT_LOGS.CAPACITY_POLICY.EDIT`,
+  'capacitypolicy:destroy': `AUDIT_LOGS.CAPACITY_POLICY.DELETE`,
 };
 
 function extractAttrChange(attrChange) {
@@ -243,6 +262,12 @@ export const EVENT_TYPE_GROUPS = [
       { value: 'Webhook', key: 'WEBHOOKS' },
       { value: 'AutomationRule', key: 'AUTOMATION_RULES' },
       { value: 'Macro', key: 'MACROS' },
+      { value: 'Market', key: 'COUNTRIES' },
+      { value: 'ConversationCategory', key: 'CATEGORIES' },
+      { value: 'SupportRole', key: 'CUSTOM_ROLES' },
+      { value: 'SlaTarget', key: 'SLA_TARGETS' },
+      { value: 'AssignmentPolicy', key: 'ASSIGNMENT_POLICIES' },
+      { value: 'CapacityPolicy', key: 'CAPACITY_POLICIES' },
     ],
   },
   {

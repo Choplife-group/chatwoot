@@ -31,3 +31,5 @@ class CapacityPolicy < ApplicationRecord
     errors.add(:exclusion_rules, 'exclude_older_than_hours must be a positive whole number')
   end
 end
+
+CapacityPolicy.include(ChopwinAudited)

@@ -143,7 +143,8 @@ Rails.application.routes.draw do
             end
           end
           resources :assignable_agents, only: [:index]
-          resource :audit_logs, only: [:show]
+          # Choplife fork: served by our ActivityLogsController (enterprise/ is stripped from the CE build)
+          resource :audit_logs, controller: 'activity_logs', only: [:show]
           resources :callbacks, only: [] do
             collection do
               post :register_facebook_page

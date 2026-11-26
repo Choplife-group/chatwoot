@@ -40,3 +40,5 @@ class AssignmentPolicy < ApplicationRecord
 end
 
 AssignmentPolicy.include_mod_with('Concerns::AssignmentPolicy')
+
+AssignmentPolicy.include(ChopwinAudited)

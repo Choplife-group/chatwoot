@@ -11,6 +11,8 @@ class DeviseOverrides::SessionsController < DeviseTokenAuth::SessionsController
   # same credentials a header-only request would authenticate with.
   before_action :merge_credential_headers, only: [:create]
   before_action :process_sso_auth_token, only: [:create]
+  # Choplife fork: sign-outs for Settings → Audit logs on the CE build (enterprise/ logs its own)
+  before_action :record_sign_out, only: [:destroy], unless: -> { ChatwootApp.enterprise? }
 
   def new
     redirect_to login_page_url(error: 'access-denied')
@@ -28,6 +30,7 @@ class DeviseOverrides::SessionsController < DeviseTokenAuth::SessionsController
 
   def render_create_success
     track_user_session unless @impersonation
+    AuditLog.record_session(@resource, 'sign_in', request) unless @impersonation || ChatwootApp.enterprise?
     if @backup_codes.present?
       render 'devise_overrides/sessions/create_with_backup_codes', formats: [:json]
     else
@@ -36,6 +39,10 @@ class DeviseOverrides::SessionsController < DeviseTokenAuth::SessionsController
   end
 
   private
+
+  def record_sign_out
+    AuditLog.record_session(current_user, 'sign_out', request) if current_user
+  end
 
   def render_create_error_not_confirmed
     render_error(

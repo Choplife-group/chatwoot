@@ -43,3 +43,5 @@ class Market < ApplicationRecord
     { id: id, name: name, code: code }
   end
 end
+
+Market.include(ChopwinAudited)
