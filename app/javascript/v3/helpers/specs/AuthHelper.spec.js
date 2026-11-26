@@ -25,6 +25,35 @@ describe('#URL Helpers', () => {
       ).toBe('/app/accounts/7500/conversations/752');
     });
 
+    it('should open Insights when the default account has it', () => {
+      expect(
+        getLoginRedirectURL({
+          user: {
+            account_id: 7500,
+            accounts: [
+              { id: 7499, insights: false },
+              { id: 7500, insights: true },
+            ],
+          },
+        })
+      ).toBe('/app/accounts/7500/reports/insights');
+    });
+
+    it('should open conversations when the chosen account has no Insights', () => {
+      expect(
+        getLoginRedirectURL({
+          ssoAccountId: '7499',
+          user: {
+            account_id: 7500,
+            accounts: [
+              { id: 7499, insights: false },
+              { id: 7500, insights: true },
+            ],
+          },
+        })
+      ).toBe('/app/accounts/7499/dashboard');
+    });
+
     it('should return default URL if account id is not present', () => {
       expect(getLoginRedirectURL({ ssoAccountId: '7500', user: {} })).toBe(
         '/app/'
