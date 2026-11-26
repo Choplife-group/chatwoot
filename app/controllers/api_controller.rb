@@ -17,9 +17,11 @@ class ApiController < ApplicationController
     'failing'
   end
 
+  # Connections open lazily, so `active?` is false until the first query; run one instead.
   def postgres_status
-    ActiveRecord::Base.connection.active? ? 'ok' : 'failing'
-  rescue ActiveRecord::ConnectionNotEstablished
+    ActiveRecord::Base.connection.select_value('SELECT 1')
+    'ok'
+  rescue ActiveRecord::ActiveRecordError
     'failing'
   end
 end
