@@ -5,6 +5,9 @@ self.addEventListener('push', event => {
 
   event.waitUntil(
     self.registration.showNotification(notification.title, {
+      body: notification.body,
+      icon: '/android-icon-192x192.png',
+      badge: '/android-icon-96x96.png',
       tag: notification.tag,
       data: {
         url: notification.url,
