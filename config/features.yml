@@ -41,7 +41,7 @@
   enabled: false
 - name: help_center
   display_name: Help Center
-  enabled: false
+  enabled: true
   help_url: https://chwt.app/hc/help-center
 - name: agent_bots
   display_name: Agent Bots
