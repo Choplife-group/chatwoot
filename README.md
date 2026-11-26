@@ -137,3 +137,15 @@ Thanks goes to all these [wonderful people](https://www.chatwoot.com/docs/contri
 
 
 *Chatwoot* &copy; 2017-2026, Chatwoot Inc - Released under the MIT License.
+
+
+start app
+overmind start -f Procfile.dev
+
+- Email: john@acme.inc
+- Password: Password1!
+
+
+to stop unneccessary chatwoot request to the server
+DISABLE_TELEMETRY=true
+ENABLE_PUSH_RELAY_SERVER=false
